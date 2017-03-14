@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Phone Calls Blocker</string>
+    <string name="menu_settings">Ustawienia</string>
+    <string name="title_activity_main">Blokowanie połączeń</string>
 </resources>
