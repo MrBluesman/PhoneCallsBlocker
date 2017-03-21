@@ -1,5 +1,9 @@
 package com.example.ukasz.phonecallsblocker;
 
+import com.example.ukasz.androidsqlite.Block;
+import com.example.ukasz.androidsqlite.DatabaseHandler;
+
+
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -9,6 +13,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Switch;
 import android.widget.TextView;
+
+import java.util.List;
 
 /**
  * Created by Łukasz Parysek on 2017-03-05.
@@ -62,6 +68,40 @@ public class MainActivity extends AppCompatActivity
                 editDataSettings.commit();
             }
         });
+
+
+        //DATABASE IMPLEMENTATION TESTING
+        DatabaseHandler db = new DatabaseHandler(this);
+        //Insertings blocks
+        Log.d("Insert: ", "Inserting..");
+        //db.addBlocking(new Block("123456789", "234567890", 0, "a", true));
+        //db.addBlocking(new Block("123456789", "534567890", 1, "bb", false));
+
+        //Reading all blocks
+        Log.d("Read: ", "Reading..");
+        List<Block> blockings = db.getAllBlockings();
+        TextView textViewTestowy2 = (TextView) findViewById(R.id.textView2);
+        String caly = "";
+
+        for(Block b: blockings)
+        {
+            String log = "Blokujący: " + b.getNrDeclarant() + ", Blokowany: " + b.getNrBlocked() +
+                    ", Kategoria: " + b.getReasonCategory() + ", Opis: " + b.getReasonDescription()
+                    + ", czyNegatywny: " + b.getNrRating();
+
+            Log.d("Name: ", log);
+            caly+= log + "\n";
+            textViewTestowy2.setText(caly);
+        }
+
+        //db.updateCategories();
+//
+//        List<String> categories = db.getAllCategories();
+//        for(String c: categories)
+//        {
+//            caly+= c + "\n";
+//            textViewTestowy2.setText(caly);
+//        }
     }
 
     /**
