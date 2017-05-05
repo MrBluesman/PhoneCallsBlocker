@@ -27,6 +27,8 @@ public class MainActivity extends AppCompatActivity
      */
     private boolean detectEnabled;
     private Switch blockServiceSwitch;
+    private boolean autoBlockEnabled;
+    private Switch autoBlockSwitch;
     //textView TESTOWY
     private TextView textViewTestowy;
     public SharedPreferences data;
@@ -40,15 +42,22 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+        Log.e("test","MainActivity - onStart() method");
         setContentView(R.layout.activity_main);
 
         //Switch to enable/disable blocking
         blockServiceSwitch = (Switch) findViewById(R.id.switch1_block_service);
+        autoBlockSwitch = (Switch) findViewById(R.id.switch2_automatic_block);
         //Testowy text Views
         textViewTestowy = (TextView) findViewById(R.id.textView);
 
         //load data settings
         loadSettingsState();
+
+        Intent intent = new Intent(this, CallDetectService.class);
+
+        stopService(intent);
+        setDetectEnabled(detectEnabled);
 
         //Click listener for enable or disable phone calls catching
         blockServiceSwitch.setOnClickListener(new View.OnClickListener()
@@ -69,13 +78,33 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
+        //Click listener for enable or disable phone calls catching
+        autoBlockSwitch.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                autoBlockSwitch.setChecked(!autoBlockEnabled);
+                autoBlockEnabled = !autoBlockEnabled;
+                //textViewTestowy.setText(Boolean.toString(detectEnabled));
+
+                //Save setting in SharedPreferences
+                data = getSharedPreferences("data", Context.MODE_PRIVATE);
+                SharedPreferences.Editor editDataSettings = data.edit();
+                editDataSettings.putBoolean("autoBlockEnabled", autoBlockEnabled);
+                editDataSettings.commit();
+            }
+        });
+
 
         //DATABASE IMPLEMENTATION TESTING
         DatabaseHandler db = new DatabaseHandler(this);
         //Insertings blocks
         Log.d("Insert: ", "Inserting..");
-        //db.addBlocking(new Block("123456789", "234567890", 0, "a", true));
-        //db.addBlocking(new Block("123456789", "534567890", 1, "bb", false));
+        //db.addBlocking(new Block("721315333", "665693959", 0, "a", true));
+        //db.addBlocking(new Block("721315345", "665693959", 0, "a", true));
+        //db.deleteBlocking(new Block("721315778", "665693959", 0, "a", true));
+        //db.deleteBlocking(new Block("+48721315778", "665693959", 0, "a", true));
 
         //Reading all blocks
         Log.d("Read: ", "Reading..");
@@ -111,7 +140,7 @@ public class MainActivity extends AppCompatActivity
     protected void onResume()
     {
         super.onResume();
-        //Log.e("test","MainActivity - onResume() method");
+        Log.e("test","MainActivity - onResume() method");
         //loadSettingsState();
     }
 
@@ -123,7 +152,7 @@ public class MainActivity extends AppCompatActivity
     {
         super.onRestart();
         Log.e("test","MainActivity - onRestart() method");
-        loadSettingsState();
+        //loadSettingsState();
     }
 
 
@@ -136,10 +165,11 @@ public class MainActivity extends AppCompatActivity
         //load data settings
         data = getSharedPreferences("data", Context.MODE_PRIVATE);
         detectEnabled = data.getBoolean("detectEnabled", false);
+        autoBlockEnabled = data.getBoolean("autoBlockEnabled", false);
         blockServiceSwitch.setChecked(detectEnabled);
+        autoBlockSwitch.setChecked(autoBlockEnabled);
         textViewTestowy.setText(Boolean.toString(detectEnabled));
-        //set or unset detecting service by this method
-        setDetectEnabled(detectEnabled);
+        //set or unset detecting service by this method;
     }
 
     /**
@@ -176,7 +206,7 @@ public class MainActivity extends AppCompatActivity
         {
             Log.e("test","MainActivity - START CallDetectService [method call]");
             //restart service
-            stopService(intent);
+            //stopService(intent);
             startService(intent);
         }
         else

@@ -5,14 +5,16 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * DatabaseHandler for keeping blocks in database
+ * Extends SQLiteOpenHelper
  * Created by Łukasz on 2017-03-20.
  */
-
 public class DatabaseHandler extends SQLiteOpenHelper
 {
     private static final int DATABASE_VERSION = 1;
@@ -32,12 +34,24 @@ public class DatabaseHandler extends SQLiteOpenHelper
     private static final String ID_KEY_T_C = "id";
     private static final String NAME_T_C = "name";
 
+    /**
+     * Constructor which create a new instance od DatabaseHandler by call extended super
+     * SQLiteOpenHelper
+     *
+     * @param context Context of application
+     */
     public DatabaseHandler(Context context)
     {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
 
+    /**
+     * Method which runs on creating a SQLite database
+     * Contains definition and structure of tables in database
+     *
+     * @param db Database which will be keeping SQLite tables defined in this method
+     */
     @Override
     public void onCreate(SQLiteDatabase db)
     {
@@ -67,6 +81,13 @@ public class DatabaseHandler extends SQLiteOpenHelper
         db.execSQL(createBlockingTable);
     }
 
+    /**
+     * Method which desroy database structure and creating new by call onCreate(db)
+     *
+     * @param db Database which will be upgraded
+     * @param oldVersion id of old database version
+     * @param newVersion id of new database version
+     */
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion)
     {
@@ -76,6 +97,11 @@ public class DatabaseHandler extends SQLiteOpenHelper
         onCreate(db);
     }
 
+    /**
+     * Method which adds a new blocking to database
+     *
+     * @param block Instance of block which will be add to database
+     */
     public void addBlocking(Block block)
     {
         SQLiteDatabase db = this.getWritableDatabase();
@@ -91,6 +117,13 @@ public class DatabaseHandler extends SQLiteOpenHelper
         db.close();
     }
 
+    /**
+     * Method which return Block instance from database
+     *
+     * @param nr_declarant Phone number of declarant
+     * @param nr_blocked Blocked phone number
+     * @return Block instance from database
+     */
     public Block getBlocking(String nr_declarant, String nr_blocked)
     {
         SQLiteDatabase db = this.getReadableDatabase();
@@ -113,6 +146,45 @@ public class DatabaseHandler extends SQLiteOpenHelper
 
     }
 
+    /**
+     * Method which returns a list of all blockings for blocked phone number
+     *
+     * @param nr_blocked Blocked phone number
+     * @return List of all Block instances for blocked number in database
+     */
+    public List<Block> getNumberBlockings(String nr_blocked)
+    {
+        SQLiteDatabase db = this.getReadableDatabase();
+        List<Block> toReturnList = new ArrayList<Block>();
+
+        String selectNumberBlockings = "SELECT * FROM " + TABLE_BLOCKING
+                + " WHERE " + BLOCKED_KEY_T_B + "=" + nr_blocked +";";
+
+        Cursor cursor = db.rawQuery(selectNumberBlockings, null);
+        if(cursor.moveToFirst())
+        {
+            do
+            {
+                Block block = new Block();
+                block.setNrDeclarant(cursor.getString(0));
+                block.setNrBlocked(cursor.getString(1));
+                block.setReasonCategory(Integer.parseInt(cursor.getString(2)));
+                block.setReasonDescription(cursor.getString(3));
+                block.setNrRating(Boolean.parseBoolean(cursor.getString(4)));
+
+                toReturnList.add(block);
+            }
+            while (cursor.moveToNext());
+        }
+
+        return toReturnList;
+    }
+
+    /**
+     * Methoch which returns all Block instances from database
+     *
+     * @return List of all Blocks instances from database
+     */
     public List<Block> getAllBlockings()
     {
         List<Block> toReturnList = new ArrayList<Block>();
@@ -140,15 +212,69 @@ public class DatabaseHandler extends SQLiteOpenHelper
         return toReturnList;
     }
 
-    public int getBlockingsCount()
+    /**
+     * Method which count blockings for block number
+     *
+     * @param nr_blocked Blocked phone number
+     * @return count of blockings for nr_blocked in database
+     */
+    public int getNumberBlockingsCount(String nr_blocked)
     {
-        String countBlockings = "SELECT * FROM " + TABLE_BLOCKING;
+        String countBlockings = "SELECT * FROM " + TABLE_BLOCKING
+                + " WHERE " + BLOCKED_KEY_T_B + "=" + nr_blocked +";";
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(countBlockings, null);
 
         return cursor.getCount();
     }
 
+
+    /**
+     * Method which checks if block exists in database
+     *
+     * @param block Block instance which will be checked if exist in database
+     * @return true if block exists or false if not exist
+     */
+    public boolean existBlock(Block block)
+    {
+
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        String selectBlockings = "SELECT * FROM " + TABLE_BLOCKING
+                + " WHERE " + DECLARANT_KEY_T_B + "=" + "'" + block.getNrDeclarant() + "'"
+                + " AND " + BLOCKED_KEY_T_B + "=" + "'" + block.getNrBlocked() + "'";
+
+        Log.d("Exist: ", block.getNrDeclarant());
+        Log.d("Exist: ", block.getNrBlocked());
+
+        Cursor cursor = db.rawQuery(selectBlockings, null);
+        boolean toReturn = cursor.getCount() > 0;
+
+        Log.d("Exist: ", ""+cursor.getCount());
+
+        return toReturn;
+    }
+
+    /**
+     * Method which returns count of all blockings in database
+     *
+     * @return count of all blockings in database
+     */
+    public int getBlockingsCount()
+    {
+        String countNumberBlockings = "SELECT * FROM " + TABLE_BLOCKING;
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(countNumberBlockings, null);
+
+        return cursor.getCount();
+    }
+
+    /**
+     * Method which update data for block in database
+     *
+     * @param block Block instance which will be updated
+     * @return 1 of updated, 0 if not updated
+     */
     public int updateBlocking(Block block)
     {
         SQLiteDatabase db = this.getWritableDatabase();
@@ -168,6 +294,11 @@ public class DatabaseHandler extends SQLiteOpenHelper
 
     }
 
+    /**
+     * Method which delete instance of block from database
+     *
+     * @param block Block instance which will be deleted from database
+     */
     public void deleteBlocking(Block block)
     {
         SQLiteDatabase db = this.getWritableDatabase();
@@ -178,6 +309,11 @@ public class DatabaseHandler extends SQLiteOpenHelper
         db.close();
     }
 
+    /**
+     * Method which returns count of all categories in database
+     *
+     * @return count of all categories in database
+     */
     public int getCategoriesCount()
     {
         String countCategories = "SELECT * FROM " + TABLE_CATEGORY;
@@ -186,6 +322,9 @@ public class DatabaseHandler extends SQLiteOpenHelper
         return cursor.getCount();
     }
 
+    /**
+     * Method which deletes all categories from database
+     */
     public void clearCategories()
     {
         SQLiteDatabase db = this.getWritableDatabase();
@@ -198,12 +337,18 @@ public class DatabaseHandler extends SQLiteOpenHelper
         db.execSQL(createCategoryTable);
     }
 
+    /**
+     * Method which update categories by clear and fill again
+     */
     public void updateCategories()
     {
         clearCategories();
         fillCategories();
     }
 
+    /**
+     * Method which fill categories table in database with predefined categories
+     */
     public void fillCategories()
     {
         SQLiteDatabase db = this.getWritableDatabase();
@@ -212,6 +357,11 @@ public class DatabaseHandler extends SQLiteOpenHelper
         db.execSQL(fillCategory);
     }
 
+    /**
+     * Method which returns list of all categories in database
+     *
+     * @return list of all categories in database (List of String)
+     */
     public List<String> getAllCategories()
     {
         List<String> toReturnList = new ArrayList<String>();
