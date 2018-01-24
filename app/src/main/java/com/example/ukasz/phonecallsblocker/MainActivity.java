@@ -4,9 +4,18 @@ import com.example.ukasz.androidsqlite.Block;
 import com.example.ukasz.androidsqlite.DatabaseHandler;
 
 
+import android.Manifest;
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.net.Uri;
+import android.os.Build;
+import android.provider.Settings;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -32,6 +41,9 @@ public class MainActivity extends AppCompatActivity
     //textView TESTOWY
     private TextView textViewTestowy;
     public SharedPreferences data;
+    //const Permissions
+    final private static int ACTION_MANAGE_OVERLAY_PERMISSION_REQUEST_CODE = 5555;
+    final private static int READ_PHONE_STATE_PERMISSION_REQUEST_CODE = 5556;
 
     /**
      * Method which runs on activity start and contains listener for switch,
@@ -45,17 +57,19 @@ public class MainActivity extends AppCompatActivity
         Log.e("test","MainActivity - onStart() method");
         setContentView(R.layout.activity_main);
 
+        //checkPermission for alerts over window (MANAGE OVERLAY PERMISSION)
+        checkManageOverlayPermission();
+
         //Switch to enable/disable blocking
-        blockServiceSwitch = (Switch) findViewById(R.id.switch1_block_service);
-        autoBlockSwitch = (Switch) findViewById(R.id.switch2_automatic_block);
+        blockServiceSwitch = findViewById(R.id.switch1_block_service);
+        autoBlockSwitch = findViewById(R.id.switch2_automatic_block);
         //Testowy text Views
-        textViewTestowy = (TextView) findViewById(R.id.textView);
+        textViewTestowy = findViewById(R.id.textView);
 
         //load data settings
         loadSettingsState();
 
         Intent intent = new Intent(this, CallDetectService.class);
-
         stopService(intent);
         setDetectEnabled(detectEnabled);
 
@@ -74,7 +88,7 @@ public class MainActivity extends AppCompatActivity
                 data = getSharedPreferences("data", Context.MODE_PRIVATE);
                 SharedPreferences.Editor editDataSettings = data.edit();
                 editDataSettings.putBoolean("detectEnabled", detectEnabled);
-                editDataSettings.commit();
+                editDataSettings.apply(); //commit
             }
         });
 
@@ -92,7 +106,7 @@ public class MainActivity extends AppCompatActivity
                 data = getSharedPreferences("data", Context.MODE_PRIVATE);
                 SharedPreferences.Editor editDataSettings = data.edit();
                 editDataSettings.putBoolean("autoBlockEnabled", autoBlockEnabled);
-                editDataSettings.commit();
+                editDataSettings.apply(); //commit
             }
         });
 
@@ -109,7 +123,7 @@ public class MainActivity extends AppCompatActivity
         //Reading all blocks
         Log.d("Read: ", "Reading..");
         List<Block> blockings = db.getAllBlockings();
-        TextView textViewTestowy2 = (TextView) findViewById(R.id.textView2);
+        TextView textViewTestowy2 = findViewById(R.id.textView2);
         String caly = "";
 
         for(Block b: blockings)
@@ -200,6 +214,9 @@ public class MainActivity extends AppCompatActivity
     private void setDetectEnabled(boolean enable)
     {
         detectEnabled = enable;
+        Log.e("setDetectEnabled", "method enabled");
+
+        checkReadPhoneStatePermission();
 
         Intent intent = new Intent(this, CallDetectService.class);
         if (enable)
@@ -215,4 +232,82 @@ public class MainActivity extends AppCompatActivity
             stopService(intent);
         }
     }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           @NonNull String permissions[], @NonNull int[] grantResults)
+    {
+        switch (requestCode) {
+            case READ_PHONE_STATE_PERMISSION_REQUEST_CODE: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+                {
+
+                    // permission was granted, yay! Do the
+                    // contacts-related task you need to do.
+
+                }
+                else
+                {
+
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                }
+            }
+        }
+    }
+
+    public void checkReadPhoneStatePermission()
+    {
+        // Here, thisActivity is the current activity
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE)
+                != PackageManager.PERMISSION_GRANTED)
+        {
+            // Should we show an explanation?
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    Manifest.permission.READ_PHONE_STATE))
+            {
+                // Show an explanation to the user *asynchronously* -- don't block
+                // this thread waiting for the user's response! After the user
+                // sees the explanation, try again to request the permission.
+            }
+            else
+            {
+                // No explanation needed, we can request the permission.
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.READ_PHONE_STATE},
+                        READ_PHONE_STATE_PERMISSION_REQUEST_CODE);
+            }
+        }
+    }
+    public void checkManageOverlayPermission()
+    {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+        {
+            if (!Settings.canDrawOverlays(this))
+            {
+                Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                        Uri.parse("package:" + getPackageName()));
+                startActivityForResult(intent, ACTION_MANAGE_OVERLAY_PERMISSION_REQUEST_CODE);
+            }
+        }
+    }
+
+    @TargetApi(Build.VERSION_CODES.M)
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == ACTION_MANAGE_OVERLAY_PERMISSION_REQUEST_CODE)
+        {
+            if (!Settings.canDrawOverlays(this))
+            {
+                // You don't have permission
+                checkManageOverlayPermission();
+
+            }
+        }
+    }
+
 }
