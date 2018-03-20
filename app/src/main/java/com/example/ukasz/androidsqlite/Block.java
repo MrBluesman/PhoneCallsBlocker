@@ -15,7 +15,7 @@ public class Block
     /**
      * Instance of Block Constructor
      */
-    public Block()
+    Block()
     {
 
     }

@@ -82,7 +82,7 @@ public class DatabaseHandler extends SQLiteOpenHelper
     }
 
     /**
-     * Method which desroy database structure and creating new by call onCreate(db)
+     * Method which destroys database structure and creating new by call onCreate(db)
      *
      * @param db Database which will be upgraded
      * @param oldVersion id of old database version
@@ -139,11 +139,9 @@ public class DatabaseHandler extends SQLiteOpenHelper
             cursor.moveToFirst();
         }
 
-        Block toReturn = new Block(cursor.getString(0), cursor.getString(1), Integer.parseInt(cursor.getString(2)),
+        assert cursor != null;
+        return new Block(cursor.getString(0), cursor.getString(1), Integer.parseInt(cursor.getString(2)),
                 cursor.getString(3), Boolean.parseBoolean(cursor.getString(4)));
-
-        return toReturn;
-
     }
 
     /**
@@ -155,7 +153,7 @@ public class DatabaseHandler extends SQLiteOpenHelper
     public List<Block> getNumberBlockings(String nr_blocked)
     {
         SQLiteDatabase db = this.getReadableDatabase();
-        List<Block> toReturnList = new ArrayList<Block>();
+        List<Block> toReturnList = new ArrayList<>();
 
         String selectNumberBlockings = "SELECT * FROM " + TABLE_BLOCKING
                 + " WHERE " + BLOCKED_KEY_T_B + "=" + nr_blocked +";";
@@ -181,7 +179,7 @@ public class DatabaseHandler extends SQLiteOpenHelper
     }
 
     /**
-     * Methoch which returns all Block instances from database
+     * Method which returns all Block instances from database
      *
      * @return List of all Blocks instances from database
      */

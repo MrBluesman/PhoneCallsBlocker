@@ -2,4 +2,36 @@
     <string name="app_name">Phone Calls Blocker</string>
     <string name="menu_settings">Ustawienia</string>
     <string name="title_activity_main">Blokowanie połączeń</string>
+    <string name="title_activity_permissions_startup">Uprawnienia</string>
+
+    <!-- Strings related to MainActivity -->
+    <string name="main_activity_block_switch">Blokowanie połączeń</string>
+    <string name="main_activity_autoblock_switch">Blokowanie automatyczne z listy</string>
+
+    <!-- Strings related to PermissionsStartupActivity -->
+    <string name="permissions_startup_activity_header">
+        Do korzystania z aplikacji potrzebujemy Twojego pozwolenia.
+    </string>
+    <string name="permissions_startup_activity_phone_checkbox_header">
+        Połączenia telefoniczne
+    </string>
+    <string name="permissions_startup_activity_phone_checkbox_description">
+        Aby móc przechwytywać przychodzące numery, które chcesz zablokować lub pozytywnie ocenić.
+    </string>
+    <string name="permissions_startup_activity_phone_checkbox_warning">
+        Stuknij ZEZWÓL na pytanie o Telefon
+    </string>
+    <string name="permissions_startup_activity_windows_checkbox_header">
+        Wyskakujące okienka
+    </string>
+    <string name="permissions_startup_activity_windows_checkbox_description">
+        Aby móc wyświetlić odpowiednie opcje na ekranie do obsłużenia połączenia dla Ciebie.
+    </string>
+    <string name="permissions_startup_activity_windows_checkbox_warning">
+        Stuknij ZEZWÓL na pytanie o Wyskakujące okienka
+    </string>
+    <string name="permissions_startup_activity_accept_button">
+        Przyznaj dostęp
+    </string>
+
 </resources>

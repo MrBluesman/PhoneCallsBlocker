@@ -16,7 +16,7 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.NotificationCompat;
+//import android.support.v7.app.NotificationCompat;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.util.Log;
@@ -62,7 +62,7 @@ public class CallDetector
 //-------------------------------------------------------------------------
                     Log.e("test", "CallDetector - onCallStateChanged() method in CALL STATE LISTENER");
                     Toast.makeText(ctx,"Połączenie przychodzące: "+incomingNumber, Toast.LENGTH_LONG).show();
-                    createNotification(incomingNumber);
+//                    createNotification(incomingNumber);
                     Log.e("incomingNumber", incomingNumber);
 
                     final DatabaseHandler db = new DatabaseHandler(ctx);
@@ -242,7 +242,7 @@ public class CallDetector
             Log.e("test", "CallDetector - onReceive() method on OUTGOING RECEIVER");
             String outgoingNumber = intent.getStringExtra(Intent.EXTRA_PHONE_NUMBER);
             Toast.makeText(ctx,"Połączenie wychodzące: "+outgoingNumber, Toast.LENGTH_LONG).show();
-            createNotification(outgoingNumber);
+//            createNotification(outgoingNumber);
 
 
         }
@@ -299,30 +299,30 @@ public class CallDetector
 
 
 
-    /**
-     *  This method creating a notification
-     *
-     * @param phoneNumber   phone number which we wants to show in notification
-     */
-    private void createNotification(String phoneNumber)
-    {
-        //Bitmap icon = BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher);
-
-        Notification noti = new NotificationCompat.Builder(ctx)
-                .setContentTitle("Nowe połączenie")
-                .setContentText(phoneNumber)
-                //.setTicker("Masz wiadomość")
-                .setSmallIcon(android.R.drawable.ic_dialog_info)
-                //.setLargeIcon(icon)
-                .setAutoCancel(true)
-                //.setContentIntent(pIntent)
-                .build();
-
-        NotificationManager notificationManager = (NotificationManager) ctx.getSystemService(NOTIFICATION_SERVICE);
-
-
-        notificationManager.notify(0, noti);
-    }
+//    /**
+//     *  This method creating a notification
+//     *
+//     * @param phoneNumber   phone number which we wants to show in notification
+//     */
+//    private void createNotification(String phoneNumber)
+//    {
+//        //Bitmap icon = BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher);
+//
+//        Notification noti = new NotificationCompat.Builder(ctx)
+//                .setContentTitle("Nowe połączenie")
+//                .setContentText(phoneNumber)
+//                //.setTicker("Masz wiadomość")
+//                .setSmallIcon(android.R.drawable.ic_dialog_info)
+//                //.setLargeIcon(icon)
+//                .setAutoCancel(true)
+//                //.setContentIntent(pIntent)
+//                .build();
+//
+//        NotificationManager notificationManager = (NotificationManager) ctx.getSystemService(NOTIFICATION_SERVICE);
+//
+//
+//        notificationManager.notify(0, noti);
+//    }
 
 
 

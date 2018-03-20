@@ -22,7 +22,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Switch;
 import android.widget.TextView;
-
 import java.util.List;
 
 /**
@@ -34,21 +33,21 @@ public class MainActivity extends AppCompatActivity
     /**
      * MainActivity local variables
      */
-    private boolean detectEnabled;
+    private static boolean detectEnabled;
     private Switch blockServiceSwitch;
-    private boolean autoBlockEnabled;
+    private static boolean autoBlockEnabled;
     private Switch autoBlockSwitch;
     //textView TESTOWY
     private TextView textViewTestowy;
     public SharedPreferences data;
-    //const Permissions
+
     final private static int ACTION_MANAGE_OVERLAY_PERMISSION_REQUEST_CODE = 5555;
-    final private static int READ_PHONE_STATE_PERMISSION_REQUEST_CODE = 5556;
+
 
     /**
      * Method which runs on activity start and contains listener for switch,
      * which enable or disable phone calls catching
-     * @param savedInstanceState saved app instance state
+     * @param savedInstanceState saved app instances state
      */
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -57,21 +56,17 @@ public class MainActivity extends AppCompatActivity
         Log.e("test","MainActivity - onStart() method");
         setContentView(R.layout.activity_main);
 
-        //checkPermission for alerts over window (MANAGE OVERLAY PERMISSION)
+        //Check permission for alerts over window (MANAGE OVERLAY PERMISSION)
         checkManageOverlayPermission();
 
-        //Switch to enable/disable blocking
+        //Switcher to enable/disable blocking
         blockServiceSwitch = findViewById(R.id.switch1_block_service);
         autoBlockSwitch = findViewById(R.id.switch2_automatic_block);
-        //Testowy text Views
+        //Tests text Views
         textViewTestowy = findViewById(R.id.textView);
 
-        //load data settings
+        //load data settings (saved in shared preferences)
         loadSettingsState();
-
-        Intent intent = new Intent(this, CallDetectService.class);
-        stopService(intent);
-        setDetectEnabled(detectEnabled);
 
         //Click listener for enable or disable phone calls catching
         blockServiceSwitch.setOnClickListener(new View.OnClickListener()
@@ -111,7 +106,7 @@ public class MainActivity extends AppCompatActivity
         });
 
 
-        //DATABASE IMPLEMENTATION TESTING
+        //DATABASE IMPLEMENTATION TESTING ---------------------------------------------------------
         DatabaseHandler db = new DatabaseHandler(this);
         //Insertings blocks
         Log.d("Insert: ", "Inserting..");
@@ -137,14 +132,7 @@ public class MainActivity extends AppCompatActivity
             textViewTestowy2.setText(caly);
         }
 
-        //db.updateCategories();
-//
-//        List<String> categories = db.getAllCategories();
-//        for(String c: categories)
-//        {
-//            caly+= c + "\n";
-//            textViewTestowy2.setText(caly);
-//        }
+        //----------------------------------------------------------------------------------------
     }
 
     /**
@@ -183,7 +171,10 @@ public class MainActivity extends AppCompatActivity
         blockServiceSwitch.setChecked(detectEnabled);
         autoBlockSwitch.setChecked(autoBlockEnabled);
         textViewTestowy.setText(Boolean.toString(detectEnabled));
-        //set or unset detecting service by this method;
+
+        Log.e("Loading data","MainActivity - loadSettingsState() method");
+
+        setDetectEnabled(detectEnabled);
     }
 
     /**
@@ -216,14 +207,21 @@ public class MainActivity extends AppCompatActivity
         detectEnabled = enable;
         Log.e("setDetectEnabled", "method enabled");
 
-        checkReadPhoneStatePermission();
+
+        //Checking permission to catch the incoming calls
+//        checkReadPhoneStatePermission();
+
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE)
+                == PackageManager.PERMISSION_GRANTED)
+        {
+            Log.e("CZY TAK?", "OH YEAH");
+        }
 
         Intent intent = new Intent(this, CallDetectService.class);
         if (enable)
         {
             Log.e("test","MainActivity - START CallDetectService [method call]");
-            //restart service
-            //stopService(intent);
             startService(intent);
         }
         else
@@ -233,58 +231,67 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           @NonNull String permissions[], @NonNull int[] grantResults)
-    {
-        switch (requestCode) {
-            case READ_PHONE_STATE_PERMISSION_REQUEST_CODE: {
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED)
-                {
+//    @Override
+//    public void onRequestPermissionsResult(int requestCode,
+//                                           @NonNull String permissions[], @NonNull int[] grantResults)
+//    {
+//        switch (requestCode) {
+//            case READ_PHONE_STATE_PERMISSION_REQUEST_CODE: {
+//                // If request is cancelled, the result arrays are empty.
+//                if (grantResults.length > 0
+//                        && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+//                {
+//
+//                    // permission was granted, yay! Do the
+//                    // contacts-related task you need to do.
+//
+//                }
+//                else
+//                {
+//
+//                    // permission denied, boo! Disable the
+//                    // functionality that depends on this permission.
+//                }
+//            }
+//        }
+//    }
 
-                    // permission was granted, yay! Do the
-                    // contacts-related task you need to do.
+//    /**
+//     *
+//     */
+//    public void checkReadPhoneStatePermission()
+//    {
+//        // Here, thisActivity is the current activity
+//        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE)
+//                != PackageManager.PERMISSION_GRANTED)
+//        {
+//            // Should we show an explanation?
+//            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+//                    Manifest.permission.READ_PHONE_STATE))
+//            {
+//                // Show an explanation to the user *asynchronously* -- don't block
+//                // this thread waiting for the user's response! After the user
+//                // sees the explanation, try again to request the permission.
+//            }
+//            else
+//            {
+//                // No explanation needed, we can request the permission.
+//                ActivityCompat.requestPermissions(this,
+//                        new String[]{Manifest.permission.READ_PHONE_STATE},
+//                        READ_PHONE_STATE_PERMISSION_REQUEST_CODE);
+//            }
+//        }
+//    }
 
-                }
-                else
-                {
-
-                    // permission denied, boo! Disable the
-                    // functionality that depends on this permission.
-                }
-            }
-        }
-    }
-
-    public void checkReadPhoneStatePermission()
-    {
-        // Here, thisActivity is the current activity
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE)
-                != PackageManager.PERMISSION_GRANTED)
-        {
-            // Should we show an explanation?
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-                    Manifest.permission.READ_PHONE_STATE))
-            {
-                // Show an explanation to the user *asynchronously* -- don't block
-                // this thread waiting for the user's response! After the user
-                // sees the explanation, try again to request the permission.
-            }
-            else
-            {
-                // No explanation needed, we can request the permission.
-                ActivityCompat.requestPermissions(this,
-                        new String[]{Manifest.permission.READ_PHONE_STATE},
-                        READ_PHONE_STATE_PERMISSION_REQUEST_CODE);
-            }
-        }
-    }
+    /**
+     * Checks manage overlay permission
+     * If the app doesn't have a permission the settings windows for set permission will be opened
+     */
     public void checkManageOverlayPermission()
     {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
         {
+            Log.e("Permissions","MainActivity - checkManageOverlayPermission() method");
             if (!Settings.canDrawOverlays(this))
             {
                 Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
