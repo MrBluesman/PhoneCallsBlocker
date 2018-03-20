@@ -41,9 +41,6 @@ public class MainActivity extends AppCompatActivity
     private TextView textViewTestowy;
     public SharedPreferences data;
 
-    final private static int ACTION_MANAGE_OVERLAY_PERMISSION_REQUEST_CODE = 5555;
-
-
     /**
      * Method which runs on activity start and contains listener for switch,
      * which enable or disable phone calls catching
@@ -57,7 +54,7 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
 
         //Check permission for alerts over window (MANAGE OVERLAY PERMISSION)
-        checkManageOverlayPermission();
+//        checkManageOverlayPermission();
 
         //Switcher to enable/disable blocking
         blockServiceSwitch = findViewById(R.id.switch1_block_service);
@@ -207,11 +204,6 @@ public class MainActivity extends AppCompatActivity
         detectEnabled = enable;
         Log.e("setDetectEnabled", "method enabled");
 
-
-        //Checking permission to catch the incoming calls
-//        checkReadPhoneStatePermission();
-
-
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE)
                 == PackageManager.PERMISSION_GRANTED)
         {
@@ -230,91 +222,4 @@ public class MainActivity extends AppCompatActivity
             stopService(intent);
         }
     }
-
-//    @Override
-//    public void onRequestPermissionsResult(int requestCode,
-//                                           @NonNull String permissions[], @NonNull int[] grantResults)
-//    {
-//        switch (requestCode) {
-//            case READ_PHONE_STATE_PERMISSION_REQUEST_CODE: {
-//                // If request is cancelled, the result arrays are empty.
-//                if (grantResults.length > 0
-//                        && grantResults[0] == PackageManager.PERMISSION_GRANTED)
-//                {
-//
-//                    // permission was granted, yay! Do the
-//                    // contacts-related task you need to do.
-//
-//                }
-//                else
-//                {
-//
-//                    // permission denied, boo! Disable the
-//                    // functionality that depends on this permission.
-//                }
-//            }
-//        }
-//    }
-
-//    /**
-//     *
-//     */
-//    public void checkReadPhoneStatePermission()
-//    {
-//        // Here, thisActivity is the current activity
-//        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE)
-//                != PackageManager.PERMISSION_GRANTED)
-//        {
-//            // Should we show an explanation?
-//            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-//                    Manifest.permission.READ_PHONE_STATE))
-//            {
-//                // Show an explanation to the user *asynchronously* -- don't block
-//                // this thread waiting for the user's response! After the user
-//                // sees the explanation, try again to request the permission.
-//            }
-//            else
-//            {
-//                // No explanation needed, we can request the permission.
-//                ActivityCompat.requestPermissions(this,
-//                        new String[]{Manifest.permission.READ_PHONE_STATE},
-//                        READ_PHONE_STATE_PERMISSION_REQUEST_CODE);
-//            }
-//        }
-//    }
-
-    /**
-     * Checks manage overlay permission
-     * If the app doesn't have a permission the settings windows for set permission will be opened
-     */
-    public void checkManageOverlayPermission()
-    {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
-        {
-            Log.e("Permissions","MainActivity - checkManageOverlayPermission() method");
-            if (!Settings.canDrawOverlays(this))
-            {
-                Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                        Uri.parse("package:" + getPackageName()));
-                startActivityForResult(intent, ACTION_MANAGE_OVERLAY_PERMISSION_REQUEST_CODE);
-            }
-        }
-    }
-
-    @TargetApi(Build.VERSION_CODES.M)
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data)
-    {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == ACTION_MANAGE_OVERLAY_PERMISSION_REQUEST_CODE)
-        {
-            if (!Settings.canDrawOverlays(this))
-            {
-                // You don't have permission
-                checkManageOverlayPermission();
-
-            }
-        }
-    }
-
 }

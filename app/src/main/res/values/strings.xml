@@ -21,6 +21,9 @@
     <string name="permissions_startup_activity_phone_checkbox_warning">
         Stuknij ZEZWÓL na pytanie o Telefon
     </string>
+    <string name="permissions_startup_activity_phone_checkbox_warning_nc">
+        Zaznacz pole obok na pytanie o Telefon
+    </string>
     <string name="permissions_startup_activity_windows_checkbox_header">
         Wyskakujące okienka
     </string>
@@ -29,6 +32,9 @@
     </string>
     <string name="permissions_startup_activity_windows_checkbox_warning">
         Stuknij ZEZWÓL na pytanie o Wyskakujące okienka
+    </string>
+    <string name="permissions_startup_activity_windows_checkbox_warning_nc">
+        Zaznacz pole obok na pytanie o Wyskakujące okienka
     </string>
     <string name="permissions_startup_activity_accept_button">
         Przyznaj dostęp
