@@ -13,7 +13,10 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Binder;
+import android.os.Build;
 import android.os.IBinder;
+import android.provider.Settings;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 //import android.support.v7.app.NotificationCompat;
@@ -50,6 +53,7 @@ public class CallDetector
          * @param state             Information about state from TelephonyManager
          * @param incomingNumber    Contains the number of incoming call
          */
+        @RequiresApi(api = Build.VERSION_CODES.M)
         @Override
         public void onCallStateChanged(int state, final String incomingNumber)
         {
@@ -85,91 +89,94 @@ public class CallDetector
                     }
                     else
                     {
-                        AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
-                        builder.setTitle(incomingNumber + " \n liczba zablokowań: " + db.getNumberBlockingsCount(incomingNumber));
-                        //builder.setMessage("aaa");
-                        builder.setItems(new CharSequence[]
-                                        {"Zablokuj i zapisz", "Zablokuj", "Przepuść"},
-                                new DialogInterface.OnClickListener()
-                                {
-                                    public void onClick(DialogInterface dialog, int which)
+                        if(Settings.canDrawOverlays(ctx))
+                        {
+                            AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
+                            builder.setTitle(incomingNumber + " \n liczba zablokowań: " + db.getNumberBlockingsCount(incomingNumber));
+                            //builder.setMessage("aaa");
+                            builder.setItems(new CharSequence[]
+                                            {"Zablokuj i zapisz", "Zablokuj", "Przepuść"},
+                                    new DialogInterface.OnClickListener()
                                     {
-                                        switch (which)
+                                        public void onClick(DialogInterface dialog, int which)
                                         {
-                                            case 0:
-                                                final List<String> categories = db.getAllCategories();
-                                                AlertDialog.Builder builder2 = new AlertDialog.Builder(ctx);
-                                                builder2.setTitle("Wybierz kategorię:");
-                                                CharSequence[] categoriesCharSequence = new CharSequence[categories.size()];
+                                            switch (which)
+                                            {
+                                                case 0:
+                                                    final List<String> categories = db.getAllCategories();
+                                                    AlertDialog.Builder builder2 = new AlertDialog.Builder(ctx);
+                                                    builder2.setTitle("Wybierz kategorię:");
+                                                    CharSequence[] categoriesCharSequence = new CharSequence[categories.size()];
 
-                                                int i=0;
-                                                for(String cat:categories)
-                                                {
-                                                    categoriesCharSequence[i] = cat;
-                                                    i++;
-                                                }
+                                                    int i=0;
+                                                    for(String cat:categories)
+                                                    {
+                                                        categoriesCharSequence[i] = cat;
+                                                        i++;
+                                                    }
 
-                                                builder2.setItems(categoriesCharSequence,
-                                                        new DialogInterface.OnClickListener()
-                                                        {
-
-                                                            @Override
-                                                            public void onClick(DialogInterface dialog, int which2)
+                                                    builder2.setItems(categoriesCharSequence,
+                                                            new DialogInterface.OnClickListener()
                                                             {
-                                                                if(db.existBlock(new Block(tm.getLine1Number(), incomingNumber, which2, "a", true)))
+
+                                                                @Override
+                                                                public void onClick(DialogInterface dialog, int which2)
                                                                 {
-                                                                    Toast.makeText(ctx, "Numer został już zablokowany!", Toast.LENGTH_SHORT).show();
-                                                                }
-                                                                else db.addBlocking(new Block(tm.getLine1Number(), incomingNumber, which2, "a", true));
-                                                                try
-                                                                {
-                                                                    declinePhone(ctx);
-                                                                    Toast.makeText(ctx, "Zablokowano", Toast.LENGTH_SHORT).show();
-                                                                }
-                                                                catch (Exception e)
-                                                                {
-                                                                    e.printStackTrace();
+                                                                    if(db.existBlock(new Block(tm.getLine1Number(), incomingNumber, which2, "a", true)))
+                                                                    {
+                                                                        Toast.makeText(ctx, "Numer został już zablokowany!", Toast.LENGTH_SHORT).show();
+                                                                    }
+                                                                    else db.addBlocking(new Block(tm.getLine1Number(), incomingNumber, which2, "a", true));
+                                                                    try
+                                                                    {
+                                                                        declinePhone(ctx);
+                                                                        Toast.makeText(ctx, "Zablokowano", Toast.LENGTH_SHORT).show();
+                                                                    }
+                                                                    catch (Exception e)
+                                                                    {
+                                                                        e.printStackTrace();
+                                                                    }
                                                                 }
                                                             }
-                                                        }
-                                                );
+                                                    );
 
-                                                AlertDialog alertDialog2 = builder2.create();
-                                                alertDialog2.getWindow().setType(WindowManager.LayoutParams.TYPE_SYSTEM_ALERT);
-                                                alertDialog2.getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
-                                                        | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
-                                                        | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
-                                                        | WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
-                                                alertDialog2.show();
+                                                    AlertDialog alertDialog2 = builder2.create();
+                                                    alertDialog2.getWindow().setType(WindowManager.LayoutParams.TYPE_SYSTEM_ALERT);
+                                                    alertDialog2.getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
+                                                            | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
+                                                            | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
+                                                            | WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
+                                                    alertDialog2.show();
 
-                                                break;
-                                            case 1:
-                                                try
-                                                {
-                                                    declinePhone(ctx);
-                                                    Toast.makeText(ctx, "Zablokowano", Toast.LENGTH_SHORT).show();
-                                                }
-                                                catch (Exception e)
-                                                {
-                                                    e.printStackTrace();
-                                                }
-                                                break;
-                                            case 2:
-                                                Toast.makeText(ctx, "Przepuszczono", Toast.LENGTH_SHORT).show();
-                                                break;
+                                                    break;
+                                                case 1:
+                                                    try
+                                                    {
+                                                        declinePhone(ctx);
+                                                        Toast.makeText(ctx, "Zablokowano", Toast.LENGTH_SHORT).show();
+                                                    }
+                                                    catch (Exception e)
+                                                    {
+                                                        e.printStackTrace();
+                                                    }
+                                                    break;
+                                                case 2:
+                                                    Toast.makeText(ctx, "Przepuszczono", Toast.LENGTH_SHORT).show();
+                                                    break;
+                                            }
                                         }
-                                    }
-                                });
+                                    });
 
 
 
-                        AlertDialog alertDialog = builder.create();
-                        alertDialog.getWindow().setType(WindowManager.LayoutParams.TYPE_SYSTEM_ALERT);
-                        alertDialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
-                                | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
-                                | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
-                                | WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
-                        alertDialog.show();
+                            AlertDialog alertDialog = builder.create();
+                            alertDialog.getWindow().setType(WindowManager.LayoutParams.TYPE_SYSTEM_ALERT);
+                            alertDialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
+                                    | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
+                                    | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
+                                    | WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
+                            alertDialog.show();
+                        }
                     }
                 }
             }
