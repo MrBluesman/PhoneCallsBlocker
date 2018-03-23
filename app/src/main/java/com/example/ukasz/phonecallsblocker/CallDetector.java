@@ -89,7 +89,14 @@ public class CallDetector
                     }
                     else
                     {
-                        if(Settings.canDrawOverlays(ctx))
+                        //Can draw overlays depends on SDK version
+                        boolean canDrawOverlays = true;
+                        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+                        {
+                            if(!Settings.canDrawOverlays(ctx)) canDrawOverlays = false;
+                        }
+
+                        if(canDrawOverlays)
                         {
                             AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
                             builder.setTitle(incomingNumber + " \n liczba zablokowań: " + db.getNumberBlockingsCount(incomingNumber));

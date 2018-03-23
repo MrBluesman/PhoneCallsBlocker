@@ -70,6 +70,34 @@ public class PermissionsStartupActivity extends AppCompatActivity {
             findViewById(R.id.view2).setVisibility(View.GONE);
             findViewById(R.id.permissions_startup_activity_windows_checkbox_header).setVisibility(View.GONE);
             findViewById(R.id.permissions_startup_activity_windows_checkbox_description).setVisibility(View.GONE);
+
+            //If we have granted permissions we can open a Main Activity
+            if(hasGrantedPermissions())
+            {
+                openMainActivity();
+            }
+            else //If we haven't, we have to request for this permissions
+            {
+                phoneStateWarningText = findViewById(R.id.permissions_startup_activity_phone_checkbox_warning);
+                phoneStateWarningImage = findViewById(R.id.imageView4);
+
+                grantPermissionsButton.setOnClickListener(new View.OnClickListener()
+                {
+                    @Override
+                    public void onClick(View v)
+                    {
+                        if (phoneStateCheckBoxPerm.isChecked())
+                        {
+                            setOptionsUnVisible(phoneStateWarningText, phoneStateWarningImage);
+                        }
+                        else
+                        {
+                            phoneStateWarningText.setTextKeepState(getResources().getString(R.string.permissions_startup_activity_phone_checkbox_warning_nc));
+                            setOptionsVisible(phoneStateWarningText, phoneStateWarningImage);
+                        }
+                    }
+                });
+            }
         }
         else //Android SDK >= M
         {
@@ -78,7 +106,7 @@ public class PermissionsStartupActivity extends AppCompatActivity {
             {
                 openMainActivity();
             }
-            else //If it's not we have to request for permissions
+            else //If we haven't, we have to request for this permissions
             {
                 phoneStateWarningText = findViewById(R.id.permissions_startup_activity_phone_checkbox_warning);
                 phoneStateWarningImage = findViewById(R.id.imageView4);
