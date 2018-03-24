@@ -11,8 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * DatabaseHandler for keeping blocks in database
- * Extends SQLiteOpenHelper
+ * DatabaseHandler for keeping blocks in database.
+ * Extends SQLiteOpenHelper.
  * Created by Łukasz on 2017-03-20.
  */
 public class DatabaseHandler extends SQLiteOpenHelper
@@ -35,10 +35,10 @@ public class DatabaseHandler extends SQLiteOpenHelper
     private static final String NAME_T_C = "name";
 
     /**
-     * Constructor which create a new instance od DatabaseHandler by call extended super
-     * SQLiteOpenHelper
+     * Constructor which create a new instance od DatabaseHandler by call extended super.
+     * SQLiteOpenHelper.
      *
-     * @param context Context of application
+     * @param context Context of application.
      */
     public DatabaseHandler(Context context)
     {
@@ -47,10 +47,10 @@ public class DatabaseHandler extends SQLiteOpenHelper
 
 
     /**
-     * Method which runs on creating a SQLite database
-     * Contains definition and structure of tables in database
+     * Method which runs on creating a SQLite database.
+     * Contains definition and structure of tables in database.
      *
-     * @param db Database which will be keeping SQLite tables defined in this method
+     * @param db Database which will be keeping SQLite tables defined in this method.
      */
     @Override
     public void onCreate(SQLiteDatabase db)
@@ -82,11 +82,11 @@ public class DatabaseHandler extends SQLiteOpenHelper
     }
 
     /**
-     * Method which destroys database structure and creating new by call onCreate(db)
+     * Method which destroys database structure and creating new by call onCreate(db).
      *
-     * @param db Database which will be upgraded
-     * @param oldVersion id of old database version
-     * @param newVersion id of new database version
+     * @param db Database which will be upgraded.
+     * @param oldVersion id of old database version.
+     * @param newVersion id of new database version.
      */
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion)
@@ -98,9 +98,9 @@ public class DatabaseHandler extends SQLiteOpenHelper
     }
 
     /**
-     * Method which adds a new blocking to database
+     * Method which adds a new blocking to database.
      *
-     * @param block Instance of block which will be add to database
+     * @param block Instance of block which will be add to database.
      */
     public void addBlocking(Block block)
     {
@@ -118,11 +118,11 @@ public class DatabaseHandler extends SQLiteOpenHelper
     }
 
     /**
-     * Method which return Block instance from database
+     * Method which return Block instance from database.
      *
-     * @param nr_declarant Phone number of declarant
-     * @param nr_blocked Blocked phone number
-     * @return Block instance from database
+     * @param nr_declarant Phone number of declarant.
+     * @param nr_blocked Blocked phone number.
+     * @return Block instance from database.
      */
     public Block getBlocking(String nr_declarant, String nr_blocked)
     {
@@ -145,10 +145,10 @@ public class DatabaseHandler extends SQLiteOpenHelper
     }
 
     /**
-     * Method which returns a list of all blockings for blocked phone number
+     * Method which returns a list of all blockings for blocked phone number.
      *
-     * @param nr_blocked Blocked phone number
-     * @return List of all Block instances for blocked number in database
+     * @param nr_blocked Blocked phone number.
+     * @return List of all Block instances for blocked number in database.
      */
     public List<Block> getNumberBlockings(String nr_blocked)
     {
@@ -179,9 +179,9 @@ public class DatabaseHandler extends SQLiteOpenHelper
     }
 
     /**
-     * Method which returns all Block instances from database
+     * Method which returns all Block instances from database.
      *
-     * @return List of all Blocks instances from database
+     * @return List of all Blocks instances from database.
      */
     public List<Block> getAllBlockings()
     {
@@ -211,10 +211,10 @@ public class DatabaseHandler extends SQLiteOpenHelper
     }
 
     /**
-     * Method which count blockings for block number
+     * Method which count blockings for block number.
      *
-     * @param nr_blocked Blocked phone number
-     * @return count of blockings for nr_blocked in database
+     * @param nr_blocked Blocked phone number.
+     * @return count of blockings for nr_blocked in database.
      */
     public int getNumberBlockingsCount(String nr_blocked)
     {
@@ -228,10 +228,10 @@ public class DatabaseHandler extends SQLiteOpenHelper
 
 
     /**
-     * Method which checks if block exists in database
+     * Method which checks if block exists in database.
      *
-     * @param block Block instance which will be checked if exist in database
-     * @return true if block exists or false if not exist
+     * @param block Block instance which will be checked if exist in database.
+     * @return true if block exists or false if not exist.
      */
     public boolean existBlock(Block block)
     {
@@ -254,9 +254,9 @@ public class DatabaseHandler extends SQLiteOpenHelper
     }
 
     /**
-     * Method which returns count of all blockings in database
+     * Method which returns count of all blockings in database.
      *
-     * @return count of all blockings in database
+     * @return count of all blockings in database.
      */
     public int getBlockingsCount()
     {
@@ -268,10 +268,10 @@ public class DatabaseHandler extends SQLiteOpenHelper
     }
 
     /**
-     * Method which update data for block in database
+     * Method which update data for block in database.
      *
-     * @param block Block instance which will be updated
-     * @return 1 of updated, 0 if not updated
+     * @param block Block instance which will be updated.
+     * @return 1 of updated, 0 if not updated.
      */
     public int updateBlocking(Block block)
     {
@@ -293,9 +293,9 @@ public class DatabaseHandler extends SQLiteOpenHelper
     }
 
     /**
-     * Method which delete instance of block from database
+     * Method which delete instance of block from database.
      *
-     * @param block Block instance which will be deleted from database
+     * @param block Block instance which will be deleted from database.
      */
     public void deleteBlocking(Block block)
     {
@@ -308,9 +308,9 @@ public class DatabaseHandler extends SQLiteOpenHelper
     }
 
     /**
-     * Method which returns count of all categories in database
+     * Method which returns count of all categories in database.
      *
-     * @return count of all categories in database
+     * @return count of all categories in database.
      */
     public int getCategoriesCount()
     {
@@ -321,7 +321,7 @@ public class DatabaseHandler extends SQLiteOpenHelper
     }
 
     /**
-     * Method which deletes all categories from database
+     * Method which deletes all categories from database.
      */
     public void clearCategories()
     {
@@ -336,7 +336,7 @@ public class DatabaseHandler extends SQLiteOpenHelper
     }
 
     /**
-     * Method which update categories by clear and fill again
+     * Method which update categories by clear and fill again.
      */
     public void updateCategories()
     {
@@ -345,7 +345,7 @@ public class DatabaseHandler extends SQLiteOpenHelper
     }
 
     /**
-     * Method which fill categories table in database with predefined categories
+     * Method which fill categories table in database with predefined categories.
      */
     public void fillCategories()
     {
@@ -356,9 +356,9 @@ public class DatabaseHandler extends SQLiteOpenHelper
     }
 
     /**
-     * Method which returns list of all categories in database
+     * Method which returns list of all categories in database.
      *
-     * @return list of all categories in database (List of String)
+     * @return list of all categories in database (List of String).
      */
     public List<String> getAllCategories()
     {

@@ -36,22 +36,22 @@ import static android.content.Context.NOTIFICATION_SERVICE;
 
 /**
  * Created by Łukasz Parysek on 2017-03-05.
- * This class describes Listener, and Retriever for Incoming and Outging calls
+ * This class describes Listener, and Retriever for Incoming and Outgoing calls.
  */
 public class CallDetector
 {
     /**
-     * Local private class which describes Listener for Incoming colls
+     * Local private class which describes Listener for Incoming calls.
      */
     private class CallStateListener extends PhoneStateListener
     {
         /**
-         * This method runs when the Listener is working, and call state has changed
-         * Creating a Toast and Notification when the calls incoming
-         * (incoming call)
+         * This method runs when the Listener is working, and call state has changed.
+         * Creating a Toast and Notification when the calls incoming.
+         * (incoming call).
          *
-         * @param state             Information about state from TelephonyManager
-         * @param incomingNumber    Contains the number of incoming call
+         * @param state             Information about state from TelephonyManager.
+         * @param incomingNumber    Contains the number of incoming call.
          */
         @RequiresApi(api = Build.VERSION_CODES.M)
         @Override
@@ -191,10 +191,10 @@ public class CallDetector
     }
 
     /**
-     * Method which decline/hang out/turn off incoming call
+     * Method which decline/hang out/turn off incoming call.
      *
-     * @param context       Context of application
-     * @throws Exception    Exception, when app cannot decline incoming call
+     * @param context       Context of application.
+     * @throws Exception    Exception, when app cannot decline incoming call.
      */
     private void declinePhone(Context context) throws Exception
     {
@@ -235,7 +235,7 @@ public class CallDetector
     }
 
     /**
-     * Local private class which describes Receiver for Outgoing calls
+     * Local private class which describes Receiver for Outgoing calls.
      */
     private class OutgoingReceiver extends BroadcastReceiver
     {
@@ -243,9 +243,9 @@ public class CallDetector
         }
 
         /**
-         * This method runs, when we receiving a outgoing call in app context
-         * Creating a Toast and Notification when the calls outcoming
-         * (outcoming call)
+         * This method runs, when we receiving a outgoing call in app context.
+         * Creating a Toast and Notification when the calls outgoing.
+         * (outgoing call).
          *
          * @param context   app context
          * @param intent    intent of outgoing call action
@@ -268,10 +268,10 @@ public class CallDetector
     private OutgoingReceiver outgoingReceiver;
 
     /**
-     * Constructor
-     * Creating a Listener and Receiver for calls
+     * Constructor.
+     * Creating a Listener and Receiver for calls.
      *
-     * @param _ctx  param of setting the app context for the CallDetector object
+     * @param _ctx  param of setting the app context for the CallDetector object.
      */
     public CallDetector(Context _ctx)
     {
@@ -282,9 +282,9 @@ public class CallDetector
     }
 
     /**
-     * This method starts a Telephony service by the Telephony Manager instance on out context
-     * Settings a Listener on listening calls state
-     * Settings a registerReceiver on retrieving a outgoing calls
+     * This method starts a Telephony service by the Telephony Manager instance on out context.
+     * Settings a Listener on listening calls state.
+     * Settings a registerReceiver on retrieving a outgoing calls.
      */
     public void start()
     {
@@ -297,8 +297,8 @@ public class CallDetector
     }
 
     /**
-     *  This method stops a listening incoming calls by set listener state on LISTEN_NONE
-     *  Unregisters receiver for outgoing calls
+     *  This method stops a listening incoming calls by set listener state on LISTEN_NONE.
+     *  Unregisters receiver for outgoing calls.
      */
     public void stop()
     {

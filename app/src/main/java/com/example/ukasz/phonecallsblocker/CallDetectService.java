@@ -9,8 +9,8 @@ import android.widget.Toast;
 
 /**
  * Created by Łukasz on 2017-03-05.
- * Service class which allows working app in background
- * Allows start and stop detecting calls
+ * Service class which allows working app in background.
+ * Allows start and stop detecting calls.
  */
 public class CallDetectService extends Service
 {
@@ -22,13 +22,13 @@ public class CallDetectService extends Service
     }
 
     /**
-     * This method runs on creating the service of detecting calls
-     * Creating a CallDetector object, and calls a start() method for it
+     * This method runs on creating the service of detecting calls.
+     * Creating a CallDetector object, and calls a start() method for it.
      *
-     * @param intent intent which runs a service
-     * @param flags flags of service
-     * @param startId id of service
-     * @return res
+     * @param intent intent which runs a service.
+     * @param flags flags of service.
+     * @param startId id of service.
+     * @return res.
      */
     @Override
     public int onStartCommand(Intent intent, int flags, int startId)
@@ -41,8 +41,8 @@ public class CallDetectService extends Service
     }
 
     /**
-     * This method runs when we disable the service
-     * Calls a stop() method for CallDetector object
+     * This method runs when we disable the service.
+     * Calls a stop() method for CallDetector object.
      */
     @Override
     public void onDestroy()

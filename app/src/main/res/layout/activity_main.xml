@@ -15,7 +15,7 @@
         android:id="@+id/switch1_block_service"
         android:layout_width="match_parent"
         android:layout_height="20pt"
-        android:text="@string/main_activity_block_switch"
+        android:text="@string/home_fragment_block_switch"
         android:visibility="visible"
 
         app:layout_constraintTop_toTopOf="parent"
@@ -25,7 +25,7 @@
         android:id="@+id/switch2_automatic_block"
         android:layout_width="match_parent"
         android:layout_height="20pt"
-        android:text="@string/main_activity_autoblock_switch"
+        android:text="@string/home_fragment_autoblock_switch"
         android:visibility="visible"
 
         app:layout_constraintStart_toStartOf="parent"

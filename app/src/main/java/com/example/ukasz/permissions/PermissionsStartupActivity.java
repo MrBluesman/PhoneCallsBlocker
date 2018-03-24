@@ -21,6 +21,7 @@ import android.widget.TextView;
 
 import com.example.ukasz.phonecallsblocker.MainActivity;
 import com.example.ukasz.phonecallsblocker.R;
+import com.example.ukasz.phonecallsblocker.StartActivity;
 
 /**
  * Class for grant permissions for the first run of app or when
@@ -74,7 +75,7 @@ public class PermissionsStartupActivity extends AppCompatActivity {
             //If we have granted permissions we can open a Main Activity
             if(hasGrantedPermissions())
             {
-                openMainActivity();
+                openStartActivity();
             }
             else //If we haven't, we have to request for this permissions
             {
@@ -104,7 +105,7 @@ public class PermissionsStartupActivity extends AppCompatActivity {
             //If we have granted permissions we can open a Main Activity
             if (hasGrantedPermissions() && hasGrantedManageOverlayPermission())
             {
-                openMainActivity();
+                openStartActivity();
             }
             else //If we haven't, we have to request for this permissions
             {
@@ -206,9 +207,9 @@ public class PermissionsStartupActivity extends AppCompatActivity {
     /**
      * Opens a new activity with NO_HISTORY flag and destroys this startup activity
      */
-    public void openMainActivity()
+    public void openStartActivity()
     {
-        Intent i = new Intent(new Intent(getApplicationContext(), MainActivity.class));
+        Intent i = new Intent(new Intent(getApplicationContext(), StartActivity.class));
         i.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY); // Adds the FLAG_ACTIVITY_NO_HISTORY flag
 //            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 //            i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -240,7 +241,7 @@ public class PermissionsStartupActivity extends AppCompatActivity {
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED)
                 {
                     // permission was granted, we can open a Main Activity
-                    if(hasGrantedManageOverlayPermission()) openMainActivity();
+                    if(hasGrantedManageOverlayPermission()) openStartActivity();
                     else setOptionsUnVisible(phoneStateWarningText, phoneStateWarningImage);
                 }
                 else
@@ -290,7 +291,7 @@ public class PermissionsStartupActivity extends AppCompatActivity {
                 allowWindowsWarningText.setTextKeepState(getResources().getString(R.string.permissions_startup_activity_windows_checkbox_warning));
                 setOptionsVisible(allowWindowsWarningText, allowWindowsWarningImage);
             }
-            else if(hasGrantedPermissions()) openMainActivity();
+            else if(hasGrantedPermissions()) openStartActivity();
             else setOptionsUnVisible(allowWindowsWarningText, allowWindowsWarningImage );
         }
     }
