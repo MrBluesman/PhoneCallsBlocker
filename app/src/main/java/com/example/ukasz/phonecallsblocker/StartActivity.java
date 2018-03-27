@@ -25,10 +25,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-import android.widget.Switch;
 import android.widget.TextView;
 
-public class StartActivity extends AppCompatActivity implements HomeFragment.OnFragmentInteractionListener
+import com.example.ukasz.androidsqlite.Block;
+
+public class StartActivity extends AppCompatActivity implements HomeFragment.OnFragmentInteractionListener,
+        PhoneBlockFragment.OnListFragmentInteractionListener
 {
 
     /**
@@ -262,6 +264,12 @@ public class StartActivity extends AppCompatActivity implements HomeFragment.OnF
         return autoBlockEnabled;
     }
 
+    @Override
+    public void onListFragmentInteraction(Block item)
+    {
+
+    }
+
     /**
      * A placeholder fragment containing a simple view.
      */
@@ -321,15 +329,20 @@ public class StartActivity extends AppCompatActivity implements HomeFragment.OnF
         /**
          * Chooses a fragment which instance will be create and show.
          * @param position Position of fragment on the top sliding tabs.
-         * @return
+         * @return Instance of selected Fragment depends on @param position
          */
         @Override
         public Fragment getItem(int position)
         {
             // getItem is called to instantiate the fragment for the given page.
             // Return a PlaceholderFragment (defined as a static inner class below).
-            if(position == 0) return HomeFragment.newInstance();
-            else return PlaceholderFragment.newInstance(position + 1);
+
+            switch(position)
+            {
+                case 0: return HomeFragment.newInstance();
+                case 1: return PhoneBlockFragment.newInstance(1);
+                default: return PlaceholderFragment.newInstance(position + 1);
+            }
         }
 
         /**
