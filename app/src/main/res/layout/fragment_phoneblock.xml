@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
+
+    <!--private String nr_declarant;-->
+    <!--private String nr_blocked;-->
+    <!--private int reason_category;-->
+    <!--private String reason_description;-->
+    <!--private boolean nr_rating;-->
+
+    <!--<TextView-->
+        <!--android:id="@+id/item_number"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_margin="@dimen/text_margin"-->
+        <!--android:text="1"/>-->
+
+    <TextView
+        android:id="@+id/fragment_phoneblock_nr_blocked"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/text_margin" />
+</LinearLayout>
