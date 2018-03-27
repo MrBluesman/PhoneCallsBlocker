@@ -210,7 +210,7 @@ public class PermissionsStartupActivity extends AppCompatActivity {
     public void openStartActivity()
     {
         Intent i = new Intent(new Intent(getApplicationContext(), StartActivity.class));
-        i.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY); // Adds the FLAG_ACTIVITY_NO_HISTORY flag
+//        i.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY); // Adds the FLAG_ACTIVITY_NO_HISTORY flag
 //            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 //            i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(i);

@@ -52,6 +52,12 @@ public class PhoneBlockFragment extends Fragment
         return fragment;
     }
 
+    public void onResume()
+    {
+        // TODO Auto-generated method stub
+        super.onResume();
+    }
+
     /**
      * Runs on creating a this Fragment.
      * @param savedInstanceState saved instance state of this Fragment.

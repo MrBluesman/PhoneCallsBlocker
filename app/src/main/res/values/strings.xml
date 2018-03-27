@@ -50,4 +50,11 @@
     <string name="home_fragment_block_switch">Blokowanie połączeń</string>
     <string name="home_fragment_autoblock_switch">Blokowanie automatyczne z listy</string>
 
+    <!-- Strings related to AddPhoneBlock -->
+    <string name="add_phone_block_title">Nowe blokowanie numeru</string>
+    <string name="add_phone_block_nr_blocked_hint">Wpisz numer telefonu</string>
+    <string name="add_phone_block_button_title">Importuj</string>
+    <string name="add_phone_block_category_header">Kategoria</string>
+    <string name="add_phone_block_description_hint">Opisz powód blokowania</string>
+    <string name="add_phone_block_button_add">Dodaj numer do listy</string>
 </resources>
