@@ -1,15 +1,11 @@
 package com.example.ukasz.phonecallsblocker;
 
-import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
@@ -26,6 +22,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.ukasz.androidsqlite.Block;
 
@@ -72,29 +69,48 @@ public class StartActivity extends AppCompatActivity implements HomeFragment.OnF
         Toolbar toolbar = findViewById(R.id.start_activity_toolbar);
         setSupportActionBar(toolbar);
 
-        // Create the adapter that will return a fragment for each of the three
-        // primary sections of the activity.
+        //Create the adapter that will return a fragment for each of the three
+        //primary sections of the activity.
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
-        // Set up the ViewPager with the sections adapter.
+        //Set up the ViewPager with the sections adapter.
         mViewPager = findViewById(R.id.start_activity_container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
-        // Set up the listeners
+        //Set up the listeners
         TabLayout tabLayout = findViewById(R.id.start_activity_tabs);
         mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
         tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(mViewPager));
 
-        FloatingActionButton fab = findViewById(R.id.start_activity_fab);
-        fab.setOnClickListener(new View.OnClickListener()
+        //Floating Action Button Menu
+        com.github.clans.fab.FloatingActionButton fab_add_manually = findViewById(R.id.start_activity_add_manually);
+        fab_add_manually.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View view)
             {
-//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
                 Intent addBlockIntent = new Intent(getApplicationContext(), AddPhoneBlock.class);
                 startActivity(addBlockIntent);
+            }
+        });
+
+        com.github.clans.fab.FloatingActionButton fab_add_contacts = findViewById(R.id.start_activity_add_contacts);
+        fab_add_contacts.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                Toast.makeText(getApplicationContext(), "ZROBIĆ DODAWANIE Z KONTAKTÓW", Toast.LENGTH_LONG).show();
+            }
+        });
+
+        com.github.clans.fab.FloatingActionButton fab_add_calls_registry = findViewById(R.id.start_activity_add_calls_registry);
+        fab_add_calls_registry.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                Toast.makeText(getApplicationContext(), "ZROBIĆ DODAWANIE Z REJESTRU POŁĄCZEŃ", Toast.LENGTH_LONG).show();
             }
         });
     }

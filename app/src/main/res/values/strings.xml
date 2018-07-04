@@ -45,6 +45,9 @@
     <string name="start_activity_tab_text_1">Start</string>
     <string name="start_activity_tab_text_2">Lista</string>
     <string name="start_activity_tab_text_3">Ustawienia</string>
+    <string name="start_activity_fab_manually">Ręcznie</string>
+    <string name="start_activity_fab_contacts">Z kontaktów</string>
+    <string name="start_activity_fab_calls_registry">Z rejestru połączeń</string>
 
     <!-- Strings related to HomeFragment -->
     <string name="home_fragment_block_switch">Blokowanie połączeń</string>
@@ -53,7 +56,6 @@
     <!-- Strings related to AddPhoneBlock -->
     <string name="add_phone_block_title">Nowe blokowanie numeru</string>
     <string name="add_phone_block_nr_blocked_hint">Wpisz numer telefonu</string>
-    <string name="add_phone_block_button_title">Importuj</string>
     <string name="add_phone_block_category_header">Kategoria</string>
     <string name="add_phone_block_description_hint">Opisz powód blokowania</string>
     <string name="add_phone_block_button_add">Dodaj numer do listy</string>

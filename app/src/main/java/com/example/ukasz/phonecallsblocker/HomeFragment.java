@@ -177,25 +177,6 @@ public class HomeFragment extends Fragment
         //db.addBlocking(new Block("721315345", "665693959", 0, "a", true));
         //db.deleteBlocking(new Block("721315778", "665693959", 0, "a", true));
         //db.deleteBlocking(new Block("+48721315778", "665693959", 0, "a", true));
-
-        //Reading all blocks
-        Log.d("Read: ", "Reading..");
-        List<Block> blockings = db.getAllBlockings();
-        TextView textViewTestowy2 = getView().findViewById(R.id.textView2);
-        String caly = "";
-
-        for(Block b: blockings)
-        {
-            String log = "Blokujący: " + b.getNrDeclarant() + ", Blokowany: " + b.getNrBlocked() +
-                    ", Kategoria: " + b.getReasonCategory() + ", Opis: " + b.getReasonDescription()
-                    + ", czyNegatywny: " + b.getNrRating();
-
-            Log.d("Name: ", log);
-            caly+= log + "\n";
-            textViewTestowy2.setText(caly);
-        }
-
-        //----------------------------------------------------------------------------------------
     }
 
     /**

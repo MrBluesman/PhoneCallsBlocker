@@ -7,6 +7,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,6 +29,7 @@ public class PhoneBlockFragment extends Fragment
     private static final String ARG_COLUMN_COUNT = "column-count";
     private int mColumnCount = 1;
     private OnListFragmentInteractionListener mListener;
+    RecyclerView.Adapter adapter;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -56,6 +58,9 @@ public class PhoneBlockFragment extends Fragment
     {
         // TODO Auto-generated method stub
         super.onResume();
+        Log.e("PhoneBlockFragment", "onResume()");
+        //get blockings
+        adapter.notifyDataSetChanged();
     }
 
     /**
@@ -67,7 +72,6 @@ public class PhoneBlockFragment extends Fragment
     {
 
         super.onCreate(savedInstanceState);
-
         if (getArguments() != null)
         {
             mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
@@ -106,7 +110,9 @@ public class PhoneBlockFragment extends Fragment
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
 //            recyclerView.setAdapter(new MyPhoneBlockRecyclerViewAdapter(DummyContent.ITEMS, mListener));
-            recyclerView.setAdapter(new MyPhoneBlockRecyclerViewAdapter(blockings, mListener));
+            adapter = new MyPhoneBlockRecyclerViewAdapter(blockings, mListener);
+            adapter.notifyDataSetChanged();
+            recyclerView.setAdapter(adapter);
         }
         return view;
     }
