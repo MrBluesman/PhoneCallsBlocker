@@ -19,7 +19,6 @@ import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.example.ukasz.phonecallsblocker.MainActivity;
 import com.example.ukasz.phonecallsblocker.R;
 import com.example.ukasz.phonecallsblocker.StartActivity;
 
@@ -62,8 +61,6 @@ public class PermissionsStartupActivity extends AppCompatActivity {
         phoneStateCheckBoxPerm = findViewById(R.id.permissions_startup_activity_phone_checkbox);
         allowWindowsCheckBoxPerm = findViewById(R.id.permissions_startup_activity_windows_checkbox);
 
-        //Split on Android SDK < M and Android SDK >= M
-        //TO DO !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M)
         {
             //disable manage overlay permission options

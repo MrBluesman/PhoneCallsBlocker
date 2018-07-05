@@ -57,8 +57,7 @@ public class AddPhoneBlock extends AppCompatActivity implements AdapterView.OnIt
             @Override
             public void onClick(View v)
             {
-//                                Snackbar.make(v, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
+
                 if(nrBlocked.getText().toString().length() == 0)
                 {
                     nrBlocked.setError("Podaj numer telefonu");
@@ -66,6 +65,7 @@ public class AddPhoneBlock extends AppCompatActivity implements AdapterView.OnIt
                 }
                 else
                 {
+                    //TODO: get phone number ((TelephonyManager)v.getContext().getSystemService(Context.TELEPHONY_SERVICE) is not working anymore)
 //                    Toast.makeText(v.getContext(), String.valueOf(category.getSelectedItemPosition()), Toast.LENGTH_SHORT).show();
                     DatabaseHandler db = new DatabaseHandler(v.getContext());
 //                    //Insertings block
