@@ -1,6 +1,7 @@
 package com.example.ukasz.phonecallsblocker;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -29,7 +30,9 @@ public class PhoneBlockFragment extends Fragment
     private static final String ARG_COLUMN_COUNT = "column-count";
     private int mColumnCount = 1;
     private OnListFragmentInteractionListener mListener;
-    RecyclerView.Adapter adapter;
+    public static RecyclerView.Adapter adapter;
+    public static List<Block> blockings; //adapter data
+    DatabaseHandler db;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -59,8 +62,6 @@ public class PhoneBlockFragment extends Fragment
         // TODO Auto-generated method stub
         super.onResume();
         Log.e("PhoneBlockFragment", "onResume()");
-        //get blockings
-        adapter.notifyDataSetChanged();
     }
 
     /**
@@ -70,12 +71,15 @@ public class PhoneBlockFragment extends Fragment
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
-
         super.onCreate(savedInstanceState);
         if (getArguments() != null)
         {
             mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
         }
+
+        //get blockings
+        db = new DatabaseHandler(getActivity());
+        blockings = db.getAllBlockings();
     }
 
     /**
@@ -90,11 +94,9 @@ public class PhoneBlockFragment extends Fragment
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState)
     {
+        Log.e("PhoneBlockFragment", "onCreateView()");
         View view = inflater.inflate(R.layout.fragment_phoneblock_list, container, false);
 
-        //get blockings
-        DatabaseHandler db = new DatabaseHandler(getActivity());
-        List<Block> blockings = db.getAllBlockings();
 
         // Set the adapter
         if (view instanceof RecyclerView)
@@ -106,14 +108,15 @@ public class PhoneBlockFragment extends Fragment
                 recyclerView.setLayoutManager(new LinearLayoutManager(context));
             }
             else
-                {
+            {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
-//            recyclerView.setAdapter(new MyPhoneBlockRecyclerViewAdapter(DummyContent.ITEMS, mListener));
+
             adapter = new MyPhoneBlockRecyclerViewAdapter(blockings, mListener);
             adapter.notifyDataSetChanged();
             recyclerView.setAdapter(adapter);
         }
+
         return view;
     }
 
@@ -124,6 +127,7 @@ public class PhoneBlockFragment extends Fragment
     @Override
     public void onAttach(Context context)
     {
+        Log.e("PhoneBlockFragment", "onAttach()");
         super.onAttach(context);
         if (context instanceof OnListFragmentInteractionListener)
         {
@@ -134,6 +138,7 @@ public class PhoneBlockFragment extends Fragment
             throw new RuntimeException(context.toString()
                     + " must implement OnListFragmentInteractionListener");
         }
+
     }
 
     /**
@@ -143,6 +148,7 @@ public class PhoneBlockFragment extends Fragment
     @Override
     public void onDetach()
     {
+        Log.e("PhoneBlockFragment", "onDetach()");
         super.onDetach();
         mListener = null;
     }
@@ -161,5 +167,12 @@ public class PhoneBlockFragment extends Fragment
     {
         // TODO: Update argument type and name
         void onListFragmentInteraction(Block item);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        blockings.clear();
+        adapter.notifyDataSetChanged();
     }
 }

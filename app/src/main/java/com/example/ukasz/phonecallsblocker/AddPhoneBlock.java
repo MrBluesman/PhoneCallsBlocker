@@ -72,10 +72,15 @@ public class AddPhoneBlock extends AppCompatActivity implements AdapterView.OnIt
 //                    Log.d("Insert: ", "Inserting..");
 //                    TelephonyManager tMgr = (TelephonyManager)v.getContext().getSystemService(Context.TELEPHONY_SERVICE);
 //                    String mPhoneNumber = tMgr.getLine1Number();
-                    db.addBlocking(new Block("721315333", nrBlocked.getText().toString(),
-                            category.getSelectedItemPosition(), description.getText().toString(), true));
+                    Block newBlock = new Block("721315333", nrBlocked.getText().toString(),
+                            category.getSelectedItemPosition(), description.getText().toString(), true);
+                    db.addBlocking(newBlock);
                     Toast.makeText(v.getContext(), "Numer dodany", Toast.LENGTH_SHORT).show();
                     finish();
+
+                    //TEST
+                    PhoneBlockFragment.blockings.add(newBlock);
+                    PhoneBlockFragment.adapter.notifyDataSetChanged();
                 }
             }
         });

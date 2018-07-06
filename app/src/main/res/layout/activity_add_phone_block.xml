@@ -16,6 +16,7 @@
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
 
 
+
     <EditText
         android:id="@+id/add_phone_block_nr_blocked_editText"
         android:layout_width="0dp"
