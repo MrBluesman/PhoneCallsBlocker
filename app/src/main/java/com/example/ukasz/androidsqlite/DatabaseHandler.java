@@ -75,7 +75,7 @@ public class DatabaseHandler extends SQLiteOpenHelper
                 + REASON_CATEGORY_T_B + " INTEGER NOT NULL, "
                 + REASON_DESCRIPTION_T_B + " TEXT, "
                 + RATING_T_B + " BOOLEAN NOT NULL, "
-                + "FOREIGN KEY (" + REASON_CATEGORY_T_B + ") REFERENCES " + TABLE_CATEGORY + "(" + ID_KEY_T_C + ") "
+                + "FOREIGN KEY (" + REASON_CATEGORY_T_B + ") REFERENCES " + TABLE_CATEGORY + "(" + ID_KEY_T_C + "), "
                 + "PRIMARY KEY (" + DECLARANT_KEY_T_B + ", " + BLOCKED_KEY_T_B + ") "
                 + ")";
         db.execSQL(createBlockingTable);
@@ -174,6 +174,7 @@ public class DatabaseHandler extends SQLiteOpenHelper
             }
             while (cursor.moveToNext());
         }
+        cursor.close();
 
         return toReturnList;
     }
@@ -206,6 +207,7 @@ public class DatabaseHandler extends SQLiteOpenHelper
             }
             while (cursor.moveToNext());
         }
+        cursor.close();
 
         return toReturnList;
     }
@@ -222,8 +224,10 @@ public class DatabaseHandler extends SQLiteOpenHelper
                 + " WHERE " + BLOCKED_KEY_T_B + "=" + nr_blocked +";";
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(countBlockings, null);
+        int count = cursor.getCount();
+        cursor.close();
 
-        return cursor.getCount();
+        return count;
     }
 
 
@@ -247,7 +251,7 @@ public class DatabaseHandler extends SQLiteOpenHelper
 
         Cursor cursor = db.rawQuery(selectBlockings, null);
         boolean toReturn = cursor.getCount() > 0;
-
+        cursor.close();
         Log.d("Exist: ", ""+cursor.getCount());
 
         return toReturn;
@@ -263,8 +267,10 @@ public class DatabaseHandler extends SQLiteOpenHelper
         String countNumberBlockings = "SELECT * FROM " + TABLE_BLOCKING;
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(countNumberBlockings, null);
+        int count = cursor.getCount();
+        cursor.close();
 
-        return cursor.getCount();
+        return count;
     }
 
     /**
@@ -284,12 +290,9 @@ public class DatabaseHandler extends SQLiteOpenHelper
         values.put(REASON_DESCRIPTION_T_B, block.getReasonDescription());
         values.put(RATING_T_B, block.getNrRating());
 
-        int toReturn = db.update(TABLE_BLOCKING, values, DECLARANT_KEY_T_B + " = ?" +
+        return db.update(TABLE_BLOCKING, values, DECLARANT_KEY_T_B + " = ?" +
                     " AND " + BLOCKED_KEY_T_B + " = ?",
             new String[] { String.valueOf(block.getNrDeclarant()), String.valueOf(block.getNrBlocked()) });
-
-        return toReturn;
-
     }
 
     /**
@@ -372,12 +375,13 @@ public class DatabaseHandler extends SQLiteOpenHelper
         {
             do
             {
-                String category = new String(cursor.getString(1));
+                String category = cursor.getString(1);
 
                 toReturnList.add(category);
             }
             while (cursor.moveToNext());
         }
+        cursor.close();
 
         return toReturnList;
     }

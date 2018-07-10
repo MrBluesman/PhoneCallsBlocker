@@ -1,10 +1,11 @@
 <resources>
+    <!-- General strings -->
     <string name="app_name">Phone Calls Blocker</string>
     <string name="menu_settings">Ustawienia</string>
     <string name="title_activity_main">Blokowanie połączeń</string>
     <string name="title_activity_permissions_startup">Uprawnienia</string>
-
-    <!-- Strings related to MainActivity -->
+    <string name="ok">OK</string>
+    <string name="cancel">Anuluj</string>
 
     <!-- Strings related to PermissionsStartupActivity -->
     <string name="permissions_startup_activity_header">
@@ -57,6 +58,8 @@
     <string name="phone_block_fragment_action_settings">Ustawienia</string>
     <string name="phone_block_fragment_action_search">Wyszukaj</string>
     <string name="phone_block_fragment_action_delete">Usuń</string>
+    <string name="phone_block_fragment_delete_confirm_title">Usuwanie blokowań</string>
+    <string name="phone_block_fragment_delete_confirm">Czy na pewno usunąć zaznaczone blokowania?</string>
 
     <!-- Strings related to AddPhoneBlock -->
     <string name="add_phone_block_title">Nowe blokowanie numeru</string>

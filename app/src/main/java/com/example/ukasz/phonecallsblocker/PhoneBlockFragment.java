@@ -1,7 +1,9 @@
 package com.example.ukasz.phonecallsblocker;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -33,7 +35,8 @@ import java.util.Objects;
  * A fragment representing a list of Blocks.
  * <p/>
  */
-public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, MyPhoneBlockRecyclerViewAdapter.BlockAdapterListener
+public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener,
+        MyPhoneBlockRecyclerViewAdapter.BlockAdapterListener
 {
 
     private static final String ARG_COLUMN_COUNT = "column-count";
@@ -382,14 +385,17 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
             {
                 case R.id.action_delete:
                     // delete all the selected blockings
-                    deleteBlockings();
-                    mode.finish();
+
+                    //alert dialog for confirmation
+                    confirmDelete(mode).show();
                     return true;
 
                 default:
+                    mode.finish();
                     return false;
             }
         }
+
 
         /**
          * Action after destroy action mode - deleting.
@@ -415,10 +421,8 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
         }
     }
 
-    //TODO: DELETE ALSO FROM DATABASE
-    // deleting the blockings from recycler view
-
     /**
+     * TODO: Poprawić, usuwa niepoprawne blokowania
      * Deletes the blocking from {@link RecyclerView}.
      */
     private void deleteBlockings()
@@ -428,8 +432,43 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
                 adapter.getSelectedItems();
         for (int i = selectedItemPositions.size() - 1; i >= 0; i--)
         {
+            Block b = blockings.get(i);
+            db.deleteBlocking(b);
             adapter.removeData(selectedItemPositions.get(i));
         }
         adapter.notifyDataSetChanged();
+    }
+
+
+    /**
+     * Creates a confirmation {@link AlertDialog} for deleting selected blockings from list.
+     *
+     * @param mode {@link ActionMode mode} to finish after positive deleting
+     * @return {@link AlertDialog} with confirmation for deleting selected blockings
+     */
+    private AlertDialog confirmDelete(final ActionMode mode)
+    {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+
+        //Add the buttons
+        builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which)
+            {
+                deleteBlockings();
+                mode.finish();
+            }
+        });
+
+        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener()
+        {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {}
+        });
+
+        builder.setMessage(R.string.phone_block_fragment_delete_confirm)
+                .setTitle(R.string.phone_block_fragment_delete_confirm_title);
+
+        return builder.create();
     }
 }
