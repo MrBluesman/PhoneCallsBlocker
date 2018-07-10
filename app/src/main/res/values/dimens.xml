@@ -5,4 +5,11 @@
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="appbar_padding_top">8dp</dimen>
     <dimen name="text_margin">16dp</dimen>
+
+    <dimen name="padding_list_row">16dp</dimen>
+    <dimen name="phoneblock_text_primary">16sp</dimen>
+    <dimen name="icon_width_height">40dp</dimen>
+    <dimen name="icon_text">22dp</dimen>
+
+
 </resources>

@@ -4,4 +4,9 @@
     <color name="colorPrimaryDark">#303f9f</color>
     <color name="colorAccent">#2b3941</color>
     <color name="colorBackground">#ffffff</color>
+
+    <color name="bg_action_mode">#757575</color>
+    <color name="bg_circle_default">#666666</color>
+    <color name="row_activated">#e0e0e0</color>
+    <color name="block_number">#000000</color>
 </resources>

@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.support.design.widget.TabLayout;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
@@ -26,8 +25,7 @@ import android.widget.Toast;
 
 import com.example.ukasz.androidsqlite.Block;
 
-public class StartActivity extends AppCompatActivity implements HomeFragment.OnFragmentInteractionListener,
-        PhoneBlockFragment.OnListFragmentInteractionListener
+public class StartActivity extends AppCompatActivity implements HomeFragment.OnFragmentInteractionListener
 {
 
     /**
@@ -52,6 +50,11 @@ public class StartActivity extends AppCompatActivity implements HomeFragment.OnF
 
     private boolean detectEnabled;
     private boolean autoBlockEnabled;
+
+    /**
+     * The {@link com.github.clans.fab.FloatingActionMenu} instance.
+     */
+    com.github.clans.fab.FloatingActionMenu fab;
 
     /**
      * Method which runs on activity start.
@@ -83,6 +86,7 @@ public class StartActivity extends AppCompatActivity implements HomeFragment.OnF
         tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(mViewPager));
 
         //Floating Action Button Menu
+        fab = findViewById(R.id.start_activity_fab);
         com.github.clans.fab.FloatingActionButton fab_add_manually = findViewById(R.id.start_activity_add_manually);
         fab_add_manually.setOnClickListener(new View.OnClickListener()
         {
@@ -93,6 +97,7 @@ public class StartActivity extends AppCompatActivity implements HomeFragment.OnF
                 startActivity(addBlockIntent);
             }
         });
+
 
         com.github.clans.fab.FloatingActionButton fab_add_contacts = findViewById(R.id.start_activity_add_contacts);
         fab_add_contacts.setOnClickListener(new View.OnClickListener()
@@ -122,6 +127,7 @@ public class StartActivity extends AppCompatActivity implements HomeFragment.OnF
     protected void onResume()
     {
         super.onResume();
+        if(fab.isOpened()) fab.toggle(true);
         Log.e("StartActivity","onResume() method");
         //loadSettingsState();
     }
@@ -133,6 +139,7 @@ public class StartActivity extends AppCompatActivity implements HomeFragment.OnF
     protected void onRestart()
     {
         super.onRestart();
+        if(fab.isOpened()) fab.toggle(true);
         Log.e("StartActivity","onRestart() method");
         //loadSettingsState();
     }
@@ -282,11 +289,6 @@ public class StartActivity extends AppCompatActivity implements HomeFragment.OnF
         return autoBlockEnabled;
     }
 
-    @Override
-    public void onListFragmentInteraction(Block item)
-    {
-
-    }
 
     /**
      * A placeholder fragment containing a simple view.
@@ -373,5 +375,7 @@ public class StartActivity extends AppCompatActivity implements HomeFragment.OnF
             // Show 3 total pages.
             return 3;
         }
+
     }
+
 }

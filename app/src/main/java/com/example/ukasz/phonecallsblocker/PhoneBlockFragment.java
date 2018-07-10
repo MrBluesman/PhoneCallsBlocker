@@ -1,38 +1,51 @@
 package com.example.ukasz.phonecallsblocker;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.view.ActionMode;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.example.ukasz.androidsqlite.Block;
 import com.example.ukasz.androidsqlite.DatabaseHandler;
+import com.example.ukasz.phonecallsblocker.list_helper.DividerItemDecoration;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * A fragment representing a list of Blocks.
  * <p/>
- * Activities containing this fragment MUST implement the {@link OnListFragmentInteractionListener}
- * interface.
  */
-public class PhoneBlockFragment extends Fragment
+public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, MyPhoneBlockRecyclerViewAdapter.BlockAdapterListener
 {
 
     private static final String ARG_COLUMN_COUNT = "column-count";
     private int mColumnCount = 1;
-    private OnListFragmentInteractionListener mListener;
-    public static RecyclerView.Adapter adapter;
-    public static List<Block> blockings; //adapter data
+    private MyPhoneBlockRecyclerViewAdapter adapter;
+    private RecyclerView recyclerView;
+    public static List<Block> blockings = new ArrayList<>(); //adapter data
     DatabaseHandler db;
+
+    private SwipeRefreshLayout swipeRefreshLayout;
+    private ActionModeCallback actionModeCallback;
+    private android.view.ActionMode actionMode;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -57,10 +70,15 @@ public class PhoneBlockFragment extends Fragment
         return fragment;
     }
 
+    /**
+     * Runs on resume application.
+     * Notify data set changed.
+     */
     public void onResume()
     {
         // TODO Auto-generated method stub
         super.onResume();
+        adapter.notifyDataSetChanged();
         Log.e("PhoneBlockFragment", "onResume()");
     }
 
@@ -77,9 +95,11 @@ public class PhoneBlockFragment extends Fragment
             mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
         }
 
-        //get blockings
+        //set up the DatabaseHandler
         db = new DatabaseHandler(getActivity());
-        blockings = db.getAllBlockings();
+
+        //create a action mode callback
+        actionModeCallback = new ActionModeCallback();
     }
 
     /**
@@ -95,14 +115,20 @@ public class PhoneBlockFragment extends Fragment
                              Bundle savedInstanceState)
     {
         Log.e("PhoneBlockFragment", "onCreateView()");
-        View view = inflater.inflate(R.layout.fragment_phoneblock_list, container, false);
 
+        //Get the root of the phoneblock list fragment - ConstraintLayout
+        View rootView = inflater.inflate(R.layout.fragment_phoneblock_list, container, false);
+        //Then get the recyclewView from rootView
+        View view = rootView.findViewById(R.id.fragment_phoneblock_list);
 
-        // Set the adapter
+        swipeRefreshLayout = rootView.findViewById(R.id.swipe_refresh_layout);
+        swipeRefreshLayout.setOnRefreshListener(this);
+
+        //Set the adapter
         if (view instanceof RecyclerView)
         {
             Context context = view.getContext();
-            RecyclerView recyclerView = (RecyclerView) view;
+            recyclerView = (RecyclerView) view;
             if (mColumnCount <= 1)
             {
                 recyclerView.setLayoutManager(new LinearLayoutManager(context));
@@ -112,12 +138,26 @@ public class PhoneBlockFragment extends Fragment
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
 
-            adapter = new MyPhoneBlockRecyclerViewAdapter(blockings, mListener);
+            adapter = new MyPhoneBlockRecyclerViewAdapter(context, blockings, this);
             adapter.notifyDataSetChanged();
+            recyclerView.setItemAnimator(new DefaultItemAnimator());
+            recyclerView.addItemDecoration(new DividerItemDecoration(context, LinearLayoutManager.VERTICAL));
             recyclerView.setAdapter(adapter);
+
+            //Show loader and fetch blockings
+            swipeRefreshLayout.post(
+                    new Runnable()
+                    {
+                        @Override
+                        public void run()
+                        {
+                            loadBlockings();
+                        }
+                    }
+            );
         }
 
-        return view;
+        return rootView;
     }
 
     /**
@@ -129,50 +169,267 @@ public class PhoneBlockFragment extends Fragment
     {
         Log.e("PhoneBlockFragment", "onAttach()");
         super.onAttach(context);
-        if (context instanceof OnListFragmentInteractionListener)
-        {
-            mListener = (OnListFragmentInteractionListener) context;
-        }
-        else
-            {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnListFragmentInteractionListener");
-        }
+    }
 
+    /**
+     * Loads all blockings from database.
+     */
+    private void loadBlockings()
+    {
+        swipeRefreshLayout.setRefreshing(true);
+        List<Block> blockingsToAddFromDb = db.getAllBlockings();
+
+        blockings.clear();
+        blockings.addAll(blockingsToAddFromDb);
+
+        adapter.notifyDataSetChanged();
+        swipeRefreshLayout.setRefreshing(false);
+    }
+
+    /**
+     *  Refresh the list of blockings.
+     */
+    @Override
+    public void onRefresh()
+    {
+        loadBlockings();
+    }
+
+    /**
+     * Creates a options menu by inflate a {@link Menu menu} to {@link MenuInflater inflater}.
+     *
+     * @param menu {@link Menu menu} to inflate.
+     * @param inflater {@link MenuInflater inflater}.
+     */
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
+    {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.menu_start, menu);
+    }
+
+    /**
+     * Catch the selecting the menu options.
+     *
+     * @param item Selected option.
+     * @return This method applied to superclass with this item.
+     */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.menu_action_settings)
+        {
+            Toast.makeText(getActivity(), "Search...", Toast.LENGTH_SHORT).show();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     /**
      * Runs on detaching this Fragment from the Activity.
-     * disable a {@link OnListFragmentInteractionListener} for Fragment.
      */
     @Override
     public void onDetach()
     {
         Log.e("PhoneBlockFragment", "onDetach()");
         super.onDetach();
-        mListener = null;
     }
 
     /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
+     * Action after click a icon identified by position.
+     * @param position icon position.
      */
-    public interface OnListFragmentInteractionListener
+    @Override
+    public void onIconClicked(int position)
     {
-        // TODO: Update argument type and name
-        void onListFragmentInteraction(Block item);
+        Log.e("onIconClicked", String.valueOf(position));
+        enableActionMode(position);
     }
 
+    /**
+     * Turns on the action mode (deleting toolbar).
+     *
+     * @param position position of selected item do toggle.
+     */
+    @SuppressLint("ResourceAsColor")
+    private void enableActionMode(int position)
+    {
+        if (actionMode == null)
+        {
+            actionMode = Objects.requireNonNull(getActivity()).startActionMode(actionModeCallback);
+        }
+        toggleSelection(position);
+    }
+
+
+    /**
+     * Action after short click (tap) a row of position.
+     * Action depends on whether adapter has selected item to delete or for now is selected to
+     * delete - don't select then, just run a single Block info.
+     *
+     * @param position position of the clicked row.
+     */
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        blockings.clear();
+    public void onBlockRowClicked(int position)
+    {
+        Log.e("onBlockRowClicked", String.valueOf(position));
+        // verify whether action mode is enabled or not
+        // if enabled, change the row state to activated
+        if (adapter.getSelectedItemCount() > 0)
+        {
+            enableActionMode(position);
+        }
+        else
+        {
+            // read the block which removes bold from the row
+            Block block = blockings.get(position);
+            blockings.set(position, block);
+            adapter.notifyDataSetChanged();
+
+            Toast.makeText(getActivity(), "Read: " + block.getNrBlocked(), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    /**
+     * Action after long click a row of position.
+     *
+     * @param position position of the clicked row.
+     */
+    @Override
+    public void onRowLongClicked(int position)
+    {
+        Log.e("onRowLongClicked", String.valueOf(position));
+        // long press is performed, enable action mode
+        enableActionMode(position);
+    }
+
+    /**
+     * Toggle selected position to another state (to delete or not).
+     *
+     * @param position position of the Block to toggle.
+     */
+    private void toggleSelection(int position)
+    {
+        adapter.toggleSelection(position);
+        int count = adapter.getSelectedItemCount();
+
+        if (count == 0)
+        {
+            actionMode.finish();
+        }
+        else
+        {
+            actionMode.setTitle(String.valueOf(count));
+            actionMode.invalidate();
+        }
+    }
+
+    /**
+     * Inner class for creating a action mode - deleting blockings.
+     */
+    private class ActionModeCallback implements ActionMode.Callback
+    {
+
+        /**
+         * Action on creating a action mode.
+         *
+         * @param mode {@link ActionMode mode}.
+         * @param menu {@link Menu menu}.
+         *
+         * @return true
+         */
+        @Override
+        public boolean onCreateActionMode(ActionMode mode, Menu menu)
+        {
+            mode.getMenuInflater().inflate(R.menu.menu_action_mode, menu);
+            // disable swipe refresh if action mode is enabled
+            swipeRefreshLayout.setEnabled(false);
+            return true;
+        }
+
+        /**
+         * Preparing the action mode.
+         *
+         * @param mode {@link ActionMode mode}.
+         * @param menu {@link Menu menu}.
+         *
+         * @return false
+         */
+        @Override
+        public boolean onPrepareActionMode(ActionMode mode, Menu menu)
+        {
+            return false;
+        }
+
+        /**
+         * Catch the action of the toolbar (action bar).
+         *
+         * @param mode {@link ActionMode mode}.
+         * @param item {@link MenuItem item}
+         * @return True if delete has clicked, false if hasn't.
+         */
+        @Override
+        public boolean onActionItemClicked(ActionMode mode, MenuItem item)
+        {
+            switch (item.getItemId())
+            {
+                case R.id.action_delete:
+                    // delete all the selected blockings
+                    deleteBlockings();
+                    mode.finish();
+                    return true;
+
+                default:
+                    return false;
+            }
+        }
+
+        /**
+         * Action after destroy action mode - deleting.
+         * Resets adapter animation and clear previous selected items.
+         *
+         * @param mode {@link ActionMode mode}.
+         */
+        @Override
+        public void onDestroyActionMode(ActionMode mode)
+        {
+            adapter.clearSelections();
+            swipeRefreshLayout.setEnabled(true);
+            actionMode = null;
+            recyclerView.post(new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    adapter.resetAnimationIndex();
+                    // mAdapter.notifyDataSetChanged();
+                }
+            });
+        }
+    }
+
+    //TODO: DELETE ALSO FROM DATABASE
+    // deleting the blockings from recycler view
+
+    /**
+     * Deletes the blocking from {@link RecyclerView}.
+     */
+    private void deleteBlockings()
+    {
+        adapter.resetAnimationIndex();
+        List<Integer> selectedItemPositions =
+                adapter.getSelectedItems();
+        for (int i = selectedItemPositions.size() - 1; i >= 0; i--)
+        {
+            adapter.removeData(selectedItemPositions.get(i));
+        }
         adapter.notifyDataSetChanged();
     }
 }

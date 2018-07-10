@@ -53,6 +53,11 @@
     <string name="home_fragment_block_switch">Blokowanie połączeń</string>
     <string name="home_fragment_autoblock_switch">Blokowanie automatyczne z listy</string>
 
+    <!-- String related to PhoneBlockFragment -->
+    <string name="phone_block_fragment_action_settings">Ustawienia</string>
+    <string name="phone_block_fragment_action_search">Wyszukaj</string>
+    <string name="phone_block_fragment_action_delete">Usuń</string>
+
     <!-- Strings related to AddPhoneBlock -->
     <string name="add_phone_block_title">Nowe blokowanie numeru</string>
     <string name="add_phone_block_nr_blocked_hint">Wpisz numer telefonu</string>

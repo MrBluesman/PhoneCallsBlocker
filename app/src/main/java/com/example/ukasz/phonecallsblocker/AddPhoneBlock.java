@@ -27,6 +27,11 @@ public class AddPhoneBlock extends AppCompatActivity implements AdapterView.OnIt
     private EditText description;
     private Button addButton;
 
+    /**
+     * Initialize var instances and view for start Activity.
+     *
+     * @param savedInstanceState Instance state.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -68,19 +73,15 @@ public class AddPhoneBlock extends AppCompatActivity implements AdapterView.OnIt
                     //TODO: get phone number ((TelephonyManager)v.getContext().getSystemService(Context.TELEPHONY_SERVICE) is not working anymore)
 //                    Toast.makeText(v.getContext(), String.valueOf(category.getSelectedItemPosition()), Toast.LENGTH_SHORT).show();
                     DatabaseHandler db = new DatabaseHandler(v.getContext());
-//                    //Insertings block
-//                    Log.d("Insert: ", "Inserting..");
-//                    TelephonyManager tMgr = (TelephonyManager)v.getContext().getSystemService(Context.TELEPHONY_SERVICE);
-//                    String mPhoneNumber = tMgr.getLine1Number();
+
                     Block newBlock = new Block("721315333", nrBlocked.getText().toString(),
                             category.getSelectedItemPosition(), description.getText().toString(), true);
                     db.addBlocking(newBlock);
                     Toast.makeText(v.getContext(), "Numer dodany", Toast.LENGTH_SHORT).show();
                     finish();
 
-                    //TEST
+                    //ADD to blicking list to make notify data changed possible for adapter
                     PhoneBlockFragment.blockings.add(newBlock);
-                    PhoneBlockFragment.adapter.notifyDataSetChanged();
                 }
             }
         });
@@ -88,6 +89,7 @@ public class AddPhoneBlock extends AppCompatActivity implements AdapterView.OnIt
 
     /**
      * Loads categories from database to spinner.
+     *
      * @param spinner spinner which will have a set adapter with loaded categories.
      */
     public void loadCategoriesToSpinner(Spinner spinner)
@@ -99,6 +101,12 @@ public class AddPhoneBlock extends AppCompatActivity implements AdapterView.OnIt
         spinner.setAdapter(adapter);
     }
 
+    /**
+     * Catch the selected category as one of {@link MenuItem} item.
+     *
+     * @param item {@link MenuItem} item - selected category.
+     * @return This method applied to superclass with this item.
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item)
     {
@@ -111,11 +119,10 @@ public class AddPhoneBlock extends AppCompatActivity implements AdapterView.OnIt
         return super.onOptionsItemSelected(item);
     }
 
+
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id)
     {
-        // An item was selected. You can retrieve the selected item using
-        // parent.getItemAtPosition(pos)
 //        CharSequence elem = (CharSequence) parent.getItemAtPosition(position);
 //        Toast t = Toast.makeText(this, elem, Toast.LENGTH_SHORT);
 //        t.show();
