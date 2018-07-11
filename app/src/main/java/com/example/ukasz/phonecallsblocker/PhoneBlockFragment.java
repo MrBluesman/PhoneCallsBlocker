@@ -422,7 +422,6 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
     }
 
     /**
-     * TODO: Poprawić, usuwa niepoprawne blokowania
      * Deletes the blocking from {@link RecyclerView}.
      */
     private void deleteBlockings()
@@ -432,9 +431,10 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
                 adapter.getSelectedItems();
         for (int i = selectedItemPositions.size() - 1; i >= 0; i--)
         {
-            Block b = blockings.get(i);
+            int positionToDelete = selectedItemPositions.get(i);
+            Block b = blockings.get(positionToDelete);
             db.deleteBlocking(b);
-            adapter.removeData(selectedItemPositions.get(i));
+            adapter.removeData(positionToDelete);
         }
         adapter.notifyDataSetChanged();
     }
