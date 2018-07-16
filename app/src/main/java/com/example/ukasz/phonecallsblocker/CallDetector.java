@@ -100,7 +100,6 @@ public class CallDetector
                         {
                             AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
                             builder.setTitle(incomingNumber + " \n liczba zablokowań: " + db.getNumberBlockingsCount(incomingNumber));
-                            //builder.setMessage("aaa");
                             builder.setItems(new CharSequence[]
                                             {"Zablokuj i zapisz", "Zablokuj", "Przepuść"},
                                     new DialogInterface.OnClickListener()
@@ -148,7 +147,7 @@ public class CallDetector
                                                     );
 
                                                     AlertDialog alertDialog2 = builder2.create();
-                                                    alertDialog2.getWindow().setType(WindowManager.LayoutParams.TYPE_SYSTEM_ALERT);
+                                                    alertDialog2.getWindow().setType(getDialogLayoutFlag());
                                                     alertDialog2.getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
                                                             | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
                                                             | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
@@ -177,7 +176,7 @@ public class CallDetector
 
 
                             AlertDialog alertDialog = builder.create();
-                            alertDialog.getWindow().setType(WindowManager.LayoutParams.TYPE_SYSTEM_ALERT);
+                            alertDialog.getWindow().setType(getDialogLayoutFlag());
                             alertDialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
                                     | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
                                     | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
@@ -188,6 +187,18 @@ public class CallDetector
                 }
             }
         }
+    }
+
+    /**
+     * Get the flag for Dialog Layout. Since Android O permission can no longer use the previous
+     * system window type TYPE_SYSTEM_ALERT
+     *
+     * @return dialog layout flag
+     */
+    private int getDialogLayoutFlag()
+    {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.O ? WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY :
+                WindowManager.LayoutParams.TYPE_SYSTEM_ALERT;
     }
 
     /**
