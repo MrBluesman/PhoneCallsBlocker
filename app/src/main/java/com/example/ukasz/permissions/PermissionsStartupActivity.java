@@ -33,11 +33,13 @@ public class PermissionsStartupActivity extends AppCompatActivity {
     private Button grantPermissionsButton;
     private CheckBox phoneStateCheckBoxPerm;
     private CheckBox allowWindowsCheckBoxPerm;
+
     //Hidden warnings
     private TextView phoneStateWarningText;
     private ImageView phoneStateWarningImage;
     private TextView allowWindowsWarningText;
     private ImageView allowWindowsWarningImage;
+
     //const Permissions Codes
     final private static int ACTION_MANAGE_OVERLAY_PERMISSION_REQUEST_CODE = 5555;
     final private static int READ_PHONE_STATE_PERMISSION_REQUEST_CODE = 5556;
@@ -45,9 +47,9 @@ public class PermissionsStartupActivity extends AppCompatActivity {
 
     /**
      * Method which runs on activity start and contains listener for button and checkboxes,
-     * which are responsible for granting a permissions
+     * which are responsible for granting a permissions.
      * Without permissions user can't create a Phone Calls Blocking Activity
-     * (phonecallsblocker.MainActivity)
+     * {@link StartActivity}.
      *
      * @param savedInstanceState saved app instances state
      */
@@ -125,7 +127,6 @@ public class PermissionsStartupActivity extends AppCompatActivity {
                             if (!hasGrantedPermissions())
                             {
                                 requestReadPhoneStatePermission();
-                                requestCallPhonePermission();
                             }
 
                         }
@@ -155,7 +156,8 @@ public class PermissionsStartupActivity extends AppCompatActivity {
     }
 
     /**
-     * Sets options views passed by params as visible
+     * Sets options views passed by params as visible.
+     *
      * @param t TextView to set as visible
      * @param i ImageView to set as visible
      */
@@ -166,7 +168,8 @@ public class PermissionsStartupActivity extends AppCompatActivity {
     }
 
     /**
-     * Sets options views passed by params as unVisible
+     * Sets options views passed by params as unVisible.
+     *
      * @param t TextView to set as unVisible
      * @param i ImageView to set as unVisible
      */
@@ -177,7 +180,7 @@ public class PermissionsStartupActivity extends AppCompatActivity {
     }
 
     /**
-     * Opens a windows to ask for a permissions to read a phone state
+     * Opens a window to ask for a permission to read a phone state.
      */
     public void requestReadPhoneStatePermission()
     {
@@ -187,6 +190,9 @@ public class PermissionsStartupActivity extends AppCompatActivity {
                 READ_PHONE_STATE_PERMISSION_REQUEST_CODE);
     }
 
+    /**
+     * Opens a window to ask for a permission to call phone.
+     */
     public void requestCallPhonePermission(){
         //Request the permission
         Log.e("CallPhone", "true");
@@ -196,18 +202,22 @@ public class PermissionsStartupActivity extends AppCompatActivity {
     }
 
     /**
-     * Checks if the read phone state is  granted
-     * @return True if it is granted, false if it's are not
+     * Checks if the read phone state is  granted.
+     *
+     * @return true if it is granted, false if it's are not
      */
     public boolean hasGrantedPermissions()
     {
         return ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.READ_PHONE_STATE)
-                == PackageManager.PERMISSION_GRANTED;
+                == PackageManager.PERMISSION_GRANTED &&
+                ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.CALL_PHONE)
+                        == PackageManager.PERMISSION_GRANTED;
     }
 
     /**
-     * Checks if the manage overlay permission is granted
-     * Only for ANDROID SDK version >= M
+     * Checks if the manage overlay permission is granted.
+     * Only for ANDROID SDK version >= M.
+     *
      * @return True if it's granted
      */
     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -217,21 +227,19 @@ public class PermissionsStartupActivity extends AppCompatActivity {
     }
 
     /**
-     * Opens a new activity with NO_HISTORY flag and destroys this startup activity
+     * Opens a new activity with NO_HISTORY flag and destroys this startup activity.
      */
     public void openStartActivity()
     {
         Intent i = new Intent(new Intent(getApplicationContext(), StartActivity.class));
-//        i.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY); // Adds the FLAG_ACTIVITY_NO_HISTORY flag
-//            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-//            i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(i);
         finish();
     }
 
     /**
-     * Runs as a result of requesting for a grant a permissions
-     * Opens a phonecallsblocker.MainActivity if all permissions are granted
+     * Runs as a result of requesting for a grant a permissions.
+     * Opens a {@link StartActivity} if all permissions are granted.
+     *
      * @param requestCode code of the request, identify a request
      * @param permissions array of permissions
      * @param grantResults array of granted permissions
@@ -253,7 +261,11 @@ public class PermissionsStartupActivity extends AppCompatActivity {
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED)
                 {
                     // permission was granted, we can open a Main Activity
-                    if(hasGrantedManageOverlayPermission()) openStartActivity();
+                    if(hasGrantedManageOverlayPermission())
+                    {
+                        requestCallPhonePermission();
+                        //openStartActivity();
+                    }
                     else setOptionsUnVisible(phoneStateWarningText, phoneStateWarningImage);
                 }
                 else
@@ -270,7 +282,18 @@ public class PermissionsStartupActivity extends AppCompatActivity {
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED)
                 {
-                    Log.e("CallPhone2", "true");
+                    // permission was granted, we can open a Main Activity
+                    if(hasGrantedManageOverlayPermission() && hasGrantedPermissions())
+                    {
+                        openStartActivity();
+                    }
+                    else
+                    {
+                        // permission denied, boo! Disable the
+                        // functionality that depends on this permission.
+                        phoneStateWarningText.setTextKeepState(getResources().getString(R.string.permissions_startup_activity_phone_checkbox_warning));
+                        setOptionsVisible(phoneStateWarningText, phoneStateWarningImage);
+                    }
                 }
             }
         }
@@ -290,8 +313,9 @@ public class PermissionsStartupActivity extends AppCompatActivity {
     }
 
     /**
-     *  Runs after request for manage overlay permission
-     *  Opens a phonecallsblocker.MainActivity if all permissions are granted
+     *  Runs after request for manage overlay permission.
+     *  Opens a {@link StartActivity} if all permissions are granted.
+     *
      * @param requestCode code of the request, identify a request
      * @param resultCode code of the requests result
      * @param data data
