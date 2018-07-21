@@ -1,5 +1,8 @@
 package com.example.ukasz.phonecallsblocker;
 
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -22,8 +25,6 @@ import android.view.ViewGroup;
 
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.example.ukasz.androidsqlite.Block;
 
 public class StartActivity extends AppCompatActivity implements HomeFragment.OnFragmentInteractionListener
 {
@@ -172,14 +173,23 @@ public class StartActivity extends AppCompatActivity implements HomeFragment.OnF
     {
         super.onDestroy();
         Log.e("StartActivity","onDestroy() method");
-        Intent intent = new Intent(this, CallDetectService.class);
-        if(!detectEnabled) stopService(intent);
-        else
-        {
-            //restart service after killing app
-            stopService(intent);
-            startService(intent);
-        }
+    }
+
+    /**
+     * Schedule for calls detecting service in the background.
+     */
+    private void scheduleDetectingJob() {
+        JobScheduler jobScheduler = (JobScheduler)getApplicationContext()
+                .getSystemService(JOB_SCHEDULER_SERVICE);
+
+        ComponentName componentName = new ComponentName(this, CallDetectService.class);
+
+        JobInfo jobInfo = new JobInfo.Builder(1, componentName)
+                .setPersisted(true)
+                .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
+                .build();
+
+        if (jobScheduler != null) jobScheduler.schedule(jobInfo);
     }
 
     /**
@@ -197,12 +207,13 @@ public class StartActivity extends AppCompatActivity implements HomeFragment.OnF
         if (enable)
         {
             Log.e("StartActivity","START CallDetectService [method call]");
-            startService(intent);
+            scheduleDetectingJob();
+//            startService(intent);
         }
         else
         {
             Log.e("StartActivity","STOP CallDetectService [method call]");
-            stopService(intent);
+//            stopService(intent);
         }
     }
 

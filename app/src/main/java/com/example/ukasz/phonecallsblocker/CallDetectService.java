@@ -1,9 +1,7 @@
 package com.example.ukasz.phonecallsblocker;
 
-import android.app.Service;
-import android.content.Intent;
-import android.os.IBinder;
-import android.support.annotation.Nullable;
+import android.app.job.JobParameters;
+import android.app.job.JobService;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -12,55 +10,40 @@ import android.widget.Toast;
  * Service class which allows working app in background.
  * Allows start and stop detecting calls.
  */
-public class CallDetectService extends Service
+public class CallDetectService extends JobService
 {
     private CallDetector callDetector;
 
-    public CallDetectService()
-    {
-
-    }
-
     /**
-     * This method runs on creating the service of detecting calls.
-     * Creating a CallDetector object, and calls a start() method for it.
+     * This method runs on starting the job service of detecting calls.
+     * Creates a {@link CallDetector} object and calls a start method for it.
      *
-     * @param intent intent which runs a service.
-     * @param flags flags of service.
-     * @param startId id of service.
-     * @return res.
+     * @param params {@link JobParameters} parameters of the job to schedule
+     * @return true
      */
     @Override
-    public int onStartCommand(Intent intent, int flags, int startId)
+    public boolean onStartJob(JobParameters params)
     {
-        Log.e("test","CallDetectService - onStartCommand() method");
+        Log.e("test","CallDetectService - onStartJob() method");
         callDetector = new CallDetector(this);
-        int res = super.onStartCommand(intent, flags, startId);
         callDetector.start();
-        return res;
+        return true;
     }
 
     /**
-     * This method runs when we disable the service.
-     * Calls a stop() method for CallDetector object.
+     *
+     * This method runs when we disable a job service of detecting calls.
+     * Calls a stop method for {@link CallDetector} object.
+     *
+     * @param params {@link JobParameters} parameters of the job to finish
+     * @return false
      */
     @Override
-    public void onDestroy()
+    public boolean onStopJob(JobParameters params)
     {
-        super.onDestroy();
-        Log.e("test","CallDetectService - onDestroy() method");
-        callDetector.stop();
+        Log.e("test","CallDetectService - onStopJob() method");
+        if(callDetector != null) callDetector.stop();
         Toast.makeText(this, "service onDestroy", Toast.LENGTH_SHORT).show();
-
-
+        return false;
     }
-
-
-
-    @Nullable
-    @Override
-    public IBinder onBind(Intent intent) {
-        return null;
-    }
-
 }
