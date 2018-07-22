@@ -178,7 +178,8 @@ public class StartActivity extends AppCompatActivity implements HomeFragment.OnF
     /**
      * Schedule for calls detecting service in the background.
      */
-    private void scheduleDetectingJob() {
+    private void scheduleDetectingJob()
+    {
         JobScheduler jobScheduler = (JobScheduler)getApplicationContext()
                 .getSystemService(JOB_SCHEDULER_SERVICE);
 
@@ -189,7 +190,20 @@ public class StartActivity extends AppCompatActivity implements HomeFragment.OnF
                 .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
                 .build();
 
+        //Schedule detecting only Job Scheduler object is set up
         if (jobScheduler != null) jobScheduler.schedule(jobInfo);
+    }
+
+    /**
+     * Cancel scheduled calls detecting service.
+     */
+    private void cancelDetectingJob()
+    {
+        JobScheduler jobScheduler = (JobScheduler)getApplicationContext()
+                .getSystemService(JOB_SCHEDULER_SERVICE);
+
+        //Cancel only Job Scheduler object is set up
+        if (jobScheduler != null) jobScheduler.cancel(1);
     }
 
     /**
@@ -208,12 +222,11 @@ public class StartActivity extends AppCompatActivity implements HomeFragment.OnF
         {
             Log.e("StartActivity","START CallDetectService [method call]");
             scheduleDetectingJob();
-//            startService(intent);
         }
         else
         {
             Log.e("StartActivity","STOP CallDetectService [method call]");
-//            stopService(intent);
+            cancelDetectingJob();
         }
     }
 
