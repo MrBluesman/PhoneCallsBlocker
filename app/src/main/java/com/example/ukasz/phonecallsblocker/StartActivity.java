@@ -34,6 +34,9 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.ukasz.androidsqlite.Block;
+import com.example.ukasz.androidsqlite.DatabaseHandler;
+
 public class StartActivity extends AppCompatActivity implements HomeFragment.OnFragmentInteractionListener
 {
 
@@ -465,7 +468,7 @@ public class StartActivity extends AppCompatActivity implements HomeFragment.OnF
                 }
                 else
                 {
-                    Toast.makeText(StartActivity.this, "Do dodawania numerów z listy kontaktów potrzebujemy Twojej zgody na ich odczyt",
+                    Toast.makeText(StartActivity.this, "Do dodawania numerów z listy kontaktów potrzebujemy Twojej zgody na ich odczyt.",
                             Toast.LENGTH_LONG).show();
                 }
             }
@@ -532,7 +535,8 @@ public class StartActivity extends AppCompatActivity implements HomeFragment.OnF
                                             nrBlocked = numbers.getString(numbers.getColumnIndex
                                                     (ContactsContract.CommonDataKinds.Phone.NUMBER));
 
-                                            Toast.makeText(StartActivity.this, "Number="+nrBlocked, Toast.LENGTH_LONG).show();
+                                            addPhoneBlock(nrBlocked);
+
                                         }
 
                                         numbers.close();
@@ -546,5 +550,20 @@ public class StartActivity extends AppCompatActivity implements HomeFragment.OnF
                 break;
             }
         }
+    }
+
+    /**
+     * Adds nrBlocked to the blocking list.
+     *
+     * @param nrBlocked phone number to add to blocking list
+     */
+    private void addPhoneBlock(String nrBlocked)
+    {
+        DatabaseHandler db = new DatabaseHandler(StartActivity.this);
+
+        Block newBlock = new Block("721315333", nrBlocked,
+                1, "", true);
+        db.addBlocking(newBlock);
+        Toast.makeText(StartActivity.this, "Numer dodany - aby dodać opis i kategorię wejdź w szczegóły numeru.", Toast.LENGTH_SHORT).show();
     }
 }
