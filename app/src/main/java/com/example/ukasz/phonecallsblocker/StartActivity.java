@@ -1,11 +1,13 @@
 package com.example.ukasz.phonecallsblocker;
 
+import android.app.Activity;
 import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.net.Uri;
 import android.provider.ContactsContract;
 import android.support.design.widget.TabLayout;
@@ -57,7 +59,8 @@ public class StartActivity extends AppCompatActivity implements HomeFragment.OnF
 
     /**
      * Method which runs on activity start.
-     * @param savedInstanceState saved instance of Activity state.
+     *
+     * @param savedInstanceState saved instance of Activity state
      */
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -232,7 +235,8 @@ public class StartActivity extends AppCompatActivity implements HomeFragment.OnF
     /**
      * Creates a right side options menu (expandable).
      * @param menu Menu which will be created.
-     * @return true if created, false if it's not.
+     *
+     * @return true if created, false if it's not
      */
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
@@ -245,8 +249,9 @@ public class StartActivity extends AppCompatActivity implements HomeFragment.OnF
     /**
      * Handles right side options menu item clicks.
      * Actions depends on item choose.
-     * @param item Selected right side options item.
-     * @return true if actions ran correctly, false if it didn't.
+     *
+     * @param item Selected right side options item
+     * @return true if actions ran correctly, false if it didn't
      */
     @Override
     public boolean onOptionsItemSelected(MenuItem item)
@@ -268,7 +273,8 @@ public class StartActivity extends AppCompatActivity implements HomeFragment.OnF
 
     /**
      * Actions on fragment interaction.
-     * @param uri Uri.
+     *
+     * @param uri Uri
      */
     @Override
     public void onFragmentInteraction(Uri uri)
@@ -278,7 +284,8 @@ public class StartActivity extends AppCompatActivity implements HomeFragment.OnF
 
     /**
      * Checks detectEnabled boolean value.
-     * @return detectEnabled state.
+     *
+     * @return detectEnabled state
      */
     public boolean isDetectEnabled()
     {
@@ -287,7 +294,8 @@ public class StartActivity extends AppCompatActivity implements HomeFragment.OnF
 
     /**
      * Checks autoBlockEnabled boolean value.
-     * @return autoBlockEnabled state.
+     *
+     * @return autoBlockEnabled state
      */
     public boolean isAutoBlockEnabled()
     {
@@ -296,7 +304,8 @@ public class StartActivity extends AppCompatActivity implements HomeFragment.OnF
 
     /**
      * detectEnabled getter.
-     * @return value of detectEnabled.
+     *
+     * @return value of detectEnabled
      */
     public boolean getDetectEnabled()
     {
@@ -305,7 +314,8 @@ public class StartActivity extends AppCompatActivity implements HomeFragment.OnF
 
     /**
      * autoBlockEnabled getter.
-     * @return value of autoBlockEnabled.
+     *
+     * @return value of autoBlockEnabled
      */
     public boolean getAutoBlockEnabled()
     {
@@ -362,7 +372,8 @@ public class StartActivity extends AppCompatActivity implements HomeFragment.OnF
     {
         /**
          * SectionsPagerAdapter constructor.
-         * @param fm A FragmentMenager to assign with this SectionsPagerAdapter.
+         *
+         * @param fm A FragmentMenager to assign with this SectionsPagerAdapter
          */
         public SectionsPagerAdapter(FragmentManager fm)
         {
@@ -371,7 +382,8 @@ public class StartActivity extends AppCompatActivity implements HomeFragment.OnF
 
         /**
          * Chooses a fragment which instance will be create and show.
-         * @param position Position of fragment on the top sliding tabs.
+         *
+         * @param position Position of fragment on the top sliding tabs
          * @return Instance of selected Fragment depends on @param position
          */
         @Override
@@ -401,4 +413,69 @@ public class StartActivity extends AppCompatActivity implements HomeFragment.OnF
 
     }
 
+    /**
+     * Runs on back from the Activity specified by requestCode.
+     * Operates on the result of this Activity.
+     *
+     * @param requestCode unique request code of the Activity
+     * @param resultCode result code of the Activity
+     * @param data data returned by the Activity
+     */
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        switch(requestCode)
+        {
+            case ACTION_CONTACTS_CONTRACT_REQUEST_CODE:
+            {
+                if(resultCode == Activity.RESULT_OK)
+                {
+                    Uri contactData = data.getData();
+
+                    if(contactData != null)
+                    {
+                        Cursor c = getContentResolver()
+                                .query(contactData, null, null, null, null);
+
+                        if(c != null)
+                        {
+                            if(c.moveToFirst())
+                            {
+                                String contactId = c.getString(c.getColumnIndex(ContactsContract.Contacts._ID));
+                                String hasNumber = c.getString(c.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER));
+
+                                String nrBlocked = "";
+
+                                if(Integer.valueOf(hasNumber) == 1)
+                                {
+                                    Cursor numbers = getContentResolver()
+                                            .query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null,
+                                                    ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = " + contactId,
+                                                    null, null);
+
+                                    if(numbers != null)
+                                    {
+                                        while(numbers.moveToNext())
+                                        {
+                                            nrBlocked = numbers.getString(numbers.getColumnIndex
+                                                    (ContactsContract.CommonDataKinds.Phone.NUMBER));
+
+                                            Toast.makeText(StartActivity.this, "Number="+nrBlocked, Toast.LENGTH_LONG).show();
+                                        }
+
+                                        numbers.close();
+                                    }
+                                }
+                            }
+
+                            c.close();
+                        }
+
+                    }
+                }
+            }
+        }
+    }
 }
