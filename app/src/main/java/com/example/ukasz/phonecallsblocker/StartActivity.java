@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
+import android.provider.ContactsContract;
 import android.support.design.widget.TabLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -29,33 +30,30 @@ import android.widget.Toast;
 public class StartActivity extends AppCompatActivity implements HomeFragment.OnFragmentInteractionListener
 {
 
-    /**
-     * The {@link android.support.v4.view.PagerAdapter} that will provide
-     * fragments for each of the sections. We use a
-     * {@link FragmentPagerAdapter} derivative, which will keep every
-     * loaded fragment in memory. If this becomes too memory intensive, it
-     * may be best to switch to a
-     * {@link android.support.v4.app.FragmentStatePagerAdapter}.
-     */
+    /*
+    The {@link android.support.v4.view.PagerAdapter} that will provide
+    fragments for each of the sections. We use a
+    {@link FragmentPagerAdapter} derivative, which will keep every
+    loaded fragment in memory. If this becomes too memory intensive, it
+    may be best to switch to
+    a{@link android.support.v4.app.FragmentStatePagerAdapter}.*/
     private SectionsPagerAdapter mSectionsPagerAdapter;
 
-    /**
-     * The {@link ViewPager} that will host the section contents.
-     */
+
+    //The {@link ViewPager} that will host the section contents.
     private ViewPager mViewPager;
 
-    /**
-     * The {@link SharedPreferences} where are saved a app settings.
-     */
+    //The {@link SharedPreferences} where are saved a app settings.
     private SharedPreferences data;
 
     private boolean detectEnabled;
     private boolean autoBlockEnabled;
 
-    /**
-     * The {@link com.github.clans.fab.FloatingActionMenu} instance.
-     */
+    //The {@link com.github.clans.fab.FloatingActionMenu} instance.
     com.github.clans.fab.FloatingActionMenu fab;
+
+    //const Contact contract request code
+    private final int ACTION_CONTACTS_CONTRACT_REQUEST_CODE = 1111;
 
     /**
      * Method which runs on activity start.
@@ -106,7 +104,8 @@ public class StartActivity extends AppCompatActivity implements HomeFragment.OnF
             @Override
             public void onClick(View v)
             {
-                Toast.makeText(getApplicationContext(), "ZROBIĆ DODAWANIE Z KONTAKTÓW", Toast.LENGTH_LONG).show();
+                Intent contactsIntent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
+                startActivityForResult(contactsIntent, ACTION_CONTACTS_CONTRACT_REQUEST_CODE);
             }
         });
 
