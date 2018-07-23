@@ -1,5 +1,6 @@
 package com.example.ukasz.phonecallsblocker;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
@@ -7,10 +8,14 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.ContactsContract;
+import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
@@ -54,8 +59,9 @@ public class StartActivity extends AppCompatActivity implements HomeFragment.OnF
     //The {@link com.github.clans.fab.FloatingActionMenu} instance.
     com.github.clans.fab.FloatingActionMenu fab;
 
-    //const Contact contract request code
+    //request unique codes
     private final int ACTION_CONTACTS_CONTRACT_REQUEST_CODE = 1111;
+    private final int READ_CONTACTS_PERMISSION_REQUEST_CODE = 1112;
 
     /**
      * Method which runs on activity start.
@@ -108,7 +114,11 @@ public class StartActivity extends AppCompatActivity implements HomeFragment.OnF
             public void onClick(View v)
             {
                 Intent contactsIntent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
-                startActivityForResult(contactsIntent, ACTION_CONTACTS_CONTRACT_REQUEST_CODE);
+                if(!hasGrantedReadContactsPermission())
+                {
+                    requestReadContactsPermission();
+                }
+                else startActivityForResult(contactsIntent, ACTION_CONTACTS_CONTRACT_REQUEST_CODE);
             }
         });
 
@@ -414,6 +424,66 @@ public class StartActivity extends AppCompatActivity implements HomeFragment.OnF
     }
 
     /**
+     * Opens a window to ask for a permission to call phone.
+     */
+    public void requestReadContactsPermission()
+    {
+        //Request the permission
+        Log.e("ReadContacts", "true");
+        ActivityCompat.requestPermissions(this,
+                new String[]{Manifest.permission.READ_CONTACTS},
+                READ_CONTACTS_PERMISSION_REQUEST_CODE);
+    }
+
+    /**
+     * Runs as a result of requesting for a grant a permissions.
+     * Opens a {@link StartActivity} if all permissions are granted.
+     *
+     * @param requestCode code of the request, identify a request
+     * @param permissions array of permissions
+     * @param grantResults array of granted permissions
+     */
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults)
+    {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        switch(requestCode)
+        {
+            case READ_CONTACTS_PERMISSION_REQUEST_CODE:
+            {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+                {
+                    // permission was granted, we can open a Main Activity
+                    if(hasGrantedReadContactsPermission())
+                    {
+                        Intent contactsIntent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
+                        startActivityForResult(contactsIntent, ACTION_CONTACTS_CONTRACT_REQUEST_CODE);
+                    }
+                }
+                else
+                {
+                    Toast.makeText(StartActivity.this, "Do dodawania numerów z listy kontaktów potrzebujemy Twojej zgody na ich odczyt",
+                            Toast.LENGTH_LONG).show();
+                }
+            }
+        }
+    }
+
+    /**
+     * Checks if the read contacts state is granted.
+     *
+     * @return true if it is granted, false if it's are not
+     */
+    public boolean hasGrantedReadContactsPermission()
+    {
+        return ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.READ_CONTACTS)
+                == PackageManager.PERMISSION_GRANTED;
+    }
+
+    /**
      * Runs on back from the Activity specified by requestCode.
      * Operates on the result of this Activity.
      *
@@ -430,7 +500,7 @@ public class StartActivity extends AppCompatActivity implements HomeFragment.OnF
         {
             case ACTION_CONTACTS_CONTRACT_REQUEST_CODE:
             {
-                if(resultCode == Activity.RESULT_OK)
+                if(resultCode == Activity.RESULT_OK && hasGrantedReadContactsPermission())
                 {
                     Uri contactData = data.getData();
 
@@ -469,12 +539,11 @@ public class StartActivity extends AppCompatActivity implements HomeFragment.OnF
                                     }
                                 }
                             }
-
                             c.close();
                         }
-
                     }
                 }
+                break;
             }
         }
     }
