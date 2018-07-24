@@ -622,7 +622,7 @@ public class StartActivity extends AppCompatActivity implements HomeFragment.OnF
         @SuppressLint("MissingPermission")
         final Cursor c = StartActivity.this.getContentResolver().query(
                 android.provider.CallLog.Calls.CONTENT_URI, callLogFields,
-                WHERE, null, viaOrder);
+                WHERE, null, viaOrder + " LIMIT 30");
 
         AlertDialog.Builder callLogDialog = new AlertDialog.Builder(
                 StartActivity.this);
