@@ -6,6 +6,7 @@ import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -16,6 +17,7 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
@@ -65,6 +67,7 @@ public class StartActivity extends AppCompatActivity implements HomeFragment.OnF
     //request unique codes
     private final int ACTION_CONTACTS_CONTRACT_REQUEST_CODE = 1111;
     private final int READ_CONTACTS_PERMISSION_REQUEST_CODE = 1112;
+    private final int READ_CALL_LOG_PERMISSION_REQUEST_CODE = 1113;
 
     /**
      * Method which runs on activity start.
@@ -131,7 +134,11 @@ public class StartActivity extends AppCompatActivity implements HomeFragment.OnF
             @Override
             public void onClick(View v)
             {
-                Toast.makeText(getApplicationContext(), "ZROBIĆ DODAWANIE Z REJESTRU POŁĄCZEŃ", Toast.LENGTH_LONG).show();
+                if(!hasGrantedReadCallLogPermission())
+                {
+                    requestReadCallLogPermission();
+                }
+//                Toast.makeText(getApplicationContext(), "ZROBIĆ DODAWANIE Z REJESTRU POŁĄCZEŃ", Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -426,8 +433,40 @@ public class StartActivity extends AppCompatActivity implements HomeFragment.OnF
 
     }
 
+//    public void getCallLog() {
+//
+//        String[] callLogFields = { android.provider.CallLog.Calls._ID,
+//                android.provider.CallLog.Calls.NUMBER,
+//                android.provider.CallLog.Calls.CACHED_NAME /* im not using the name but you can*/};
+//        String viaOrder = android.provider.CallLog.Calls.DATE + " DESC";
+//        String WHERE = android.provider.CallLog.Calls.NUMBER + " >0"; /*filter out private/unknown numbers */
+//
+//        final Cursor callLog_cursor = StartActivity.this.getContentResolver().query(
+//                android.provider.CallLog.Calls.CONTENT_URI, callLogFields,
+//                WHERE, null, viaOrder);
+//
+//        AlertDialog.Builder myversionOfCallLog = new AlertDialog.Builder(
+//                StartActivity.this);
+//
+//        android.content.DialogInterface.OnClickListener listener = new DialogInterface.OnClickListener() {
+//            public void onClick(DialogInterface dialogInterface, int item) {
+//                callLog_cursor.moveToPosition(item);
+//
+//                Log.v("number", callLog_cursor.getString(callLog_cursor
+//                        .getColumnIndex(android.provider.CallLog.Calls.NUMBER)));
+//
+//                callLog_cursor.close();
+//
+//            }
+//        };
+//        myversionOfCallLog.setCursor(callLog_cursor, listener,
+//                android.provider.CallLog.Calls.NUMBER);
+//        myversionOfCallLog.setTitle("Choose from Call Log");
+//        myversionOfCallLog.create().show();
+//    }
+
     /**
-     * Opens a window to ask for a permission to call phone.
+     * Opens a window to ask for a permission to read contacts.
      */
     public void requestReadContactsPermission()
     {
@@ -436,6 +475,18 @@ public class StartActivity extends AppCompatActivity implements HomeFragment.OnF
         ActivityCompat.requestPermissions(this,
                 new String[]{Manifest.permission.READ_CONTACTS},
                 READ_CONTACTS_PERMISSION_REQUEST_CODE);
+    }
+
+    /**
+     * Opens a window to ask for a permission to read call log.
+     */
+    public void requestReadCallLogPermission()
+    {
+        //Request the permission
+        Log.e("ReadCallLog", "true");
+        ActivityCompat.requestPermissions(this,
+                new String[]{Manifest.permission.READ_CALL_LOG},
+                READ_CALL_LOG_PERMISSION_REQUEST_CODE);
     }
 
     /**
@@ -471,18 +522,52 @@ public class StartActivity extends AppCompatActivity implements HomeFragment.OnF
                     Toast.makeText(StartActivity.this, "Do dodawania numerów z listy kontaktów potrzebujemy Twojej zgody na ich odczyt.",
                             Toast.LENGTH_LONG).show();
                 }
+                break;
+            }
+            case READ_CALL_LOG_PERMISSION_REQUEST_CODE:
+            {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+                {
+                    // permission was granted, we can open a Main Activity
+                    if(hasGrantedReadCallLogPermission())
+                    {
+                        Toast.makeText(StartActivity.this, "OK",
+                                Toast.LENGTH_LONG).show();
+//                        Intent contactsIntent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
+//                        startActivityForResult(contactsIntent, ACTION_CONTACTS_CONTRACT_REQUEST_CODE);
+                    }
+                }
+                else
+                {
+                    Toast.makeText(StartActivity.this, "Do dodawania numerów z rejestru połączeń potrzebujemy Twojej zgody na ich odczyt.",
+                            Toast.LENGTH_LONG).show();
+                }
+                break;
             }
         }
     }
 
     /**
-     * Checks if the read contacts state is granted.
+     * Checks if the read contacts permission is granted.
      *
      * @return true if it is granted, false if it's are not
      */
     public boolean hasGrantedReadContactsPermission()
     {
         return ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.READ_CONTACTS)
+                == PackageManager.PERMISSION_GRANTED;
+    }
+
+    /**
+     * Checks if the read call log permission is granted.
+     *
+     * @return true if it is granted, false if it's are not
+     */
+    public boolean hasGrantedReadCallLogPermission()
+    {
+        return ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.READ_CALL_LOG)
                 == PackageManager.PERMISSION_GRANTED;
     }
 
