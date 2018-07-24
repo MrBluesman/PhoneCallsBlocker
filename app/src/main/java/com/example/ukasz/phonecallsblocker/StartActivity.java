@@ -1,6 +1,7 @@
 package com.example.ukasz.phonecallsblocker;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
@@ -12,6 +13,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
+import android.provider.CallLog;
 import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
@@ -138,6 +140,7 @@ public class StartActivity extends AppCompatActivity implements HomeFragment.OnF
                 {
                     requestReadCallLogPermission();
                 }
+                else getPhoneFromCallLog();
 //                Toast.makeText(getApplicationContext(), "ZROBIĆ DODAWANIE Z REJESTRU POŁĄCZEŃ", Toast.LENGTH_LONG).show();
             }
         });
@@ -433,38 +436,6 @@ public class StartActivity extends AppCompatActivity implements HomeFragment.OnF
 
     }
 
-//    public void getCallLog() {
-//
-//        String[] callLogFields = { android.provider.CallLog.Calls._ID,
-//                android.provider.CallLog.Calls.NUMBER,
-//                android.provider.CallLog.Calls.CACHED_NAME /* im not using the name but you can*/};
-//        String viaOrder = android.provider.CallLog.Calls.DATE + " DESC";
-//        String WHERE = android.provider.CallLog.Calls.NUMBER + " >0"; /*filter out private/unknown numbers */
-//
-//        final Cursor callLog_cursor = StartActivity.this.getContentResolver().query(
-//                android.provider.CallLog.Calls.CONTENT_URI, callLogFields,
-//                WHERE, null, viaOrder);
-//
-//        AlertDialog.Builder myversionOfCallLog = new AlertDialog.Builder(
-//                StartActivity.this);
-//
-//        android.content.DialogInterface.OnClickListener listener = new DialogInterface.OnClickListener() {
-//            public void onClick(DialogInterface dialogInterface, int item) {
-//                callLog_cursor.moveToPosition(item);
-//
-//                Log.v("number", callLog_cursor.getString(callLog_cursor
-//                        .getColumnIndex(android.provider.CallLog.Calls.NUMBER)));
-//
-//                callLog_cursor.close();
-//
-//            }
-//        };
-//        myversionOfCallLog.setCursor(callLog_cursor, listener,
-//                android.provider.CallLog.Calls.NUMBER);
-//        myversionOfCallLog.setTitle("Choose from Call Log");
-//        myversionOfCallLog.create().show();
-//    }
-
     /**
      * Opens a window to ask for a permission to read contacts.
      */
@@ -533,10 +504,7 @@ public class StartActivity extends AppCompatActivity implements HomeFragment.OnF
                     // permission was granted, we can open a Main Activity
                     if(hasGrantedReadCallLogPermission())
                     {
-                        Toast.makeText(StartActivity.this, "OK",
-                                Toast.LENGTH_LONG).show();
-//                        Intent contactsIntent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
-//                        startActivityForResult(contactsIntent, ACTION_CONTACTS_CONTRACT_REQUEST_CODE);
+                        getPhoneFromCallLog();
                     }
                 }
                 else
@@ -604,7 +572,7 @@ public class StartActivity extends AppCompatActivity implements HomeFragment.OnF
                                 String contactId = c.getString(c.getColumnIndex(ContactsContract.Contacts._ID));
                                 String hasNumber = c.getString(c.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER));
 
-                                String nrBlocked = "";
+                                String nrBlocked;
 
                                 if(Integer.valueOf(hasNumber) == 1)
                                 {
@@ -635,6 +603,46 @@ public class StartActivity extends AppCompatActivity implements HomeFragment.OnF
                 break;
             }
         }
+    }
+
+    public void getPhoneFromCallLog()
+    {
+        String[] callLogFields = {
+                android.provider.CallLog.Calls._ID,
+                android.provider.CallLog.Calls.NUMBER,
+                android.provider.CallLog.Calls.CACHED_NAME
+        };
+
+        //DESC order
+        String viaOrder = android.provider.CallLog.Calls.DATE + " DESC";
+        //filter out private/unknown numbers
+        String WHERE = android.provider.CallLog.Calls.NUMBER + " >0";
+
+
+        @SuppressLint("MissingPermission")
+        final Cursor c = StartActivity.this.getContentResolver().query(
+                android.provider.CallLog.Calls.CONTENT_URI, callLogFields,
+                WHERE, null, viaOrder);
+
+        AlertDialog.Builder callLogDialog = new AlertDialog.Builder(
+                StartActivity.this);
+
+        android.content.DialogInterface.OnClickListener listener = new DialogInterface.OnClickListener()
+        {
+            public void onClick(DialogInterface dialogInterface, int item)
+            {
+                if (c != null)
+                {
+                    c.moveToPosition(item);
+                    addPhoneBlock(c.getString(c.getColumnIndex(android.provider.CallLog.Calls.NUMBER)));
+                    c.close();
+                }
+            }
+        };
+
+        callLogDialog.setCursor(c, listener, CallLog.Calls.NUMBER);
+        callLogDialog.setTitle(R.string.start_activity_call_log_choose_dialog_title);
+        callLogDialog.create().show();
     }
 
     /**

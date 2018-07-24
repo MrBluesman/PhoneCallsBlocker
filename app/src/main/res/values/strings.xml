@@ -49,6 +49,7 @@
     <string name="start_activity_fab_manually">Ręcznie</string>
     <string name="start_activity_fab_contacts">Z kontaktów</string>
     <string name="start_activity_fab_calls_registry">Z rejestru połączeń</string>
+    <string name="start_activity_call_log_choose_dialog_title">Rejestr ostatnich połączeń</string>
 
     <!-- Strings related to HomeFragment -->
     <string name="home_fragment_block_switch">Blokowanie połączeń</string>
