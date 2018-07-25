@@ -38,7 +38,7 @@ public class DatabaseHandler extends SQLiteOpenHelper
      * Constructor which create a new instance od DatabaseHandler by call extended super.
      * SQLiteOpenHelper.
      *
-     * @param context Context of application.
+     * @param context Context of application
      */
     public DatabaseHandler(Context context)
     {
@@ -47,10 +47,10 @@ public class DatabaseHandler extends SQLiteOpenHelper
 
 
     /**
-     * Method which runs on creating a SQLite database.
+     * Runs on creating a SQLite database.
      * Contains definition and structure of tables in database.
      *
-     * @param db Database which will be keeping SQLite tables defined in this method.
+     * @param db database which will be keeping SQLite tables defined in this method
      */
     @Override
     public void onCreate(SQLiteDatabase db)
@@ -82,11 +82,11 @@ public class DatabaseHandler extends SQLiteOpenHelper
     }
 
     /**
-     * Method which destroys database structure and creating new by call onCreate(db).
+     * Destroys database structure and creating new by call onCreate(db).
      *
-     * @param db Database which will be upgraded.
-     * @param oldVersion id of old database version.
-     * @param newVersion id of new database version.
+     * @param db database which will be upgraded
+     * @param oldVersion id of old database version
+     * @param newVersion id of new database version
      */
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion)
@@ -98,9 +98,9 @@ public class DatabaseHandler extends SQLiteOpenHelper
     }
 
     /**
-     * Method which adds a new blocking to database.
+     * Adds a new blocking to database.
      *
-     * @param block Instance of block which will be add to database.
+     * @param block instance of block which will be add to database
      */
     public void addBlocking(Block block)
     {
@@ -118,11 +118,11 @@ public class DatabaseHandler extends SQLiteOpenHelper
     }
 
     /**
-     * Method which return Block instance from database.
+     * Gets Block instance from database.
      *
-     * @param nr_declarant Phone number of declarant.
-     * @param nr_blocked Blocked phone number.
-     * @return Block instance from database.
+     * @param nr_declarant Phone number of declarant
+     * @param nr_blocked Blocked phone number
+     * @return Block instance from database
      */
     public Block getBlocking(String nr_declarant, String nr_blocked)
     {
@@ -145,10 +145,10 @@ public class DatabaseHandler extends SQLiteOpenHelper
     }
 
     /**
-     * Method which returns a list of all blockings for blocked phone number.
+     * Gets a list of all blockings for blocked phone number.
      *
-     * @param nr_blocked Blocked phone number.
-     * @return List of all Block instances for blocked number in database.
+     * @param nr_blocked Blocked phone number
+     * @return list of all Block instances for blocked number in database
      */
     public List<Block> getNumberBlockings(String nr_blocked)
     {
@@ -180,13 +180,13 @@ public class DatabaseHandler extends SQLiteOpenHelper
     }
 
     /**
-     * Method which returns all Block instances from database.
+     * Gets all Block instances from database.
      *
-     * @return List of all Blocks instances from database.
+     * @return list of all Blocks instances from database
      */
     public List<Block> getAllBlockings()
     {
-        List<Block> toReturnList = new ArrayList<Block>();
+        List<Block> toReturnList = new ArrayList<>();
 
         String selectAllBlockings = "SELECT * FROM " + TABLE_BLOCKING;
         SQLiteDatabase db = this.getReadableDatabase();
@@ -213,10 +213,45 @@ public class DatabaseHandler extends SQLiteOpenHelper
     }
 
     /**
-     * Method which count blockings for block number.
+     * Gets all Block instances from database filtered by rating.
      *
-     * @param nr_blocked Blocked phone number.
-     * @return count of blockings for nr_blocked in database.
+     * @param rating filter condition - get only positive or only negative
+     * @return list of Blocks instances from database filtered by rating
+     */
+    public List<Block> getAllBlockings(boolean rating)
+    {
+        List<Block> toReturnList = new ArrayList<>();
+
+        int sqlRating = rating ? 1 : 0;
+        String selectBlockingsByRating = "SELECT * FROM " + TABLE_BLOCKING + "WHERE " + RATING_T_B + "=" + sqlRating + ";";
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = db.rawQuery(selectBlockingsByRating, null);
+        if(cursor.moveToFirst())
+        {
+            do
+            {
+                Block block = new Block();
+                block.setNrDeclarant(cursor.getString(0));
+                block.setNrBlocked(cursor.getString(1));
+                block.setReasonCategory(Integer.parseInt(cursor.getString(2)));
+                block.setReasonDescription(cursor.getString(3));
+                block.setNrRating(Boolean.parseBoolean(cursor.getString(4)));
+
+                toReturnList.add(block);
+            }
+            while (cursor.moveToNext());
+        }
+        cursor.close();
+
+        return toReturnList;
+    }
+
+    /**
+     * Counts blockings for block number.
+     *
+     * @param nr_blocked blocked phone number
+     * @return count of blockings for nr_blocked in database
      */
     public int getNumberBlockingsCount(String nr_blocked)
     {
@@ -230,12 +265,33 @@ public class DatabaseHandler extends SQLiteOpenHelper
         return count;
     }
 
+    /**
+     * Counts blockings for block number filtered by rating.
+     *
+     * @param nr_blocked blocked phone number
+     * @param rating filter condition - get only positive or only negative
+     * @return count of blockings for nr_blocked in database filtered by rating
+     */
+    public int getNumberBlockingsCount(String nr_blocked, boolean rating)
+    {
+        int sqlRating = rating ? 1 : 0;
+        String countBlockingsByRating = "SELECT * FROM " + TABLE_BLOCKING
+                + " WHERE " + BLOCKED_KEY_T_B + "=" + nr_blocked
+                + " AND " + RATING_T_B + "=" + sqlRating + ";";
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(countBlockingsByRating, null);
+        int count = cursor.getCount();
+        cursor.close();
+
+        return count;
+    }
+
 
     /**
-     * Method which checks if block exists in database.
+     * Checks if block exists in database.
      *
-     * @param block Block instance which will be checked if exist in database.
-     * @return true if block exists or false if not exist.
+     * @param block Block instance which will be checked if exist in database
+     * @return true if block exists or false if not exist
      */
     public boolean existBlock(Block block)
     {
@@ -258,9 +314,9 @@ public class DatabaseHandler extends SQLiteOpenHelper
     }
 
     /**
-     * Method which returns count of all blockings in database.
+     * Gets count of all blockings in database.
      *
-     * @return count of all blockings in database.
+     * @return count of all blockings in database
      */
     public int getBlockingsCount()
     {
@@ -274,10 +330,10 @@ public class DatabaseHandler extends SQLiteOpenHelper
     }
 
     /**
-     * Method which update data for block in database.
+     * Updates data for block in database.
      *
-     * @param block Block instance which will be updated.
-     * @return 1 of updated, 0 if not updated.
+     * @param block block instance which will be updated
+     * @return 1 of updated, 0 if not updated
      */
     public int updateBlocking(Block block)
     {
@@ -296,9 +352,9 @@ public class DatabaseHandler extends SQLiteOpenHelper
     }
 
     /**
-     * Method which delete instance of block from database.
+     * Deletes instance of block from database.
      *
-     * @param block Block instance which will be deleted from database.
+     * @param block Block instance which will be deleted from database
      */
     public void deleteBlocking(Block block)
     {
@@ -311,9 +367,9 @@ public class DatabaseHandler extends SQLiteOpenHelper
     }
 
     /**
-     * Method which returns count of all categories in database.
+     * Gets count of all categories in database.
      *
-     * @return count of all categories in database.
+     * @return count of all categories in database
      */
     public int getCategoriesCount()
     {
@@ -324,7 +380,7 @@ public class DatabaseHandler extends SQLiteOpenHelper
     }
 
     /**
-     * Method which deletes all categories from database.
+     * Deletes all categories from database.
      */
     public void clearCategories()
     {
@@ -339,7 +395,7 @@ public class DatabaseHandler extends SQLiteOpenHelper
     }
 
     /**
-     * Method which update categories by clear and fill again.
+     * Updates categories by clear and fill again.
      */
     public void updateCategories()
     {
@@ -348,7 +404,7 @@ public class DatabaseHandler extends SQLiteOpenHelper
     }
 
     /**
-     * Method which fill categories table in database with predefined categories.
+     * Fills categories table in database with predefined categories.
      */
     public void fillCategories()
     {
@@ -359,7 +415,7 @@ public class DatabaseHandler extends SQLiteOpenHelper
     }
 
     /**
-     * Method which returns list of all categories in database.
+     * Gets list of all categories in database.
      *
      * @return list of all categories in database (List of String).
      */

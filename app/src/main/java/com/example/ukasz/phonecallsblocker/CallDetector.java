@@ -1,25 +1,15 @@
 package com.example.ukasz.phonecallsblocker;
 
-import android.Manifest;
-import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Notification;
-import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
-import android.os.Binder;
 import android.os.Build;
-import android.os.IBinder;
 import android.provider.Settings;
 import android.support.annotation.RequiresApi;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-//import android.support.v7.app.NotificationCompat;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.util.Log;
@@ -31,8 +21,6 @@ import com.example.ukasz.androidsqlite.DatabaseHandler;
 
 import java.lang.reflect.Method;
 import java.util.List;
-
-import static android.content.Context.NOTIFICATION_SERVICE;
 
 /**
  * Created by Łukasz Parysek on 2017-03-05.
@@ -78,7 +66,8 @@ public class CallDetector
                     //autoBlockSwitch.setChecked(autoBlockEnabled);
                     //textViewTestowy.setText(Boolean.toString(detectEnabled));
 
-                    if(autoBlockEnabled && db.getNumberBlockingsCount(incomingNumber) > 0)
+                    //Checks if we should autoblocked (only for negative phone numbers)
+                    if(autoBlockEnabled && db.getNumberBlockingsCount(incomingNumber, true) > 0)
                     {
                         try
                         {
