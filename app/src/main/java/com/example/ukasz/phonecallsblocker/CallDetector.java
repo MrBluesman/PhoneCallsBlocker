@@ -78,7 +78,7 @@ public class CallDetector
                             e.printStackTrace();
                         }
                     }
-                    else
+                    else if(db.getNumberBlockingsCount(incomingNumber, false) == 0)
                     {
                         //Can draw overlays depends on SDK version
                         boolean canDrawOverlays = true;
