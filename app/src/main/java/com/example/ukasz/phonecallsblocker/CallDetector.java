@@ -78,12 +78,14 @@ public class CallDetector
                     //autoBlockSwitch.setChecked(autoBlockEnabled);
                     //textViewTestowy.setText(Boolean.toString(detectEnabled));
 
-                    if(autoBlockEnabled && db.getNumberBlockingsCount(incomingNumber)>0)
+                    if(autoBlockEnabled && db.getNumberBlockingsCount(incomingNumber) > 0)
                     {
-                        try {
+                        try
+                        {
                             declinePhone(ctx);
-                            Toast.makeText(ctx, "Zablokowano", Toast.LENGTH_SHORT).show();
-                        } catch (Exception e) {
+                        }
+                        catch (Exception e)
+                        {
                             e.printStackTrace();
                         }
                     }
@@ -107,12 +109,14 @@ public class CallDetector
                                         {
                                             switch (which)
                                             {
+                                                //Save and block
                                                 case 0:
                                                     final List<String> categories = db.getAllCategories();
                                                     AlertDialog.Builder builder2 = new AlertDialog.Builder(ctx);
-                                                    builder2.setTitle("Wybierz kategorię:");
+                                                    builder2.setTitle(R.string.call_detector_choose_category_title);
                                                     CharSequence[] categoriesCharSequence = new CharSequence[categories.size()];
 
+                                                    //Build categories list
                                                     int i=0;
                                                     for(String cat:categories)
                                                     {
@@ -125,17 +129,13 @@ public class CallDetector
                                                             {
 
                                                                 @Override
-                                                                public void onClick(DialogInterface dialog, int which2)
+                                                                public void onClick(DialogInterface dialog, int categoryId)
                                                                 {
-                                                                    if(db.existBlock(new Block(tm.getLine1Number(), incomingNumber, which2, "a", true)))
-                                                                    {
-                                                                        Toast.makeText(ctx, "Numer został już zablokowany!", Toast.LENGTH_SHORT).show();
-                                                                    }
-                                                                    else db.addBlocking(new Block(tm.getLine1Number(), incomingNumber, which2, "a", true));
+                                                                    addPhoneBlock(db, incomingNumber, true);
+
                                                                     try
                                                                     {
                                                                         declinePhone(ctx);
-                                                                        Toast.makeText(ctx, "Zablokowano", Toast.LENGTH_SHORT).show();
                                                                     }
                                                                     catch (Exception e)
                                                                     {
@@ -154,19 +154,35 @@ public class CallDetector
                                                     alertDialog2.show();
 
                                                     break;
+                                                //Block
                                                 case 1:
                                                     try
                                                     {
                                                         declinePhone(ctx);
-                                                        Toast.makeText(ctx, "Zablokowano", Toast.LENGTH_SHORT).show();
                                                     }
                                                     catch (Exception e)
                                                     {
                                                         e.printStackTrace();
                                                     }
                                                     break;
+
+                                                //Save as positive
                                                 case 2:
-                                                    Toast.makeText(ctx, "Przepuszczono", Toast.LENGTH_SHORT).show();
+                                                    addPhoneBlock(db, incomingNumber, false);
+
+                                                    try
+                                                    {
+                                                        declinePhone(ctx);
+                                                    }
+                                                    catch (Exception e)
+                                                    {
+                                                        e.printStackTrace();
+                                                    }
+                                                    break;
+
+                                                //Allow
+                                                case 3:
+                                                    Toast.makeText(ctx, R.string.call_detector_has_allowed, Toast.LENGTH_SHORT).show();
                                                     break;
                                             }
                                         }
@@ -201,6 +217,22 @@ public class CallDetector
     }
 
     /**
+     * Adds phoneNumber to the blocking list.
+     *
+     * @param db {@link DatabaseHandler} to check if phoneNumber exists
+     * @param phoneNumber phone number to add to blocking list
+     * @param rating rating of added phone number, positive or negative
+     */
+    private void addPhoneBlock(DatabaseHandler db, String phoneNumber, boolean rating)
+    {
+        if(db.existBlock(new Block(tm.getLine1Number(), phoneNumber, 0, "", rating)))
+        {
+            Toast.makeText(ctx, "Numer został już zablokowany!", Toast.LENGTH_SHORT).show();
+        }
+        else db.addBlocking(new Block(tm.getLine1Number(), phoneNumber, 0, "", rating));
+    }
+
+    /**
      * Method which decline/hang out/turn off incoming call.
      *
      * @param context       Context of application.
@@ -221,6 +253,8 @@ public class CallDetector
 
             m2.invoke(iTelephony);
             m3.invoke(iTelephony);
+
+            Toast.makeText(ctx, R.string.call_detector_has_blocked, Toast.LENGTH_SHORT).show();
         }
         catch (Exception e)
         {

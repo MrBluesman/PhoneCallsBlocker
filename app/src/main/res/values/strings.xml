@@ -64,9 +64,14 @@
     <string name="phone_block_fragment_delete_confirm">Czy na pewno usunąć zaznaczone numery?</string>
 
     <!-- Strings related to AddPhoneBlock -->
-    <string name="add_phone_block_title">Nowe numer</string>
+    <string name="add_phone_block_title">Nowy numer</string>
     <string name="add_phone_block_nr_blocked_hint">Wpisz numer telefonu</string>
     <string name="add_phone_block_category_header">Kategoria</string>
     <string name="add_phone_block_description_hint">Opisz powód blokowania</string>
     <string name="add_phone_block_button_add">Dodaj numer do listy</string>
+
+    <!-- String related to CallDetector -->
+    <string name="call_detector_choose_category_title">Wybierz kategorię</string>
+    <string name="call_detector_has_blocked">Zablokowano</string>
+    <string name="call_detector_has_allowed">Przepuszczono</string>
 </resources>
