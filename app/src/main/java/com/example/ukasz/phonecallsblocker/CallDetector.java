@@ -100,8 +100,7 @@ public class CallDetector
                         {
                             AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
                             builder.setTitle(incomingNumber + " \n liczba zablokowań: " + db.getNumberBlockingsCount(incomingNumber));
-                            builder.setItems(new CharSequence[]
-                                            {"Zablokuj i zapisz", "Zablokuj", "Przepuść"},
+                            builder.setItems(R.array.incoming_number_options,
                                     new DialogInterface.OnClickListener()
                                     {
                                         public void onClick(DialogInterface dialog, int which)
