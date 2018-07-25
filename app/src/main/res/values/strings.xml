@@ -50,6 +50,7 @@
     <string name="start_activity_fab_contacts">Z kontaktów</string>
     <string name="start_activity_fab_calls_registry">Z rejestru połączeń</string>
     <string name="start_activity_call_log_choose_dialog_title">Rejestr ostatnich połączeń</string>
+    <string name="start_activity_dialog_rating_title">Ocena dodanego numeru</string>
 
     <!-- Strings related to HomeFragment -->
     <string name="home_fragment_block_switch">Blokowanie połączeń</string>
@@ -59,11 +60,11 @@
     <string name="phone_block_fragment_action_settings">Ustawienia</string>
     <string name="phone_block_fragment_action_search">Wyszukaj</string>
     <string name="phone_block_fragment_action_delete">Usuń</string>
-    <string name="phone_block_fragment_delete_confirm_title">Usuwanie blokowań</string>
-    <string name="phone_block_fragment_delete_confirm">Czy na pewno usunąć zaznaczone blokowania?</string>
+    <string name="phone_block_fragment_delete_confirm_title">Usuwanie numerów z listy</string>
+    <string name="phone_block_fragment_delete_confirm">Czy na pewno usunąć zaznaczone numery?</string>
 
     <!-- Strings related to AddPhoneBlock -->
-    <string name="add_phone_block_title">Nowe blokowanie numeru</string>
+    <string name="add_phone_block_title">Nowe numer</string>
     <string name="add_phone_block_nr_blocked_hint">Wpisz numer telefonu</string>
     <string name="add_phone_block_category_header">Kategoria</string>
     <string name="add_phone_block_description_hint">Opisz powód blokowania</string>

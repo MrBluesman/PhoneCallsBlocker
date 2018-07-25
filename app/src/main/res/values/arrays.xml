@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="blocking_rating_options">
+        <item>Pozytywny</item>
+        <item>Negatywny</item>
+    </string-array>
+</resources>

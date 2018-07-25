@@ -3,6 +3,7 @@ package com.example.ukasz.phonecallsblocker;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.Dialog;
 import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
 import android.content.ComponentName;
@@ -585,11 +586,11 @@ public class StartActivity extends AppCompatActivity implements HomeFragment.OnF
                                     {
                                         while(numbers.moveToNext())
                                         {
+
                                             nrBlocked = numbers.getString(numbers.getColumnIndex
                                                     (ContactsContract.CommonDataKinds.Phone.NUMBER));
 
-                                            addPhoneBlock(nrBlocked);
-
+                                            createRatingDialog(nrBlocked).show();
                                         }
 
                                         numbers.close();
@@ -634,7 +635,7 @@ public class StartActivity extends AppCompatActivity implements HomeFragment.OnF
                 if (c != null)
                 {
                     c.moveToPosition(item);
-                    addPhoneBlock(c.getString(c.getColumnIndex(android.provider.CallLog.Calls.NUMBER)));
+                    createRatingDialog(c.getString(c.getColumnIndex(android.provider.CallLog.Calls.NUMBER))).show();
                     c.close();
                 }
             }
@@ -646,17 +647,43 @@ public class StartActivity extends AppCompatActivity implements HomeFragment.OnF
     }
 
     /**
+     * Creates a {@link AlertDialog} for choose rating for adding blocking.
+     *
+     * @param nrBlocked phone number to add to blocking list after dialog action
+     * @return created {@link AlertDialog}
+     */
+    private Dialog createRatingDialog(final String nrBlocked)
+    {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(StartActivity.this);
+        builder.setTitle(R.string.start_activity_dialog_rating_title)
+                .setItems(R.array.blocking_rating_options, new DialogInterface.OnClickListener()
+                {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which)
+                    {
+                        //0 - positive, 1 - negative
+                        boolean rating = which != 0;
+                        addPhoneBlock(nrBlocked, rating);
+                    }
+                });
+
+
+        return builder.create();
+    }
+
+    /**
      * Adds nrBlocked to the blocking list.
      *
      * @param nrBlocked phone number to add to blocking list
+     * @param rating rating of added phone number, positive or negative
      */
-    private void addPhoneBlock(String nrBlocked)
+    private void addPhoneBlock(String nrBlocked, boolean rating)
     {
         DatabaseHandler db = new DatabaseHandler(StartActivity.this);
 
         Block newBlock = new Block("721315333", nrBlocked,
-                1, "", true);
+                1, "", rating);
         db.addBlocking(newBlock);
-        Toast.makeText(StartActivity.this, "Numer dodany - aby dodać opis i kategorię wejdź w szczegóły numeru.", Toast.LENGTH_SHORT).show();
+        Toast.makeText(StartActivity.this, "Numer dodany", Toast.LENGTH_SHORT).show();
     }
 }
