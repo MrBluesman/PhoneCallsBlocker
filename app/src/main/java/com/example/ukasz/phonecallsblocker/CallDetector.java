@@ -189,6 +189,10 @@ public class CallDetector
                         }
                     }
                 }
+                case TelephonyManager.CALL_STATE_OFFHOOK:
+                {
+                    Log.e("ABC", "już nie dzwoni");
+                }
             }
         }
     }
