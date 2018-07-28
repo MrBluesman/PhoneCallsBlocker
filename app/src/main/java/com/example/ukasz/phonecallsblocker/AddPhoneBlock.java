@@ -104,8 +104,9 @@ public class AddPhoneBlock extends AppCompatActivity implements AdapterView.OnIt
                     if(!db.existBlock(newBlock))
                     {
                         db.addBlocking(newBlock);
-                        //ADD to bloicking list to make notify data changed possible for adapter
+                        //ADD to blocking list to make notify data changed possible for adapter
                         PhoneBlockFragment.blockings.add(newBlock);
+                        Toast.makeText(v.getContext(), "Numer dodany", Toast.LENGTH_SHORT).show();
                     }
                     else
                     {
