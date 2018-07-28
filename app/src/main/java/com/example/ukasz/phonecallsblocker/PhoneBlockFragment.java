@@ -2,9 +2,11 @@ package com.example.ukasz.phonecallsblocker;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -45,6 +47,7 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
     private RecyclerView recyclerView;
     public static List<Block> blockings = new ArrayList<>(); //adapter data
     DatabaseHandler db;
+    IntentFilter intentFilter;
 
     private SwipeRefreshLayout swipeRefreshLayout;
     private ActionModeCallback actionModeCallback;
@@ -162,6 +165,19 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
                     }
             );
         }
+
+        //Refresh list on every minute
+        intentFilter = new IntentFilter();
+        intentFilter.addAction(Intent.ACTION_TIME_TICK);
+
+        view.getContext().registerReceiver(new BroadcastReceiver()
+        {
+            @Override
+            public void onReceive(Context context, Intent intent)
+            {
+                adapter.notifyDataSetChanged();
+            }
+        }, intentFilter);
 
         return rootView;
     }
