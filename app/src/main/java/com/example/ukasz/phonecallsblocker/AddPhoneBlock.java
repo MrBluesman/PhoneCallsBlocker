@@ -54,28 +54,24 @@ public class AddPhoneBlock extends AppCompatActivity implements AdapterView.OnIt
         isPositiveSwitch = findViewById(R.id.add_phone_block_is_positive_switch);
         description = findViewById(R.id.add_phone_block_descriptionEditText);
 
-        //line divider ---------------------------------------------------------------------
-        lineDivider = findViewById(R.id.view5);
-
         //spinner --------------------------------------------------------------------------
         category = findViewById(R.id.add_phone_block_spinner);
         loadCategoriesToSpinner(category);
         category.setOnItemSelectedListener(this);
 
+        //Switch view depends on blocking type (positive or negative)
         isPositiveSwitch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(isPositiveSwitch.isChecked())
                 {
-                    description.setVisibility(View.GONE);
+//                    description.setVisibility(View.GONE);
                     category.setVisibility(View.GONE);
-                    lineDivider.setVisibility(View.GONE);
                 }
                 else
                 {
-                    description.setVisibility(View.VISIBLE);
+//                    description.setVisibility(View.VISIBLE);
                     category.setVisibility(View.VISIBLE);
-                    lineDivider.setVisibility(View.VISIBLE);
                 }
             }
         });
@@ -98,14 +94,25 @@ public class AddPhoneBlock extends AppCompatActivity implements AdapterView.OnIt
 //                    Toast.makeText(v.getContext(), String.valueOf(category.getSelectedItemPosition()), Toast.LENGTH_SHORT).show();
                     DatabaseHandler db = new DatabaseHandler(v.getContext());
 
-                    Block newBlock = new Block("721315333", nrBlocked.getText().toString(),
+                    //Block data depends on isPositiveSwitch
+                    Block newBlock = isPositiveSwitch.isChecked() ? new Block("721315333", nrBlocked.getText().toString(),
+                           0 , description.getText().toString(), false)
+                            : new Block("721315333", nrBlocked.getText().toString(),
                             category.getSelectedItemPosition(), description.getText().toString(), true);
-                    db.addBlocking(newBlock);
-                    Toast.makeText(v.getContext(), "Numer dodany", Toast.LENGTH_SHORT).show();
-                    finish();
 
-                    //ADD to blicking list to make notify data changed possible for adapter
-                    PhoneBlockFragment.blockings.add(newBlock);
+
+                    if(!db.existBlock(newBlock))
+                    {
+                        db.addBlocking(newBlock);
+                        //ADD to bloicking list to make notify data changed possible for adapter
+                        PhoneBlockFragment.blockings.add(newBlock);
+                    }
+                    else
+                    {
+                        Toast.makeText(v.getContext(), "Numer jest już na liście", Toast.LENGTH_SHORT).show();
+                    }
+
+                    finish();
                 }
             }
         });
