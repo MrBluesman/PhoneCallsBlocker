@@ -683,17 +683,7 @@ public class StartActivity extends AppCompatActivity implements HomeFragment.OnF
 
         Block newBlock = new Block("721315333", nrBlocked,
                 1, "", rating);
-
-        if(!db.existBlock(newBlock))
-        {
-            db.addBlocking(newBlock);
-            //ADD to blocking list to make notify data changed possible for adapter
-            PhoneBlockFragment.blockings.add(newBlock);
-            Toast.makeText(StartActivity.this, "Numer dodany", Toast.LENGTH_SHORT).show();
-        }
-        else
-        {
-            Toast.makeText(StartActivity.this, "Numer jest już na liście", Toast.LENGTH_SHORT).show();
-        }
+        db.addBlocking(newBlock);
+        Toast.makeText(StartActivity.this, "Numer dodany", Toast.LENGTH_SHORT).show();
     }
 }
