@@ -111,6 +111,7 @@ public class DatabaseHandler extends SQLiteOpenHelper
         values.put(BLOCKED_KEY_T_B, block.getNrBlocked());
         values.put(REASON_CATEGORY_T_B, block.getReasonCategory());
         values.put(REASON_DESCRIPTION_T_B, block.getReasonDescription());
+        Log.e("JAKI RODZAJ?", String.valueOf(block.getNrRating()));
         values.put(RATING_T_B, block.getNrRating());
 
         db.insert(TABLE_BLOCKING, null, values);
@@ -141,7 +142,7 @@ public class DatabaseHandler extends SQLiteOpenHelper
 
         assert cursor != null;
         return new Block(cursor.getString(0), cursor.getString(1), Integer.parseInt(cursor.getString(2)),
-                cursor.getString(3), Boolean.parseBoolean(cursor.getString(4)));
+                cursor.getString(3), "1".equals(cursor.getString(4)));
     }
 
     /**
@@ -201,7 +202,7 @@ public class DatabaseHandler extends SQLiteOpenHelper
                 block.setNrBlocked(cursor.getString(1));
                 block.setReasonCategory(Integer.parseInt(cursor.getString(2)));
                 block.setReasonDescription(cursor.getString(3));
-                block.setNrRating(Boolean.parseBoolean(cursor.getString(4)));
+                block.setNrRating("1".equals(cursor.getString(4)));
 
                 toReturnList.add(block);
             }
