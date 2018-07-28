@@ -6,22 +6,37 @@
     android:layout_height="match_parent"
     tools:context=".AddPhoneBlock">
 
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/add_phone_block_toolbar"
+    <!--<android.support.v7.widget.Toolbar-->
+        <!--android:id="@+id/add_phone_block_toolbar"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:background="@color/colorPrimary"-->
+        <!--android:elevation="4dp"-->
+        <!--android:theme="@style/ThemeOverlay.AppCompat.ActionBar"-->
+        <!--app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />-->
+
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/add_phone_block_toolbar_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/colorPrimary"
-        android:elevation="4dp"
-        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
-        app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
+        android:theme="@style/AppTheme.AppBarOverlay">
 
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/add_phone_block_toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            app:popupTheme="@style/AppTheme.PopupOverlay"
+            app:title="@string/add_phone_block_title"/>
+
+    </android.support.design.widget.AppBarLayout>
 
 
     <EditText
         android:id="@+id/add_phone_block_nr_blocked_editText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
+        android:layout_marginEnd="16dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
         android:ems="10"
@@ -30,7 +45,7 @@
         android:textAlignment="viewStart"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/add_phone_block_toolbar" />
+        app:layout_constraintTop_toBottomOf="@+id/add_phone_block_toolbar_layout" />
 
     <View
         android:id="@+id/view3"
@@ -44,6 +59,30 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/add_phone_block_nr_blocked_editText" />
 
+    <Switch
+        android:id="@+id/add_phone_block_is_positive_switch"
+        android:layout_width="match_parent"
+        android:layout_height="20pt"
+        android:layout_marginEnd="16dp"
+        android:layout_marginStart="16dp"
+        android:text="@string/add_phone_block_is_positive_switch"
+        android:visibility="visible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/view3" />
+
+    <View
+        android:id="@+id/view4"
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:background="@android:color/darker_gray"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/add_phone_block_is_positive_switch" />
+
 
     <Spinner
         android:id="@+id/add_phone_block_spinner"
@@ -54,7 +93,7 @@
         android:layout_marginTop="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/view3" />
+        app:layout_constraintTop_toBottomOf="@+id/view4" />
 
     <EditText
         android:id="@+id/add_phone_block_descriptionEditText"
@@ -89,22 +128,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/add_phone_block_descriptionEditText" />
 
-    <!--<android.support.design.widget.FloatingActionButton-->
-        <!--android:id="@+id/start_activity_fab"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_gravity="end|bottom"-->
-        <!--android:layout_margin="@dimen/fab_margin"-->
-        <!--android:tint="@color/colorBackground"-->
-        <!--app:backgroundTint="@color/colorAccent"-->
-        <!--app:elevation="13dp"-->
-        <!--app:rippleColor="@color/colorPrimary"-->
-        <!--app:srcCompat="@android:drawable/ic_input_add" />-->
-
-    <!--private String nr_blocked;-->
-    <!--private int reason_category;-->
-    <!--private String reason_description;-->
-    <!--private boolean nr_rating;-->
 
 
 </android.support.constraint.ConstraintLayout>

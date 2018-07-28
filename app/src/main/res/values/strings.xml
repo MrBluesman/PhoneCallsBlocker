@@ -69,6 +69,7 @@
     <string name="add_phone_block_category_header">Kategoria</string>
     <string name="add_phone_block_description_hint">Opisz powód blokowania</string>
     <string name="add_phone_block_button_add">Dodaj numer do listy</string>
+    <string name="add_phone_block_is_positive_switch">Dodaj jako pozytywny (tolerowany)</string>
 
     <!-- String related to CallDetector -->
     <string name="call_detector_choose_category_title">Wybierz kategorię</string>

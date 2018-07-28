@@ -38,11 +38,11 @@ public class AddPhoneBlock extends AppCompatActivity implements AdapterView.OnIt
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_phone_block);
 
-        //set toolbar
+//        //set toolbar
         mActionBar = findViewById(R.id.add_phone_block_toolbar);
         setSupportActionBar(mActionBar);
-        mActionBar.setTitle(R.string.add_phone_block_title);
-
+//        mActionBar.setTitle(R.string.add_phone_block_title);
+//
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
@@ -132,8 +132,5 @@ public class AddPhoneBlock extends AppCompatActivity implements AdapterView.OnIt
     public void onNothingSelected(AdapterView<?> parent)
     {
 
-    }
-
-    private class SHORT {
     }
 }
