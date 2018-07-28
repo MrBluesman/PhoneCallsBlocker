@@ -3,6 +3,7 @@ package com.example.ukasz.phonecallsblocker;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -10,6 +11,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.Switch;
 import android.widget.Toast;
 
 import com.example.ukasz.androidsqlite.Block;
@@ -22,10 +24,11 @@ public class AddPhoneBlock extends AppCompatActivity implements AdapterView.OnIt
 {
     private Toolbar mActionBar;
     private EditText nrBlocked;
-    private Button nrImport;
+    private Switch isPositiveSwitch;
     private Spinner category;
     private EditText description;
     private Button addButton;
+    private View lineDivider;
 
     /**
      * Initialize var instances and view for start Activity.
@@ -48,13 +51,34 @@ public class AddPhoneBlock extends AppCompatActivity implements AdapterView.OnIt
 
         //nr info ---------------------------------------------------------------------------
         nrBlocked = findViewById(R.id.add_phone_block_nr_blocked_editText);
+        isPositiveSwitch = findViewById(R.id.add_phone_block_is_positive_switch);
         description = findViewById(R.id.add_phone_block_descriptionEditText);
 
-        //spinner
+        //line divider ---------------------------------------------------------------------
+        lineDivider = findViewById(R.id.view5);
+
+        //spinner --------------------------------------------------------------------------
         category = findViewById(R.id.add_phone_block_spinner);
         loadCategoriesToSpinner(category);
         category.setOnItemSelectedListener(this);
-        //nr info ---------------------------------------------------------------------------
+
+        isPositiveSwitch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(isPositiveSwitch.isChecked())
+                {
+                    description.setVisibility(View.GONE);
+                    category.setVisibility(View.GONE);
+                    lineDivider.setVisibility(View.GONE);
+                }
+                else
+                {
+                    description.setVisibility(View.VISIBLE);
+                    category.setVisibility(View.VISIBLE);
+                    lineDivider.setVisibility(View.VISIBLE);
+                }
+            }
+        });
 
         addButton = findViewById(R.id.add_phone_block_addButton);
         addButton.setOnClickListener(new View.OnClickListener()
