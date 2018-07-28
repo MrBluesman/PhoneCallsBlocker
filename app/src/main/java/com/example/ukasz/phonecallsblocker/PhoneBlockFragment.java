@@ -61,7 +61,8 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
     /**
      * Instance of PhoneBlockFragment initiator.
      * @param columnCount amount of columns which will be show on the list view.
-     * @return new instance of this Fragment.
+     *
+     * @return new instance of this Fragment
      */
     @SuppressWarnings("unused")
     public static PhoneBlockFragment newInstance(int columnCount)
@@ -87,7 +88,8 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
 
     /**
      * Runs on creating a this Fragment.
-     * @param savedInstanceState saved instance state of this Fragment.
+     *
+     * @param savedInstanceState saved instance state of this Fragment
      */
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -108,10 +110,11 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
     /**
      * Creates a {@link View} using a RecyclerView Adapter
      * and a Linear or Grid Layout depends on {@param mColumnCount}.
-     * @param inflater {@link LayoutInflater} which will be used to inflate a {@link View}.
-     * @param container {@link ViewGroup} container.
-     * @param savedInstanceState saved state of instance this Fragment.
-     * @return created {@link View}.
+     *
+     * @param inflater {@link LayoutInflater} which will be used to inflate a {@link View}
+     * @param container {@link ViewGroup} container
+     * @param savedInstanceState saved state of instance this Fragment
+     * @return created {@link View}
      */
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
@@ -165,6 +168,7 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
 
     /**
      * Runs when this Fragment is attaching to the Activity.
+     *
      * @param context App context.
      */
     @Override
@@ -247,7 +251,8 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
 
     /**
      * Action after click a icon identified by position.
-     * @param position icon position.
+     *
+     * @param position icon position
      */
     @Override
     public void onIconClicked(int position)
@@ -259,7 +264,7 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
     /**
      * Turns on the action mode (deleting toolbar).
      *
-     * @param position position of selected item do toggle.
+     * @param position position of selected item do toggle
      */
     @SuppressLint("ResourceAsColor")
     private void enableActionMode(int position)
@@ -277,7 +282,7 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
      * Action depends on whether adapter has selected item to delete or for now is selected to
      * delete - don't select then, just run a single Block info.
      *
-     * @param position position of the clicked row.
+     * @param position position of the clicked row
      */
     @Override
     public void onBlockRowClicked(int position)
@@ -303,7 +308,7 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
     /**
      * Action after long click a row of position.
      *
-     * @param position position of the clicked row.
+     * @param position position of the clicked row
      */
     @Override
     public void onRowLongClicked(int position)
@@ -316,7 +321,7 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
     /**
      * Toggle selected position to another state (to delete or not).
      *
-     * @param position position of the Block to toggle.
+     * @param position position of the Block to toggle
      */
     private void toggleSelection(int position)
     {

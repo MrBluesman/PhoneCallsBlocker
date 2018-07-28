@@ -9,4 +9,7 @@
     <color name="bg_circle_default">#666666</color>
     <color name="row_activated">#e0e0e0</color>
     <color name="block_number">#000000</color>
+
+    <color name="blocking_positive">#1ca600</color>
+    <color name="blocking_negative">#d60000</color>
 </resources>

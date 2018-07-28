@@ -3,6 +3,7 @@ package com.example.ukasz.phonecallsblocker;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.HapticFeedbackConstants;
 import android.view.LayoutInflater;
@@ -104,7 +105,8 @@ public class MyPhoneBlockRecyclerViewAdapter extends RecyclerView.Adapter<MyPhon
 
     /**
      * Constructor for creating a {@link MyPhoneBlockRecyclerViewAdapter} instance.
-     * @param blockings List of Blocks which should be displayed on list by this Adapter.
+     *
+     * @param blockings list of Blocks which should be displayed on list by this Adapter
      */
 
     /**
@@ -158,10 +160,12 @@ public class MyPhoneBlockRecyclerViewAdapter extends RecyclerView.Adapter<MyPhon
         //change the row state to activated
         holder.itemView.setActivated(selectedItems.get(position, false));
 
-        //handle icon animation
-        applyIconAnimation(holder, position);
         //display block image
         applyBlockPicture(holder, block);
+
+        //handle icon animation
+        applyIconAnimation(holder, position, block);
+
         //apply click events
         applyClickEvents(holder, position);
 
@@ -216,9 +220,9 @@ public class MyPhoneBlockRecyclerViewAdapter extends RecyclerView.Adapter<MyPhon
      */
     private void applyBlockPicture(ViewHolder holder, Block block)
     {
-
-            holder.mImgBlock.setImageResource(R.drawable.bg_circle);
-            holder.mImgBlock.setColorFilter(R.color.bg_circle_default);
+        //Select img block depends on block type (positive or negative)
+        if(block.getNrRating()) holder.mImgBlock.setImageResource(R.drawable.bg_circle_negative);
+        else holder.mImgBlock.setImageResource(R.drawable.bg_circle_positive);
     }
 
     /**
@@ -226,11 +230,13 @@ public class MyPhoneBlockRecyclerViewAdapter extends RecyclerView.Adapter<MyPhon
      *
      * @param holder {@link ViewHolder holder} for Block at position
      * @param position position of single Block
+     * @param block {@link Block block} which picture icon will be animated
      */
-    private void applyIconAnimation(ViewHolder holder, int position)
+    private void applyIconAnimation(ViewHolder holder, int position, Block block)
     {
         if (selectedItems.get(position, false))
         {
+            holder.mImgBlock.setImageResource(R.drawable.bg_circle);
             holder.mIconFront.setVisibility(View.GONE);
             resetIconYAxis(holder.mIconBack);
             holder.mIconBack.setVisibility(View.VISIBLE);
@@ -243,6 +249,10 @@ public class MyPhoneBlockRecyclerViewAdapter extends RecyclerView.Adapter<MyPhon
         }
         else
         {
+            //Select img block depends on block type (positive or negative)
+            if(block.getNrRating()) holder.mImgBlock.setImageResource(R.drawable.bg_circle_negative);
+            else holder.mImgBlock.setImageResource(R.drawable.bg_circle_positive);
+
             holder.mIconBack.setVisibility(View.GONE);
             resetIconYAxis(holder.mIconFront);
             holder.mIconFront.setVisibility(View.VISIBLE);
@@ -260,7 +270,7 @@ public class MyPhoneBlockRecyclerViewAdapter extends RecyclerView.Adapter<MyPhon
      * As the views will be reused, sometimes the icon appears as
      * flipped because older view is reused. Reset the Y-axis to 0.
      *
-     * @param view {@link View view} where icon has to be reset.
+     * @param view {@link View view} where icon has to be reset
      */
     private void resetIconYAxis(View view)
     {
@@ -291,7 +301,8 @@ public class MyPhoneBlockRecyclerViewAdapter extends RecyclerView.Adapter<MyPhon
 
     /**
      * Size of {@link Block} list getter.
-     * @return size of {@link Block} list.
+     *
+     * @return size of {@link Block} list
      */
     @Override
     public int getItemCount()
@@ -359,7 +370,7 @@ public class MyPhoneBlockRecyclerViewAdapter extends RecyclerView.Adapter<MyPhon
     /**
      * Removes blocking at the position from adapter blockings.
      *
-     * @param position position of blocking do remove.
+     * @param position position of blocking do remove
      */
     public void removeData(int position)
     {
