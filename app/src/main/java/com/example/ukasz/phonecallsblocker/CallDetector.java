@@ -120,7 +120,7 @@ public class CallDetector
                                                                 @Override
                                                                 public void onClick(DialogInterface dialog, int categoryId)
                                                                 {
-                                                                    addPhoneBlock(db, incomingNumber, true);
+                                                                    addPhoneBlock(db, incomingNumber, categoryId, true);
 
                                                                     try
                                                                     {
@@ -157,7 +157,7 @@ public class CallDetector
 
                                                 //Save as positive
                                                 case 2:
-                                                    addPhoneBlock(db, incomingNumber, false);
+                                                    addPhoneBlock(db, incomingNumber, 0, false);
                                                     Toast.makeText(ctx, R.string.call_detector_has_saved_positive, Toast.LENGTH_SHORT).show();
 
                                                 //Allow
@@ -205,9 +205,10 @@ public class CallDetector
      *
      * @param db {@link DatabaseHandler} to check if phoneNumber exists
      * @param phoneNumber phone number to add to blocking list
+     * @param category category of added phone number
      * @param rating rating of added phone number, positive or negative
      */
-    private void addPhoneBlock(DatabaseHandler db, String phoneNumber, boolean rating)
+    private void addPhoneBlock(DatabaseHandler db, String phoneNumber, int category, boolean rating)
     {
         if(db.existBlock(new Block(tm.getLine1Number(), phoneNumber, 0, "", rating)))
         {
