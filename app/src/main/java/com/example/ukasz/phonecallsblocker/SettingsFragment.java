@@ -28,8 +28,6 @@ public class SettingsFragment extends Fragment
 {
     private Switch blockServiceSwitch;
     private Switch autoBlockSwitch;
-    //textView TESTOWY
-    private TextView textViewTestowy;
 
     //Apps data
     private SharedPreferences data;
@@ -86,7 +84,7 @@ public class SettingsFragment extends Fragment
     {
         Log.e("HomeFragment", "onCreateView() method");
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_home, container, false);
+        return inflater.inflate(R.layout.fragment_settings, container, false);
     }
 
     @Override
@@ -97,8 +95,6 @@ public class SettingsFragment extends Fragment
         //Switcher to enable/disable blocking
         blockServiceSwitch = getView().findViewById(R.id.home_fragment_switch1_block_service);
         autoBlockSwitch = getView().findViewById(R.id.home_fragment_switch2_automatic_block);
-        //Tests text Views
-        textViewTestowy = getView().findViewById(R.id.textView);
 
         loadSettingsState();
 
@@ -118,7 +114,6 @@ public class SettingsFragment extends Fragment
                 blockServiceSwitch.setChecked(detectEnabled);
                 //autoblock switch option depends on detectEnabled
                 autoBlockSwitch.setEnabled(detectEnabled);
-                textViewTestowy.setText(Boolean.toString(detectEnabled));
 
                 //Save setting in SharedPreference
                 SharedPreferences.Editor editDataSettings = data.edit();
@@ -169,7 +164,6 @@ public class SettingsFragment extends Fragment
         autoBlockSwitch.setEnabled(detectEnabled);
 
         autoBlockSwitch.setChecked(autoBlockEnabled);
-        textViewTestowy.setText(Boolean.toString(detectEnabled));
     }
 
     /**

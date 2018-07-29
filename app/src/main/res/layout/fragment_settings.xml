@@ -30,14 +30,4 @@ tools:context="com.example.ukasz.phonecallsblocker.SettingsFragment">
     app:layout_constraintStart_toStartOf="parent"
     app:layout_constraintTop_toBottomOf="@+id/home_fragment_switch1_block_service" />
 
-<TextView
-    android:id="@+id/textView"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_marginTop="27dp"
-    android:text=""
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toBottomOf="@+id/home_fragment_switch2_automatic_block" />
-
-
 </android.support.constraint.ConstraintLayout>

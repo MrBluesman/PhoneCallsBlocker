@@ -303,13 +303,13 @@ public class DatabaseHandler extends SQLiteOpenHelper
                 + " WHERE " + DECLARANT_KEY_T_B + "=" + "'" + block.getNrDeclarant() + "'"
                 + " AND " + BLOCKED_KEY_T_B + "=" + "'" + block.getNrBlocked() + "'";
 
-        Log.d("Exist: ", block.getNrDeclarant());
-        Log.d("Exist: ", block.getNrBlocked());
+        Log.e("Exist: ", block.getNrDeclarant());
+        Log.e("Exist: ", block.getNrBlocked());
 
         Cursor cursor = db.rawQuery(selectBlockings, null);
         boolean toReturn = cursor.getCount() > 0;
         cursor.close();
-        Log.d("Exist: ", ""+cursor.getCount());
+        Log.e("Exist: ", ""+cursor.getCount());
 
         return toReturn;
     }

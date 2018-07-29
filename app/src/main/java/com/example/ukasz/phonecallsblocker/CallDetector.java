@@ -210,11 +210,11 @@ public class CallDetector
      */
     private void addPhoneBlock(DatabaseHandler db, String phoneNumber, int category, boolean rating)
     {
-        if(db.existBlock(new Block(tm.getLine1Number(), phoneNumber, 0, "", rating)))
+        if(db.existBlock(new Block(tm.getLine1Number(), phoneNumber, category, "", rating)))
         {
             Toast.makeText(ctx, "Numer został już zablokowany!", Toast.LENGTH_SHORT).show();
         }
-        else db.addBlocking(new Block(tm.getLine1Number(), phoneNumber, 0, "", rating));
+        else db.addBlocking(new Block(tm.getLine1Number(), phoneNumber, category, "", rating));
     }
 
     /**
