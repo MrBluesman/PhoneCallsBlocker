@@ -1,5 +1,7 @@
 package com.example.ukasz.phonecallsblocker;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -7,9 +9,11 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.provider.Settings;
 import android.support.annotation.RequiresApi;
+import android.support.v4.app.ActivityCompat;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.util.Log;
@@ -208,8 +212,14 @@ public class CallDetector
      * @param category category of added phone number
      * @param rating rating of added phone number, positive or negative
      */
+    @SuppressLint("HardwareIds")
     private void addPhoneBlock(DatabaseHandler db, String phoneNumber, int category, boolean rating)
     {
+        if (ActivityCompat.checkSelfPermission(ctx, Manifest.permission.READ_SMS)
+                != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(ctx, Manifest.permission.READ_PHONE_NUMBERS)
+                != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(ctx, Manifest.permission.READ_PHONE_STATE)
+                != PackageManager.PERMISSION_GRANTED) return;
+
         if(db.existBlock(new Block(tm.getLine1Number(), phoneNumber, category, "", rating)))
         {
             Toast.makeText(ctx, "Numer został już zablokowany!", Toast.LENGTH_SHORT).show();

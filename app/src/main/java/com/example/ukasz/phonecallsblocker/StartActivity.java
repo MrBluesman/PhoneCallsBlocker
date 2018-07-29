@@ -130,7 +130,7 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
             public void onClick(View v)
             {
                 Intent contactsIntent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
-                if(!hasGrantedReadContactsPermission())
+                if (!hasGrantedReadContactsPermission())
                 {
                     requestReadContactsPermission();
                 }
@@ -144,12 +144,11 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
             @Override
             public void onClick(View v)
             {
-                if(!hasGrantedReadCallLogPermission())
+                if (!hasGrantedReadCallLogPermission())
                 {
                     requestReadCallLogPermission();
                 }
                 else getPhoneFromCallLog();
-//                Toast.makeText(getApplicationContext(), "ZROBIĆ DODAWANIE Z REJESTRU POŁĄCZEŃ", Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -161,8 +160,8 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
     protected void onResume()
     {
         super.onResume();
-        if(fab.isOpened()) fab.toggle(true);
-        Log.e("StartActivity","onResume() method");
+        if (fab.isOpened()) fab.toggle(true);
+        Log.e("StartActivity", "onResume() method");
         //loadSettingsState();
     }
 
@@ -173,8 +172,8 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
     protected void onRestart()
     {
         super.onRestart();
-        if(fab.isOpened()) fab.toggle(true);
-        Log.e("StartActivity","onRestart() method");
+        if (fab.isOpened()) fab.toggle(true);
+        Log.e("StartActivity", "onRestart() method");
         //loadSettingsState();
     }
 
@@ -188,11 +187,8 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
         data = getSharedPreferences("data", Context.MODE_PRIVATE);
         detectEnabled = data.getBoolean("detectEnabled", false);
         autoBlockEnabled = data.getBoolean("autoBlockEnabled", false);
-//        blockServiceSwitch.setChecked(detectEnabled);
-//        autoBlockSwitch.setChecked(autoBlockEnabled);
-//        textViewTestowy.setText(Boolean.toString(detectEnabled));
 
-        Log.e("Loading data","MainActivity - loadSettingsState() method");
+        Log.e("Loading data", "MainActivity - loadSettingsState() method");
 
         setDetectEnabled(detectEnabled);
     }
@@ -205,7 +201,7 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
     protected void onDestroy()
     {
         super.onDestroy();
-        Log.e("StartActivity","onDestroy() method");
+        Log.e("StartActivity", "onDestroy() method");
     }
 
     /**
@@ -213,7 +209,7 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
      */
     private void scheduleDetectingJob()
     {
-        JobScheduler jobScheduler = (JobScheduler)getApplicationContext()
+        JobScheduler jobScheduler = (JobScheduler) getApplicationContext()
                 .getSystemService(JOB_SCHEDULER_SERVICE);
 
         ComponentName componentName = new ComponentName(this, CallDetectService.class);
@@ -232,7 +228,7 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
      */
     private void cancelDetectingJob()
     {
-        JobScheduler jobScheduler = (JobScheduler)getApplicationContext()
+        JobScheduler jobScheduler = (JobScheduler) getApplicationContext()
                 .getSystemService(JOB_SCHEDULER_SERVICE);
 
         //Cancel only Job Scheduler object is set up
@@ -250,15 +246,14 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
         detectEnabled = enable;
         Log.e("setDetectEnabled", "method enabled");
 
-        Intent intent = new Intent(this, CallDetectService.class);
         if (enable)
         {
-            Log.e("StartActivity","START CallDetectService [method call]");
+            Log.e("StartActivity", "START CallDetectService [method call]");
             scheduleDetectingJob();
         }
         else
         {
-            Log.e("StartActivity","STOP CallDetectService [method call]");
+            Log.e("StartActivity", "STOP CallDetectService [method call]");
             cancelDetectingJob();
         }
     }
@@ -376,7 +371,7 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
          */
         public static PlaceholderFragment newInstance(int sectionNumber)
         {
-            Log.e("sectionNumber:" , String.valueOf(sectionNumber));
+            Log.e("sectionNumber:", String.valueOf(sectionNumber));
             PlaceholderFragment fragment = new PlaceholderFragment();
             Bundle args = new Bundle();
             args.putInt(ARG_SECTION_NUMBER, sectionNumber);
@@ -406,7 +401,7 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
          *
          * @param fm a FragmentMenager to assign with this SectionsPagerAdapter
          */
-        public SectionsPagerAdapter(FragmentManager fm)
+        SectionsPagerAdapter(FragmentManager fm)
         {
             super(fm);
         }
@@ -423,12 +418,16 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
             // getItem is called to instantiate the fragment for the given page.
             // Return a PlaceholderFragment (defined as a static inner class below).
 
-            switch(position)
+            switch (position)
             {
-                case 0: return PlaceholderFragment.newInstance(position + 1);
-                case 1: return PhoneBlockFragment.newInstance(1);
-                case 2: return SettingsFragment.newInstance();
-                default: return PlaceholderFragment.newInstance(position + 1);
+                case 0:
+                    return PlaceholderFragment.newInstance(position + 1);
+                case 1:
+                    return PhoneBlockFragment.newInstance(1);
+                case 2:
+                    return SettingsFragment.newInstance();
+                default:
+                    return PlaceholderFragment.newInstance(position + 1);
             }
         }
 
@@ -482,16 +481,16 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
     {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
-        switch(requestCode)
+        switch (requestCode)
         {
             case READ_CONTACTS_PERMISSION_REQUEST_CODE:
-            {
+                {
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED)
                 {
                     // permission was granted, we can open a Main Activity
-                    if(hasGrantedReadContactsPermission())
+                    if (hasGrantedReadContactsPermission())
                     {
                         Intent contactsIntent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
                         startActivityForResult(contactsIntent, ACTION_CONTACTS_CONTRACT_REQUEST_CODE);
@@ -505,13 +504,13 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
                 break;
             }
             case READ_CALL_LOG_PERMISSION_REQUEST_CODE:
-            {
+                {
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED)
                 {
                     // permission was granted, we can open a Main Activity
-                    if(hasGrantedReadCallLogPermission())
+                    if (hasGrantedReadCallLogPermission())
                     {
                         getPhoneFromCallLog();
                     }
@@ -561,38 +560,38 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
     {
         super.onActivityResult(requestCode, resultCode, data);
 
-        switch(requestCode)
+        switch (requestCode)
         {
             case ACTION_CONTACTS_CONTRACT_REQUEST_CODE:
-            {
-                if(resultCode == Activity.RESULT_OK && hasGrantedReadContactsPermission())
+                {
+                if (resultCode == Activity.RESULT_OK && hasGrantedReadContactsPermission())
                 {
                     Uri contactData = data.getData();
 
-                    if(contactData != null)
+                    if (contactData != null)
                     {
                         Cursor c = getContentResolver()
                                 .query(contactData, null, null, null, null);
 
-                        if(c != null)
+                        if (c != null)
                         {
-                            if(c.moveToFirst())
+                            if (c.moveToFirst())
                             {
                                 String contactId = c.getString(c.getColumnIndex(ContactsContract.Contacts._ID));
                                 String hasNumber = c.getString(c.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER));
 
                                 String nrBlocked;
 
-                                if(Integer.valueOf(hasNumber) == 1)
+                                if (Integer.valueOf(hasNumber) == 1)
                                 {
                                     Cursor numbers = getContentResolver()
                                             .query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null,
                                                     ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = " + contactId,
                                                     null, null);
 
-                                    if(numbers != null)
+                                    if (numbers != null)
                                     {
-                                        while(numbers.moveToNext())
+                                        while (numbers.moveToNext())
                                         {
 
                                             nrBlocked = numbers.getString(numbers.getColumnIndex
@@ -628,8 +627,7 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
         String WHERE = android.provider.CallLog.Calls.NUMBER + " >0";
 
 
-        @SuppressLint("MissingPermission")
-        final Cursor c = StartActivity.this.getContentResolver().query(
+        @SuppressLint("MissingPermission") final Cursor c = StartActivity.this.getContentResolver().query(
                 android.provider.CallLog.Calls.CONTENT_URI, callLogFields,
                 WHERE, null, viaOrder + " LIMIT 30");
 
@@ -689,8 +687,15 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
     {
         DatabaseHandler db = new DatabaseHandler(StartActivity.this);
 
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_SMS)
+                != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_NUMBERS)
+                != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE)
+                != PackageManager.PERMISSION_GRANTED) return;
+
+        @SuppressLint("HardwareIds")
         Block newBlock = new Block(tm.getLine1Number(), nrBlocked,
                 1, "", rating);
+
 
         if(!db.existBlock(newBlock))
         {
