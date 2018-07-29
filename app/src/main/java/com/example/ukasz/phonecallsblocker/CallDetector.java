@@ -158,16 +158,7 @@ public class CallDetector
                                                 //Save as positive
                                                 case 2:
                                                     addPhoneBlock(db, incomingNumber, false);
-
-                                                    try
-                                                    {
-                                                        declinePhone(ctx);
-                                                    }
-                                                    catch (Exception e)
-                                                    {
-                                                        e.printStackTrace();
-                                                    }
-                                                    break;
+                                                    Toast.makeText(ctx, R.string.call_detector_has_saved_positive, Toast.LENGTH_SHORT).show();
 
                                                 //Allow
                                                 case 3:
