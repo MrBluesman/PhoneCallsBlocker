@@ -29,6 +29,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -60,6 +61,9 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
 
     //The {@link SharedPreferences} where are saved a app settings.
     private SharedPreferences data;
+
+    //The {@link TelephonyManager} for fetch user phone number
+    private TelephonyManager tm;
 
     private boolean detectEnabled;
     private boolean autoBlockEnabled;
@@ -96,6 +100,9 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
         //Set up the ViewPager with the sections adapter.
         mViewPager = findViewById(R.id.start_activity_container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
+
+        //Set telephony manager for fetch user phone number
+        tm = (TelephonyManager) StartActivity.this.getSystemService(Context.TELEPHONY_SERVICE);
 
         //Set up the listeners
         TabLayout tabLayout = findViewById(R.id.start_activity_tabs);
@@ -682,7 +689,7 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
     {
         DatabaseHandler db = new DatabaseHandler(StartActivity.this);
 
-        Block newBlock = new Block("721315333", nrBlocked,
+        Block newBlock = new Block(tm.getLine1Number(), nrBlocked,
                 1, "", rating);
 
         if(!db.existBlock(newBlock))
