@@ -42,8 +42,8 @@ public class CallDetector
          * Creating a Toast and Notification when the calls incoming.
          * (incoming call).
          *
-         * @param state             Information about state from TelephonyManager.
-         * @param incomingNumber    Contains the number of incoming call.
+         * @param state information about state from TelephonyManager
+         * @param incomingNumber contains the number of incoming call
          */
         @RequiresApi(api = Build.VERSION_CODES.M)
         @Override
@@ -51,10 +51,8 @@ public class CallDetector
         {
             switch(state)
             {
-
                 case TelephonyManager.CALL_STATE_RINGING:
                 {
-
 //-------------------------------------------------------------------------
                     Log.e("test", "CallDetector - onCallStateChanged() method in CALL STATE LISTENER");
                     Toast.makeText(ctx,"Połączenie przychodzące: "+incomingNumber, Toast.LENGTH_LONG).show();
@@ -66,9 +64,6 @@ public class CallDetector
                     SharedPreferences data;
                     data = ctx.getSharedPreferences("data", Context.MODE_PRIVATE);
                     boolean autoBlockEnabled = data.getBoolean("autoBlockEnabled", false);
-                    //blockServiceSwitch.setChecked(detectEnabled);
-                    //autoBlockSwitch.setChecked(autoBlockEnabled);
-                    //textViewTestowy.setText(Boolean.toString(detectEnabled));
 
                     //Checks if we should autoblocked (only for negative phone numbers)
                     if(autoBlockEnabled && db.getNumberBlockingsCount(incomingNumber, true) > 0)
@@ -93,88 +88,7 @@ public class CallDetector
 
                         if(canDrawOverlays)
                         {
-                            AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
-                            builder.setTitle(incomingNumber + " \n liczba zablokowań: " + db.getNumberBlockingsCount(incomingNumber));
-                            builder.setItems(R.array.incoming_number_options,
-                                    new DialogInterface.OnClickListener()
-                                    {
-                                        public void onClick(DialogInterface dialog, int which)
-                                        {
-                                            switch (which)
-                                            {
-                                                //Save and block
-                                                case 0:
-                                                    final List<String> categories = db.getAllCategories();
-                                                    AlertDialog.Builder builder2 = new AlertDialog.Builder(ctx);
-                                                    builder2.setTitle(R.string.call_detector_choose_category_title);
-                                                    CharSequence[] categoriesCharSequence = new CharSequence[categories.size()];
-
-                                                    //Build categories list
-                                                    int i=0;
-                                                    for(String cat:categories)
-                                                    {
-                                                        categoriesCharSequence[i] = cat;
-                                                        i++;
-                                                    }
-
-                                                    builder2.setItems(categoriesCharSequence,
-                                                            new DialogInterface.OnClickListener()
-                                                            {
-
-                                                                @Override
-                                                                public void onClick(DialogInterface dialog, int categoryId)
-                                                                {
-                                                                    addPhoneBlock(db, incomingNumber, categoryId, true);
-
-                                                                    try
-                                                                    {
-                                                                        declinePhone(ctx);
-                                                                    }
-                                                                    catch (Exception e)
-                                                                    {
-                                                                        e.printStackTrace();
-                                                                    }
-                                                                }
-                                                            }
-                                                    );
-
-                                                    AlertDialog alertDialog2 = builder2.create();
-                                                    alertDialog2.getWindow().setType(getDialogLayoutFlag());
-                                                    alertDialog2.getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
-                                                            | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
-                                                            | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
-                                                            | WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
-                                                    alertDialog2.show();
-
-                                                    break;
-                                                //Block
-                                                case 1:
-                                                    try
-                                                    {
-                                                        declinePhone(ctx);
-                                                    }
-                                                    catch (Exception e)
-                                                    {
-                                                        e.printStackTrace();
-                                                    }
-                                                    break;
-
-                                                //Save as positive
-                                                case 2:
-                                                    addPhoneBlock(db, incomingNumber, 0, false);
-                                                    Toast.makeText(ctx, R.string.call_detector_has_saved_positive, Toast.LENGTH_SHORT).show();
-
-                                                //Allow
-                                                case 3:
-                                                    Toast.makeText(ctx, R.string.call_detector_has_allowed, Toast.LENGTH_SHORT).show();
-                                                    break;
-                                            }
-                                        }
-                                    });
-
-
-
-                            AlertDialog alertDialog = builder.create();
+                            AlertDialog alertDialog = createIncomingCallDialogNewNumber(incomingNumber, db);
                             alertDialog.getWindow().setType(getDialogLayoutFlag());
                             alertDialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
                                     | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
@@ -189,6 +103,98 @@ public class CallDetector
                     Log.e("ABC", "już nie dzwoni");
                 }
             }
+        }
+
+        /**
+         * Creates a {@link AlertDialog} for incoming call with number
+         * which doesn't exist in local list.
+         *
+         * @param incomingNumber contains the number of incoming call
+         * @param db database for receive number of blockings and allow save to local list
+         * @return created {@link AlertDialog} with options for incoming call dialog for new number
+         */
+        private AlertDialog createIncomingCallDialogNewNumber(final String incomingNumber, final DatabaseHandler db)
+        {
+            AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
+            builder.setTitle(incomingNumber + " \n liczba zablokowań: " + db.getNumberBlockingsCount(incomingNumber));
+            builder.setItems(R.array.incoming_number_options,
+                    new DialogInterface.OnClickListener()
+                    {
+                        public void onClick(DialogInterface dialog, int which)
+                        {
+                            switch (which)
+                            {
+                                //Save and block
+                                case 0:
+                                    final List<String> categories = db.getAllCategories();
+                                    AlertDialog.Builder builder2 = new AlertDialog.Builder(ctx);
+                                    builder2.setTitle(R.string.call_detector_choose_category_title);
+                                    CharSequence[] categoriesCharSequence = new CharSequence[categories.size()];
+
+                                    //Build categories list
+                                    int i=0;
+                                    for(String cat:categories)
+                                    {
+                                        categoriesCharSequence[i] = cat;
+                                        i++;
+                                    }
+
+                                    builder2.setItems(categoriesCharSequence,
+                                            new DialogInterface.OnClickListener()
+                                            {
+
+                                                @Override
+                                                public void onClick(DialogInterface dialog, int categoryId)
+                                                {
+                                                    addPhoneBlock(db, incomingNumber, categoryId, true);
+
+                                                    try
+                                                    {
+                                                        declinePhone(ctx);
+                                                    }
+                                                    catch (Exception e)
+                                                    {
+                                                        e.printStackTrace();
+                                                    }
+                                                }
+                                            }
+                                    );
+
+                                    AlertDialog alertDialog2 = builder2.create();
+                                    alertDialog2.getWindow().setType(getDialogLayoutFlag());
+                                    alertDialog2.getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
+                                            | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
+                                            | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
+                                            | WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
+                                    alertDialog2.show();
+
+                                    break;
+                                //Block
+                                case 1:
+                                    try
+                                    {
+                                        declinePhone(ctx);
+                                    }
+                                    catch (Exception e)
+                                    {
+                                        e.printStackTrace();
+                                    }
+                                    break;
+
+                                //Save as positive
+                                case 2:
+                                    addPhoneBlock(db, incomingNumber, 0, false);
+                                    Toast.makeText(ctx, R.string.call_detector_has_saved_positive, Toast.LENGTH_SHORT).show();
+
+                                    //Allow
+                                case 3:
+                                    Toast.makeText(ctx, R.string.call_detector_has_allowed, Toast.LENGTH_SHORT).show();
+                                    break;
+                            }
+                        }
+                    });
+
+           return builder.create();
         }
     }
 
