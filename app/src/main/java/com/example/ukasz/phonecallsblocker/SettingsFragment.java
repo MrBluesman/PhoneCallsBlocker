@@ -1,12 +1,10 @@
 package com.example.ukasz.phonecallsblocker;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,21 +13,18 @@ import android.view.ViewGroup;
 import android.widget.Switch;
 import android.widget.TextView;
 
-import com.example.ukasz.androidsqlite.Block;
 import com.example.ukasz.androidsqlite.DatabaseHandler;
-
-import java.util.List;
 
 
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link HomeFragment.OnFragmentInteractionListener} interface
+ * {@link SettingsFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link HomeFragment#newInstance} factory method to
+ * Use the {@link SettingsFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class HomeFragment extends Fragment
+public class SettingsFragment extends Fragment
 {
 //    // TODO: Rename parameter arguments, choose names that match
 //    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -51,7 +46,7 @@ public class HomeFragment extends Fragment
 
     private OnFragmentInteractionListener mListener;
 
-    public HomeFragment()
+    public SettingsFragment()
     {
         // Required empty public constructor
     }
@@ -63,9 +58,9 @@ public class HomeFragment extends Fragment
      * @return A new instance of fragment HomeFragment.
      */
 //     TODO: Rename and change types and number of parameters
-    public static HomeFragment newInstance()
+    public static SettingsFragment newInstance()
     {
-        HomeFragment fragment = new HomeFragment();
+        SettingsFragment fragment = new SettingsFragment();
         Bundle args = new Bundle();
 //        args.putString(ARG_PARAM1, param1);
 //        args.putString(ARG_PARAM2, param2);
@@ -75,7 +70,8 @@ public class HomeFragment extends Fragment
 
     /**
      * Runs on create this Fragment.
-     * @param savedInstanceState Saved instance of this Fragment.
+     *
+     * @param savedInstanceState saved instance of this Fragment
      */
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -91,10 +87,11 @@ public class HomeFragment extends Fragment
 
     /**
      * Creates a view of this Fragment.
-     * @param inflater LayoutInflater of this Fragment.
-     * @param container ViewGroup container for elements of this Fragment.
-     * @param savedInstanceState Saved instance of this Fragment.
-     * @return Created View of this Fragment.
+     *
+     * @param inflater {@link LayoutInflater} of this Fragment
+     * @param container {@link ViewGroup} container for elements of this Fragment
+     * @param savedInstanceState saved instance of this Fragment
+     * @return created View of this Fragment
      */
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
@@ -205,7 +202,8 @@ public class HomeFragment extends Fragment
 
     /**
      * Run on attach a this Fragment to Activity.
-     * @param context Context of Activity which includes a this Fragment.
+     *
+     * @param context {@link Context} of Activity which includes a this Fragment
      */
     @Override
     public void onAttach(Context context)

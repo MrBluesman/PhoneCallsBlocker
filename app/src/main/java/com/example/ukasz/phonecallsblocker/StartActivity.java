@@ -42,7 +42,7 @@ import android.widget.Toast;
 import com.example.ukasz.androidsqlite.Block;
 import com.example.ukasz.androidsqlite.DatabaseHandler;
 
-public class StartActivity extends AppCompatActivity implements HomeFragment.OnFragmentInteractionListener
+public class StartActivity extends AppCompatActivity implements SettingsFragment.OnFragmentInteractionListener
 {
 
     /*
@@ -274,7 +274,7 @@ public class StartActivity extends AppCompatActivity implements HomeFragment.OnF
      * Handles right side options menu item clicks.
      * Actions depends on item choose.
      *
-     * @param item Selected right side options item
+     * @param item selected right side options item
      * @return true if actions ran correctly, false if it didn't
      */
     @Override
@@ -397,7 +397,7 @@ public class StartActivity extends AppCompatActivity implements HomeFragment.OnF
         /**
          * SectionsPagerAdapter constructor.
          *
-         * @param fm A FragmentMenager to assign with this SectionsPagerAdapter
+         * @param fm a FragmentMenager to assign with this SectionsPagerAdapter
          */
         public SectionsPagerAdapter(FragmentManager fm)
         {
@@ -407,8 +407,8 @@ public class StartActivity extends AppCompatActivity implements HomeFragment.OnF
         /**
          * Chooses a fragment which instance will be create and show.
          *
-         * @param position Position of fragment on the top sliding tabs
-         * @return Instance of selected Fragment depends on @param position
+         * @param position position of fragment on the top sliding tabs
+         * @return instance of selected Fragment depends on @param position
          */
         @Override
         public Fragment getItem(int position)
@@ -418,8 +418,9 @@ public class StartActivity extends AppCompatActivity implements HomeFragment.OnF
 
             switch(position)
             {
-                case 0: return HomeFragment.newInstance();
+                case 0: return PlaceholderFragment.newInstance(position + 1);
                 case 1: return PhoneBlockFragment.newInstance(1);
+                case 2: return SettingsFragment.newInstance();
                 default: return PlaceholderFragment.newInstance(position + 1);
             }
         }
