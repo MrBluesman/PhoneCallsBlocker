@@ -30,13 +30,11 @@ import java.util.List;
  * Created by Łukasz Parysek on 2017-03-05.
  * This class describes Listener, and Retriever for Incoming and Outgoing calls.
  */
-public class CallDetector
-{
+public class CallDetector {
     /**
      * Local private class which describes Listener for Incoming calls.
      */
-    private class CallStateListener extends PhoneStateListener
-    {
+    private class CallStateListener extends PhoneStateListener {
         /**
          * This method runs when the Listener is working, and call state has changed.
          * Creating a Toast and Notification when the calls incoming.
@@ -47,12 +45,10 @@ public class CallDetector
          */
         @RequiresApi(api = Build.VERSION_CODES.M)
         @Override
-        public void onCallStateChanged(int state, final String incomingNumber)
-        {
-            switch(state)
-            {
+        public void onCallStateChanged(int state, final String incomingNumber) {
+            switch (state) {
                 case TelephonyManager.CALL_STATE_RINGING:
-                {
+                    {
 //-------------------------------------------------------------------------
                     Log.e("test", "CallDetector - onCallStateChanged() method in CALL STATE LISTENER");
                     Toast.makeText(ctx,"Połączenie przychodzące: "+incomingNumber, Toast.LENGTH_LONG).show();
@@ -77,7 +73,7 @@ public class CallDetector
                             e.printStackTrace();
                         }
                     }
-                    else if(db.getNumberBlockingsCount(incomingNumber, false) == 0)
+                    else if(db.getNumberBlockingsCount(myPhoneNumber, incomingNumber, false) == 0)
                     {
                         //Can draw overlays depends on SDK version
                         boolean canDrawOverlays = true;
@@ -294,6 +290,7 @@ public class CallDetector
 
     private Context ctx;
     private TelephonyManager tm;
+    private String myPhoneNumber;
     private CallStateListener callStateListener;
     private OutgoingReceiver outgoingReceiver;
 
@@ -303,6 +300,7 @@ public class CallDetector
      *
      * @param _ctx  param of setting the app context for the CallDetector object.
      */
+    @SuppressLint("HardwareIds")
     public CallDetector(Context _ctx)
     {
         Log.e("test","CallDetector - construct on creating detector (listener)");
@@ -321,6 +319,17 @@ public class CallDetector
         Log.e("test", "CallDetector - start() method");
         tm = (TelephonyManager) ctx.getSystemService(Context.TELEPHONY_SERVICE);
         tm.listen(callStateListener, PhoneStateListener.LISTEN_CALL_STATE);
+
+        //Save the user phone number (declarant)
+        if (ActivityCompat.checkSelfPermission(ctx, Manifest.permission.READ_SMS)
+                != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(ctx, Manifest.permission.READ_PHONE_NUMBERS)
+                != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(ctx, Manifest.permission.READ_PHONE_STATE)
+                != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        myPhoneNumber = tm.getLine1Number();
 
         IntentFilter intentFilter = new IntentFilter(Intent.ACTION_NEW_OUTGOING_CALL);
         ctx.registerReceiver(outgoingReceiver, intentFilter);

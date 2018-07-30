@@ -287,6 +287,28 @@ public class DatabaseHandler extends SQLiteOpenHelper
         return count;
     }
 
+    /**
+     * Counts blockings for block number filtered by rating.
+     *
+     * @param nr_declarant declarant phone number
+     * @param nr_blocked blocked phone number
+     * @param rating filter condition - get only positive or only negative
+     * @return count of blockings for nr_blocked in database filtered by rating
+     */
+    public int getNumberBlockingsCount(String nr_declarant, String nr_blocked, boolean rating)
+    {
+        int sqlRating = rating ? 1 : 0;
+        String countBlockingsByRating = "SELECT * FROM " + TABLE_BLOCKING
+                + " WHERE " + BLOCKED_KEY_T_B + "=" + nr_blocked
+                + " AND " + RATING_T_B + "=" + sqlRating + ";";
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(countBlockingsByRating, null);
+        int count = cursor.getCount();
+        cursor.close();
+
+        return count;
+    }
+
 
     /**
      * Checks if block exists in database.
@@ -313,6 +335,37 @@ public class DatabaseHandler extends SQLiteOpenHelper
 
         return toReturn;
     }
+
+    /**
+     * Checks if block exists in database.
+     *
+     * @param nr_declarant declarant phone number
+     * @param nr_blocked blocked phone number
+     * @param rating phone rating, true if negative, false if positive
+     * @return true if block with nr_declarant and nr_blocked exists or false if not exist
+     */
+    public boolean existBlock(String nr_declarant, String nr_blocked, boolean rating)
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        int sqlRating = rating ? 1 : 0;
+        String selectBlockings = "SELECT * FROM " + TABLE_BLOCKING
+                + " WHERE " + DECLARANT_KEY_T_B + "=" + "'" + nr_declarant + "'"
+                + " AND " + BLOCKED_KEY_T_B + "=" + "'" + nr_blocked + "'"
+                + " AND " + RATING_T_B + "=" + sqlRating + ";";
+
+        Log.e("Exist: ", nr_declarant);
+        Log.e("Exist: ", nr_declarant);
+
+        Cursor cursor = db.rawQuery(selectBlockings, null);
+        boolean toReturn = cursor.getCount() > 0;
+        cursor.close();
+        Log.e("Exist: ", ""+cursor.getCount());
+
+        return toReturn;
+    }
+
+
 
     /**
      * Gets count of all blockings in database.
