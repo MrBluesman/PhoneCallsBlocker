@@ -130,8 +130,8 @@ public class DatabaseHandler extends SQLiteOpenHelper
         SQLiteDatabase db = this.getReadableDatabase();
 
         String selectBlockings = "SELECT * FROM " + TABLE_BLOCKING
-                + " WHERE " + DECLARANT_KEY_T_B + "=" + nr_declarant
-                + " AND " + BLOCKED_KEY_T_B + "=" + nr_blocked
+                + " WHERE " + DECLARANT_KEY_T_B + "='" + nr_declarant + "'"
+                + " AND " + BLOCKED_KEY_T_B + "='" + nr_blocked + "'"
                 + " LIMIT 1";
 
         Cursor cursor = db.rawQuery(selectBlockings, null);
@@ -157,7 +157,7 @@ public class DatabaseHandler extends SQLiteOpenHelper
         List<Block> toReturnList = new ArrayList<>();
 
         String selectNumberBlockings = "SELECT * FROM " + TABLE_BLOCKING
-                + " WHERE " + BLOCKED_KEY_T_B + "=" + nr_blocked +";";
+                + " WHERE " + BLOCKED_KEY_T_B + "='" + nr_blocked +"';";
 
         Cursor cursor = db.rawQuery(selectNumberBlockings, null);
         if(cursor.moveToFirst())
@@ -224,7 +224,7 @@ public class DatabaseHandler extends SQLiteOpenHelper
         List<Block> toReturnList = new ArrayList<>();
 
         int sqlRating = rating ? 1 : 0;
-        String selectBlockingsByRating = "SELECT * FROM " + TABLE_BLOCKING + "WHERE " + RATING_T_B + "=" + sqlRating + ";";
+        String selectBlockingsByRating = "SELECT * FROM " + TABLE_BLOCKING + "WHERE " + RATING_T_B + "='" + sqlRating + "';";
         SQLiteDatabase db = this.getReadableDatabase();
 
         Cursor cursor = db.rawQuery(selectBlockingsByRating, null);

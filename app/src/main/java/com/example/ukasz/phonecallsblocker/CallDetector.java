@@ -73,7 +73,7 @@ public class CallDetector {
                             e.printStackTrace();
                         }
                     }
-                    else if(db.getNumberBlockingsCount(myPhoneNumber, incomingNumber, false) == 0)
+                    else if(!db.existBlock(myPhoneNumber, incomingNumber, false))
                     {
                         //Can draw overlays depends on SDK version
                         boolean canDrawOverlays = true;
@@ -84,7 +84,12 @@ public class CallDetector {
 
                         if(canDrawOverlays)
                         {
-                            AlertDialog alertDialog = createIncomingCallDialogNewNumber(incomingNumber, db);
+                            //If number is blocked by user show dialog box with possibility to change to positive number
+                            AlertDialog alertDialog = db.existBlock(myPhoneNumber, incomingNumber, true)
+                                    ? createIncomingCallDialogBlockedNumber(incomingNumber, db)
+                                    : createIncomingCallDialogNewNumber(incomingNumber, db);
+
+
                             alertDialog.getWindow().setType(getDialogLayoutFlag());
                             alertDialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
                                     | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
@@ -175,14 +180,15 @@ public class CallDetector {
                                     {
                                         e.printStackTrace();
                                     }
+                                    Toast.makeText(ctx, R.string.call_detector_has_blocked, Toast.LENGTH_SHORT).show();
                                     break;
 
-                                //Save as positive
+                                //Save as positive (white list)
                                 case 2:
                                     addPhoneBlock(db, incomingNumber, 0, false);
                                     Toast.makeText(ctx, R.string.call_detector_has_saved_positive, Toast.LENGTH_SHORT).show();
 
-                                    //Allow
+                                //Allow
                                 case 3:
                                     Toast.makeText(ctx, R.string.call_detector_has_allowed, Toast.LENGTH_SHORT).show();
                                     break;
@@ -191,6 +197,49 @@ public class CallDetector {
                     });
 
            return builder.create();
+        }
+
+        private AlertDialog createIncomingCallDialogBlockedNumber(final String incomingNumber, final DatabaseHandler db)
+        {
+            final AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
+            builder.setTitle(incomingNumber + " \n Ten numer jest przez Ciebie blokowany.");
+
+            builder.setItems(R.array.incoming_blocked_number_options,
+                    new DialogInterface.OnClickListener()
+                    {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which)
+                        {
+                            switch(which)
+                            {
+                                case 0:
+                                //Change to positive (white list) - false is positive (not blocked)
+                                    updatePhoneBlock(db, incomingNumber, false);
+                                    Toast.makeText(ctx, R.string.call_detector_changed_to_positive, Toast.LENGTH_SHORT).show();
+                                    break;
+
+                                //Block
+                                case 1:
+                                    try
+                                    {
+                                        declinePhone(ctx);
+                                    }
+                                    catch (Exception e)
+                                    {
+                                        e.printStackTrace();
+                                    }
+                                    Toast.makeText(ctx, R.string.call_detector_has_blocked, Toast.LENGTH_SHORT).show();
+                                    break;
+
+                                //Allow
+                                case 2:
+                                    Toast.makeText(ctx, R.string.call_detector_has_allowed, Toast.LENGTH_SHORT).show();
+                                    break;
+                            }
+                        }
+                    });
+
+            return builder.create();
         }
     }
 
@@ -209,7 +258,7 @@ public class CallDetector {
     /**
      * Adds phoneNumber to the blocking list.
      *
-     * @param db {@link DatabaseHandler} to check if phoneNumber exists
+     * @param db {@link DatabaseHandler} to check if phoneNumber exists and add if not exists
      * @param phoneNumber phone number to add to blocking list
      * @param category category of added phone number
      * @param rating rating of added phone number, positive or negative
@@ -228,6 +277,21 @@ public class CallDetector {
         }
         else db.addBlocking(new Block(tm.getLine1Number(), phoneNumber, category, "", rating));
     }
+
+    /**
+     * Updates the phone block with new rating value.
+     *
+     * @param db {@link DatabaseHandler} to make a update phoneNumber exists
+     * @param phoneNumber phone number which rating will be updated
+     * @param rating new blocking rating
+     */
+    private void updatePhoneBlock(DatabaseHandler db, String phoneNumber, boolean rating)
+    {
+        Block updatedBlock = db.getBlocking(myPhoneNumber, phoneNumber);
+        updatedBlock.setNrRating(false);
+        db.updateBlocking(updatedBlock);
+    }
+
 
     /**
      * Method which decline/hang out/turn off incoming call.
@@ -250,8 +314,6 @@ public class CallDetector {
 
             m2.invoke(iTelephony);
             m3.invoke(iTelephony);
-
-            Toast.makeText(ctx, R.string.call_detector_has_blocked, Toast.LENGTH_SHORT).show();
         }
         catch (Exception e)
         {
