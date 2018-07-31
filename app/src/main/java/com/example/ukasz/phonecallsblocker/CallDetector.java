@@ -22,8 +22,10 @@ import android.widget.Toast;
 
 import com.example.ukasz.androidsqlite.Block;
 import com.example.ukasz.androidsqlite.DatabaseHandler;
+import com.example.ukasz.androidsqlite.RegistryBlock;
 
 import java.lang.reflect.Method;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -67,6 +69,7 @@ public class CallDetector {
                         try
                         {
                             declinePhone(ctx);
+                            registerPhoneBlock(db, incomingNumber, true);
                         }
                         catch (Exception e)
                         {
@@ -98,6 +101,7 @@ public class CallDetector {
                             alertDialog.show();
                         }
                     }
+                    else registerPhoneBlock(db, incomingNumber, false);
                 }
                 case TelephonyManager.CALL_STATE_OFFHOOK:
                 {
@@ -152,6 +156,7 @@ public class CallDetector {
                                                     try
                                                     {
                                                         declinePhone(ctx);
+                                                        registerPhoneBlock(db, incomingNumber, true);
                                                     }
                                                     catch (Exception e)
                                                     {
@@ -175,6 +180,7 @@ public class CallDetector {
                                     try
                                     {
                                         declinePhone(ctx);
+                                        registerPhoneBlock(db, incomingNumber, true);
                                     }
                                     catch (Exception e)
                                     {
@@ -186,10 +192,12 @@ public class CallDetector {
                                 //Save as positive (white list)
                                 case 2:
                                     addPhoneBlock(db, incomingNumber, 0, false);
+                                    registerPhoneBlock(db, incomingNumber, false);
                                     Toast.makeText(ctx, R.string.call_detector_has_saved_positive, Toast.LENGTH_SHORT).show();
 
                                 //Allow
                                 case 3:
+                                    registerPhoneBlock(db, incomingNumber, false);
                                     Toast.makeText(ctx, R.string.call_detector_has_allowed, Toast.LENGTH_SHORT).show();
                                     break;
                             }
@@ -215,6 +223,7 @@ public class CallDetector {
                                 case 0:
                                 //Change to positive (white list) - false is positive (not blocked)
                                     updatePhoneBlock(db, incomingNumber, false);
+                                    registerPhoneBlock(db, incomingNumber, false);
                                     Toast.makeText(ctx, R.string.call_detector_changed_to_positive, Toast.LENGTH_SHORT).show();
                                     break;
 
@@ -223,6 +232,7 @@ public class CallDetector {
                                     try
                                     {
                                         declinePhone(ctx);
+                                        registerPhoneBlock(db, incomingNumber, true);
                                     }
                                     catch (Exception e)
                                     {
@@ -234,6 +244,7 @@ public class CallDetector {
                                 //Allow
                                 case 2:
                                     Toast.makeText(ctx, R.string.call_detector_has_allowed, Toast.LENGTH_SHORT).show();
+                                    registerPhoneBlock(db, incomingNumber, false);
                                     break;
                             }
                         }
@@ -273,9 +284,14 @@ public class CallDetector {
 
         if(db.existBlock(new Block(tm.getLine1Number(), phoneNumber, category, "", rating)))
         {
-            Toast.makeText(ctx, "Numer został już zablokowany!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(ctx, R.string.call_detector_already_blocked, Toast.LENGTH_SHORT).show();
         }
         else db.addBlocking(new Block(tm.getLine1Number(), phoneNumber, category, "", rating));
+    }
+
+    private void registerPhoneBlock(DatabaseHandler db, String phoneNumber, boolean rating)
+    {
+        db.addBlockingRegistry(new RegistryBlock(phoneNumber, rating, new Date()));
     }
 
     /**

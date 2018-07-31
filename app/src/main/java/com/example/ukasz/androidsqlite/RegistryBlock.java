@@ -23,7 +23,7 @@ public class RegistryBlock
      * @param nr_rat blocking number rating, positive or negative blocking
      * @param nr_blo_date date of the blocking
      */
-    RegistryBlock(String nr_blo, boolean nr_rat, Date nr_blo_date)
+    public RegistryBlock(String nr_blo, boolean nr_rat, Date nr_blo_date)
     {
         this.nr_blocked = nr_blo;
         this.nr_rating = nr_rat;
