@@ -45,7 +45,7 @@ public class RegistryBlock
      *
      * @param nr_blo_date new nr_blocking_date
      */
-    public void setNrBlocking_date(Date nr_blo_date)
+    public void setNrBlockingDate(Date nr_blo_date)
     {
         this.nr_blocking_date = nr_blo_date;
     }
@@ -75,7 +75,7 @@ public class RegistryBlock
      *
      * @return nr_blocking_date of instance
      */
-    public Date getNrBlocking_date()
+    public Date getNrBlockingDate()
     {
         return this.nr_blocking_date;
     }

@@ -1,5 +1,6 @@
 package com.example.ukasz.androidsqlite;
 
+import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -7,6 +8,9 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,6 +37,15 @@ public class DatabaseHandler extends SQLiteOpenHelper
     //columns
     private static final String ID_KEY_T_C = "id";
     private static final String NAME_T_C = "name";
+
+    //table blocking_registry
+    private static final String TABLE_BLOCKING_REGISTRY = "blocking_registry";
+    //columns
+    private static final String ID_KEY_T_BR = "id";
+    private static final String BLOCKED_KEY_T_BR = "nr_blocked";
+    private static final String RATING_T_BR = "nr_rating";
+    private static final String BLOCKING_DATE_T_BR = "nr_blocking_date";
+
 
     /**
      * Constructor which create a new instance od DatabaseHandler by call extended super.
@@ -70,8 +83,8 @@ public class DatabaseHandler extends SQLiteOpenHelper
         //create a blocking table
         String createBlockingTable = "CREATE TABLE " + TABLE_BLOCKING
                 + "("
-                + DECLARANT_KEY_T_B + " VARCHAR(9) NOT NULL, "
-                + BLOCKED_KEY_T_B + " VARCHAR(9) NOT NULL, "
+                + DECLARANT_KEY_T_B + " VARCHAR(15) NOT NULL, "
+                + BLOCKED_KEY_T_B + " VARCHAR(15) NOT NULL, "
                 + REASON_CATEGORY_T_B + " INTEGER NOT NULL, "
                 + REASON_DESCRIPTION_T_B + " TEXT, "
                 + RATING_T_B + " BOOLEAN NOT NULL, "
@@ -79,6 +92,16 @@ public class DatabaseHandler extends SQLiteOpenHelper
                 + "PRIMARY KEY (" + DECLARANT_KEY_T_B + ", " + BLOCKED_KEY_T_B + ") "
                 + ")";
         db.execSQL(createBlockingTable);
+
+        //create a blocking registry table
+        String createBlockingRegistryTable = "CREATE TABLE " + TABLE_BLOCKING_REGISTRY
+                + "("
+                + ID_KEY_T_BR + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+                + BLOCKED_KEY_T_BR + " VARCHAR(15) NOT NULL, "
+                + RATING_T_BR + " BOOLEAN NOT NULL, "
+                + BLOCKING_DATE_T_BR + " DATETIME NOT NULL"
+                + ")";
+        db.execSQL(createBlockingRegistryTable);
     }
 
     /**
@@ -93,7 +116,7 @@ public class DatabaseHandler extends SQLiteOpenHelper
     {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_CATEGORY);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_BLOCKING);
-
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_BLOCKING_REGISTRY);
         onCreate(db);
     }
 
@@ -111,7 +134,6 @@ public class DatabaseHandler extends SQLiteOpenHelper
         values.put(BLOCKED_KEY_T_B, block.getNrBlocked());
         values.put(REASON_CATEGORY_T_B, block.getReasonCategory());
         values.put(REASON_DESCRIPTION_T_B, block.getReasonDescription());
-        Log.e("JAKI RODZAJ?", String.valueOf(block.getNrRating()));
         values.put(RATING_T_B, block.getNrRating());
 
         db.insert(TABLE_BLOCKING, null, values);
@@ -457,6 +479,8 @@ public class DatabaseHandler extends SQLiteOpenHelper
         fillCategories();
     }
 
+    // CATEGORIES ----------------------------------------------------------------------------------
+
     /**
      * Fills categories table in database with predefined categories.
      */
@@ -495,4 +519,61 @@ public class DatabaseHandler extends SQLiteOpenHelper
 
         return toReturnList;
     }
+
+    // BLOCKING REGISTRY ---------------------------------------------------------------------------
+    /**
+     * Adds a new registry blocking to database.
+     *
+     * @param rBlock instance of registry block which will be add to database
+     */
+    public void addBlockingRegistry(RegistryBlock rBlock)
+    {
+        //Format to save a date in specified format
+        @SuppressLint("SimpleDateFormat")
+        DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        String fillCategory = "INSERT INTO " + TABLE_BLOCKING_REGISTRY
+                + " (" + BLOCKED_KEY_T_BR + "," + RATING_T_BR + "," + BLOCKING_DATE_T_BR + ") VALUES " +
+                "('" + rBlock.getNrBlocked() + "', '" + rBlock.getNrRating() + "', '" + df.format(rBlock.getNrBlockingDate()) + "')";
+        db.execSQL(fillCategory);
+        db.close();
+    }
+
+    /**
+     * Gets all RegistryBlock instances from database.
+     *
+     * @return list of all RegistryBlocks instances from database
+     */
+    public List<RegistryBlock> getAllRegistryBlockings() throws ParseException
+    {
+        //Format to retrieve a date in specified format
+        @SuppressLint("SimpleDateFormat")
+        DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+
+        List<RegistryBlock> toReturnList = new ArrayList<>();
+
+        String selectAllRegistryBlockings = "SELECT * FROM " + TABLE_BLOCKING_REGISTRY;
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = db.rawQuery(selectAllRegistryBlockings, null);
+        if(cursor.moveToFirst())
+        {
+            do
+            {
+                RegistryBlock rBlock = new RegistryBlock();
+//                block.setNrDeclarant(cursor.getString(0));
+                rBlock.setNrBlocked(cursor.getString(1));
+                rBlock.setNrRating("1".equals(cursor.getString(2)));
+                rBlock.setNrBlockingDate(df.parse(cursor.getString(3)));
+
+                toReturnList.add(rBlock);
+            }
+            while (cursor.moveToNext());
+        }
+        cursor.close();
+
+        return toReturnList;
+    }
+
 }
