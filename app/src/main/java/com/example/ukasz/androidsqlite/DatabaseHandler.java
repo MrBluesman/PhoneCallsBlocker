@@ -533,10 +533,10 @@ public class DatabaseHandler extends SQLiteOpenHelper
         DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
 
         SQLiteDatabase db = this.getWritableDatabase();
-        String fillCategory = "INSERT INTO " + TABLE_BLOCKING_REGISTRY
+        String addBlockingRegistry = "INSERT INTO " + TABLE_BLOCKING_REGISTRY
                 + " (" + BLOCKED_KEY_T_BR + "," + RATING_T_BR + "," + BLOCKING_DATE_T_BR + ") VALUES " +
                 "('" + rBlock.getNrBlocked() + "', '" + rBlock.getNrRating() + "', '" + df.format(rBlock.getNrBlockingDate()) + "')";
-        db.execSQL(fillCategory);
+        db.execSQL(addBlockingRegistry);
         db.close();
     }
 
@@ -574,6 +574,19 @@ public class DatabaseHandler extends SQLiteOpenHelper
         cursor.close();
 
         return toReturnList;
+    }
+
+    /**
+     * Gets count of all categories in database.
+     *
+     * @return count of all categories in database
+     */
+    public int getRegistryBlockingsCount()
+    {
+        String countRegistryBlockings = "SELECT * FROM " + TABLE_BLOCKING_REGISTRY;
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(countRegistryBlockings, null);
+        return cursor.getCount();
     }
 
 }

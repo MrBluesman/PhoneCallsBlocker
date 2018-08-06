@@ -291,6 +291,7 @@ public class CallDetector {
 
     private void registerPhoneBlock(DatabaseHandler db, String phoneNumber, boolean rating)
     {
+        Log.e("CallDetector", "registerPhoneBlock - " + phoneNumber);
         db.addBlockingRegistry(new RegistryBlock(phoneNumber, rating, new Date()));
     }
 

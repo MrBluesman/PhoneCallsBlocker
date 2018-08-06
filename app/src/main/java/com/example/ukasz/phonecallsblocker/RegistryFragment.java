@@ -63,7 +63,6 @@ public class RegistryFragment extends Fragment implements MyRegistryRecyclerView
      */
     public void onResume()
     {
-        // TODO Auto-generated method stub
         super.onResume();
         adapter.notifyDataSetChanged();
         Log.e("RegistryFragment", "onResume()");
@@ -123,11 +122,11 @@ public class RegistryFragment extends Fragment implements MyRegistryRecyclerView
             }
 
             adapter = new MyRegistryRecyclerViewAdapter(context, registryBlockings, this);
-            adapter.notifyDataSetChanged();
             recyclerView.setAdapter(adapter);
             try
             {
                 loadRegistryBlockings();
+                adapter.notifyDataSetChanged();
             }
             catch (ParseException e)
             {
@@ -155,7 +154,9 @@ public class RegistryFragment extends Fragment implements MyRegistryRecyclerView
      */
     private void loadRegistryBlockings() throws ParseException
     {
+        Log.e("RegistryFragment", "loadRegistryBlockings()");
         List<RegistryBlock> registryBlockingsToAddFromDb = db.getAllRegistryBlockings();
+        Log.e("Tresc", String.valueOf(registryBlockings.size()));
         registryBlockings.clear();
         registryBlockings.addAll(registryBlockingsToAddFromDb);
 

@@ -69,7 +69,7 @@ public class MyRegistryRecyclerViewAdapter extends RecyclerView.Adapter<MyRegist
      *
      * @param context context of the application
      * @param registryBlockings list of registry blockings (registered blockings)
-     * @param listener {@link OnListFragmentInteractionListener listener} for catching events
+     * @param listener {@link RegistryAdapterListener listener} for catching events
      */
     MyRegistryRecyclerViewAdapter(Context context, List<RegistryBlock> registryBlockings, RegistryAdapterListener listener)
     {
@@ -105,24 +105,10 @@ public class MyRegistryRecyclerViewAdapter extends RecyclerView.Adapter<MyRegist
     public void onBindViewHolder(@NonNull final ViewHolder holder, int position)
     {
         RegistryBlock rBlock = mRegistryBlockings.get(position);
+        holder.mNrRegisteredBlock.setText(rBlock.getNrBlocked() + " (" + rBlock.getNrBlockingDate() + ")");
+        if(!rBlock.getNrRating()) holder.mNrRating.setText("X");
+        else holder.mNrRating.setText("Y");
 
-//displaying text content of blockings
-//        holder.mIdView.setText(mValues.get(position).id);
-//        holder.mContentView.setText(mRegistryBlockings.get(position).getNrBlocked());
-
-        holder.mViewContainer.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                if (null != mListener)
-                {
-                    // Notify the active callbacks interface (the activity, if the
-                    // fragment is attached to one) that an item has been selected.
-//                    mListener.onListFragmentInteraction(holder.mItem);
-                }
-            }
-        });
     }
 
     @Override
