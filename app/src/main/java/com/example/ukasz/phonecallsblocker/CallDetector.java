@@ -25,6 +25,7 @@ import com.example.ukasz.androidsqlite.DatabaseHandler;
 import com.example.ukasz.androidsqlite.RegistryBlock;
 
 import java.lang.reflect.Method;
+import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 
@@ -69,7 +70,14 @@ public class CallDetector {
                         try
                         {
                             declinePhone(ctx);
-                            registerPhoneBlock(db, incomingNumber, true);
+                            try
+                            {
+                                registerPhoneBlock(db, incomingNumber, true);
+                            }
+                            catch (ParseException e)
+                            {
+                                e.printStackTrace();
+                            }
                         }
                         catch (Exception e)
                         {
@@ -101,7 +109,16 @@ public class CallDetector {
                             alertDialog.show();
                         }
                     }
-                    else registerPhoneBlock(db, incomingNumber, false);
+                    else {
+                        try
+                        {
+                            registerPhoneBlock(db, incomingNumber, false);
+                        }
+                        catch (ParseException e)
+                        {
+                            e.printStackTrace();
+                        }
+                    }
                 }
                 case TelephonyManager.CALL_STATE_OFFHOOK:
                 {
@@ -152,13 +169,11 @@ public class CallDetector {
                                                 public void onClick(DialogInterface dialog, int categoryId)
                                                 {
                                                     addPhoneBlock(db, incomingNumber, categoryId, true);
-
                                                     try
                                                     {
-                                                        declinePhone(ctx);
                                                         registerPhoneBlock(db, incomingNumber, true);
                                                     }
-                                                    catch (Exception e)
+                                                    catch (ParseException e)
                                                     {
                                                         e.printStackTrace();
                                                     }
@@ -180,7 +195,14 @@ public class CallDetector {
                                     try
                                     {
                                         declinePhone(ctx);
-                                        registerPhoneBlock(db, incomingNumber, true);
+                                        try
+                                        {
+                                            registerPhoneBlock(db, incomingNumber, true);
+                                        }
+                                        catch (ParseException e)
+                                        {
+                                            e.printStackTrace();
+                                        }
                                     }
                                     catch (Exception e)
                                     {
@@ -192,12 +214,26 @@ public class CallDetector {
                                 //Save as positive (white list)
                                 case 2:
                                     addPhoneBlock(db, incomingNumber, 0, false);
-                                    registerPhoneBlock(db, incomingNumber, false);
+                                    try
+                                    {
+                                        registerPhoneBlock(db, incomingNumber, false);
+                                    }
+                                    catch (ParseException e)
+                                    {
+                                        e.printStackTrace();
+                                    }
                                     Toast.makeText(ctx, R.string.call_detector_has_saved_positive, Toast.LENGTH_SHORT).show();
 
                                 //Allow
                                 case 3:
-                                    registerPhoneBlock(db, incomingNumber, false);
+                                    try
+                                    {
+                                        registerPhoneBlock(db, incomingNumber, false);
+                                    }
+                                    catch (ParseException e)
+                                    {
+                                        e.printStackTrace();
+                                    }
                                     Toast.makeText(ctx, R.string.call_detector_has_allowed, Toast.LENGTH_SHORT).show();
                                     break;
                             }
@@ -223,7 +259,14 @@ public class CallDetector {
                                 case 0:
                                 //Change to positive (white list) - false is positive (not blocked)
                                     updatePhoneBlock(db, incomingNumber, false);
-                                    registerPhoneBlock(db, incomingNumber, false);
+                                    try
+                                    {
+                                        registerPhoneBlock(db, incomingNumber, false);
+                                    }
+                                    catch (ParseException e)
+                                    {
+                                        e.printStackTrace();
+                                    }
                                     Toast.makeText(ctx, R.string.call_detector_changed_to_positive, Toast.LENGTH_SHORT).show();
                                     break;
 
@@ -232,7 +275,14 @@ public class CallDetector {
                                     try
                                     {
                                         declinePhone(ctx);
-                                        registerPhoneBlock(db, incomingNumber, true);
+                                        try
+                                        {
+                                            registerPhoneBlock(db, incomingNumber, true);
+                                        }
+                                        catch (ParseException e)
+                                        {
+                                            e.printStackTrace();
+                                        }
                                     }
                                     catch (Exception e)
                                     {
@@ -244,7 +294,14 @@ public class CallDetector {
                                 //Allow
                                 case 2:
                                     Toast.makeText(ctx, R.string.call_detector_has_allowed, Toast.LENGTH_SHORT).show();
-                                    registerPhoneBlock(db, incomingNumber, false);
+                                    try
+                                    {
+                                        registerPhoneBlock(db, incomingNumber, false);
+                                    }
+                                    catch (ParseException e)
+                                    {
+                                        e.printStackTrace();
+                                    }
                                     break;
                             }
                         }
@@ -289,10 +346,19 @@ public class CallDetector {
         else db.addBlocking(new Block(tm.getLine1Number(), phoneNumber, category, "", rating));
     }
 
-    private void registerPhoneBlock(DatabaseHandler db, String phoneNumber, boolean rating)
+    /**
+     * Registers a blocking of blocked or passed call.
+     *
+     * @param db {@link DatabaseHandler} to check if phoneNumber exists and add if not exists
+     * @param phoneNumber phone number to add to blocking list
+     * @param rating rating of added phone number, positive or negative
+     * @throws ParseException
+     */
+    private void registerPhoneBlock(DatabaseHandler db, String phoneNumber, boolean rating) throws ParseException
     {
         Log.e("CallDetector", "registerPhoneBlock - " + phoneNumber);
         db.addBlockingRegistry(new RegistryBlock(phoneNumber, rating, new Date()));
+        RegistryFragment.loadRegistryBlockings();
     }
 
     /**

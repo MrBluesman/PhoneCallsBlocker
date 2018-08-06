@@ -29,10 +29,10 @@ public class RegistryFragment extends Fragment implements MyRegistryRecyclerView
 
     private static final String ARG_COLUMN_COUNT = "column-count";
     private int mColumnCount = 1;
-    private MyRegistryRecyclerViewAdapter adapter;
+    private static MyRegistryRecyclerViewAdapter adapter;
     private RecyclerView recyclerView;
     public static List<RegistryBlock> registryBlockings = new ArrayList<>(); //adapter data
-    DatabaseHandler db;
+    private static DatabaseHandler db;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -152,7 +152,7 @@ public class RegistryFragment extends Fragment implements MyRegistryRecyclerView
     /**
      * Loads all blockings from database.
      */
-    private void loadRegistryBlockings() throws ParseException
+    public static void loadRegistryBlockings() throws ParseException
     {
         Log.e("RegistryFragment", "loadRegistryBlockings()");
         List<RegistryBlock> registryBlockingsToAddFromDb = db.getAllRegistryBlockings();
