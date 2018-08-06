@@ -106,12 +106,6 @@ public class MyPhoneBlockRecyclerViewAdapter extends RecyclerView.Adapter<MyPhon
     /**
      * Constructor for creating a {@link MyPhoneBlockRecyclerViewAdapter} instance.
      *
-     * @param blockings list of Blocks which should be displayed on list by this Adapter
-     */
-
-    /**
-     * Constructor for creating a {@link MyPhoneBlockRecyclerViewAdapter} instance.
-     *
      * @param context context of the application
      * @param blockings list of blockings (blocked numbers)
      * @param listener {@link BlockAdapterListener listener} for catching events
