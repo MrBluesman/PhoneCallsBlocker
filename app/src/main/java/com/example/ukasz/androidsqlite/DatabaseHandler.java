@@ -553,7 +553,8 @@ public class DatabaseHandler extends SQLiteOpenHelper
 
         List<RegistryBlock> toReturnList = new ArrayList<>();
 
-        String selectAllRegistryBlockings = "SELECT * FROM " + TABLE_BLOCKING_REGISTRY;
+        String selectAllRegistryBlockings = "SELECT * FROM " + TABLE_BLOCKING_REGISTRY
+                + " ORDER BY " + ID_KEY_T_BR +" DESC";
         SQLiteDatabase db = this.getReadableDatabase();
 
         Cursor cursor = db.rawQuery(selectAllRegistryBlockings, null);
