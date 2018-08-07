@@ -67,16 +67,8 @@ public class CallDetector {
                     //Checks if we should autoblocked (only for negative phone numbers)
                     if(autoBlockEnabled && db.getNumberBlockingsCount(incomingNumber, true) > 0)
                     {
-                        try
-                        {
-                            declinePhone(ctx);
-                            registerPhoneBlock(db, incomingNumber, true);
-
-                        }
-                        catch (Exception e)
-                        {
-                            e.printStackTrace();
-                        }
+                        declinePhone(ctx);
+                        registerPhoneBlock(db, incomingNumber, true);
                     }
                     else if(!db.existBlock(myPhoneNumber, incomingNumber, false))
                     {
@@ -173,16 +165,8 @@ public class CallDetector {
                                     break;
                                 //Block
                                 case 1:
-                                    try
-                                    {
-                                        declinePhone(ctx);
-                                        registerPhoneBlock(db, incomingNumber, true);
-
-                                    }
-                                    catch (Exception e)
-                                    {
-                                        e.printStackTrace();
-                                    }
+                                    declinePhone(ctx);
+                                    registerPhoneBlock(db, incomingNumber, true);
                                     Toast.makeText(ctx, R.string.call_detector_has_blocked, Toast.LENGTH_SHORT).show();
                                     break;
 
@@ -204,6 +188,14 @@ public class CallDetector {
            return builder.create();
         }
 
+        /**
+         * Creates a {@link AlertDialog} for incoming call with number
+         * which exist in local list.
+         *
+         * @param incomingNumber contains the number of incoming call
+         * @param db database for receive number of blockings and allow update a local list
+         * @return created {@link AlertDialog} with options for incoming call dialog for existing number
+         */
         private AlertDialog createIncomingCallDialogBlockedNumber(final String incomingNumber, final DatabaseHandler db)
         {
             final AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
@@ -227,16 +219,8 @@ public class CallDetector {
 
                                 //Block
                                 case 1:
-                                    try
-                                    {
-                                        declinePhone(ctx);
-                                        registerPhoneBlock(db, incomingNumber, true);
-
-                                    }
-                                    catch (Exception e)
-                                    {
-                                        e.printStackTrace();
-                                    }
+                                    declinePhone(ctx);
+                                    registerPhoneBlock(db, incomingNumber, true);
                                     Toast.makeText(ctx, R.string.call_detector_has_blocked, Toast.LENGTH_SHORT).show();
                                     break;
 
@@ -244,7 +228,6 @@ public class CallDetector {
                                 case 2:
                                     Toast.makeText(ctx, R.string.call_detector_has_allowed, Toast.LENGTH_SHORT).show();
                                     registerPhoneBlock(db, incomingNumber, false);
-
                                     break;
                             }
                         }
@@ -359,8 +342,7 @@ public class CallDetector {
      */
     private class OutgoingReceiver extends BroadcastReceiver
     {
-        public OutgoingReceiver() {
-        }
+        public OutgoingReceiver() {}
 
         /**
          * This method runs, when we receiving a outgoing call in app context.
@@ -470,7 +452,4 @@ public class CallDetector {
 //
 //        notificationManager.notify(0, noti);
 //    }
-
-
-
 }
