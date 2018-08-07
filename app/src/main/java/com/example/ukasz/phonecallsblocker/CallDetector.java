@@ -14,6 +14,7 @@ import android.os.Build;
 import android.provider.Settings;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
+import android.telephony.PhoneNumberUtils;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.util.Log;
@@ -23,11 +24,15 @@ import android.widget.Toast;
 import com.example.ukasz.androidsqlite.Block;
 import com.example.ukasz.androidsqlite.DatabaseHandler;
 import com.example.ukasz.androidsqlite.RegistryBlock;
+import com.google.i18n.phonenumbers.NumberParseException;
+import com.google.i18n.phonenumbers.PhoneNumberUtil;
+import com.google.i18n.phonenumbers.Phonenumber;
 
 import java.lang.reflect.Method;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Created by Łukasz Parysek on 2017-03-05.
@@ -50,10 +55,13 @@ public class CallDetector
          */
         @RequiresApi(api = Build.VERSION_CODES.M)
         @Override
-        public void onCallStateChanged(int state, final String incomingNumber) {
-            switch (state) {
+        public void onCallStateChanged(int state, final String incomingNumber)
+        {
+            switch (state)
+            {
                 case TelephonyManager.CALL_STATE_RINGING:
                     {
+                        isForeignIncomingCall(incomingNumber);
 //-------------------------------------------------------------------------
                     Log.e("test", "CallDetector - onCallStateChanged() method in CALL STATE LISTENER");
                     Toast.makeText(ctx,"Połączenie przychodzące: "+incomingNumber, Toast.LENGTH_LONG).show();
@@ -65,9 +73,11 @@ public class CallDetector
                     SharedPreferences data;
                     data = ctx.getSharedPreferences("data", Context.MODE_PRIVATE);
                     boolean autoBlockEnabled = data.getBoolean("autoBlockEnabled", false);
+                    boolean foreignBlockEnabled = data.getBoolean("foreignBlockEnabled", false);
 
                     //Checks if we should autoblocked (only for negative phone numbers)
-                    if(autoBlockEnabled && db.getNumberBlockingsCount(incomingNumber, true) > 0)
+                    if((autoBlockEnabled && db.getNumberBlockingsCount(incomingNumber, true) > 0)
+                            || (foreignBlockEnabled && isForeignIncomingCall(incomingNumber)))
                     {
                         declinePhone(ctx);
                         registerPhoneBlock(db, incomingNumber, true);
@@ -238,6 +248,32 @@ public class CallDetector
 
             return builder.create();
         }
+
+        /**
+         * Checks if the incoming number is from foreign country.
+         *
+         * @param incomingNumber contains the number of incoming call
+         * @return true if is from foreign country, false if not
+         */
+        private boolean isForeignIncomingCall(final String incomingNumber)
+        {
+            // get country-code from the phoneNumber
+            PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
+            try
+            {
+                Phonenumber.PhoneNumber numberProto = phoneUtil.parse(incomingNumber, Locale.getDefault().getCountry());
+                if (phoneUtil.isValidNumber(numberProto))
+                {
+                    return myCountryDialCode != numberProto.getCountryCode();
+                }
+            }
+            catch (NumberParseException e)
+            {
+                Log.e("CallDetector", "Unable to parse incoming phoneNumber " + e.toString());
+            }
+
+            return false;
+        }
     }
 
     /**
@@ -362,14 +398,13 @@ public class CallDetector
             String outgoingNumber = intent.getStringExtra(Intent.EXTRA_PHONE_NUMBER);
             Toast.makeText(ctx,"Połączenie wychodzące: "+outgoingNumber, Toast.LENGTH_LONG).show();
 //            createNotification(outgoingNumber);
-
-
         }
     }
 
     private Context ctx;
     private TelephonyManager tm;
     private String myPhoneNumber;
+    private int myCountryDialCode;
     private CallStateListener callStateListener;
     private OutgoingReceiver outgoingReceiver;
 
@@ -410,8 +445,11 @@ public class CallDetector
                 != PackageManager.PERMISSION_GRANTED) {
             return;
         }
+
+
         myPhoneNumber = !tm.getLine1Number().equals("") ? tm.getLine1Number() : tm.getSimSerialNumber();
-        Log.e("PHONE_NUMBER", myPhoneNumber);
+        myCountryDialCode = PhoneNumberUtil.getInstance().getCountryCodeForRegion(tm.getSimCountryIso().toUpperCase());
+        Log.e("PHONE_NUMBER", String.valueOf(myCountryDialCode));
 
         IntentFilter intentFilter = new IntentFilter(Intent.ACTION_NEW_OUTGOING_CALL);
         ctx.registerReceiver(outgoingReceiver, intentFilter);

@@ -40,4 +40,7 @@ dependencies {
 
     // glide
     implementation 'com.github.bumptech.glide:glide:3.7.0'
+
+    //libphonenumber
+    implementation 'com.googlecode.libphonenumber:libphonenumber:8.2.0'
 }
