@@ -268,11 +268,11 @@ public class CallDetector
                 != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(ctx, Manifest.permission.READ_PHONE_STATE)
                 != PackageManager.PERMISSION_GRANTED) return;
 
-        if(db.existBlock(new Block(tm.getLine1Number(), phoneNumber, category, "", rating)))
+        if(db.existBlock(new Block(myPhoneNumber, phoneNumber, category, "", rating)))
         {
             Toast.makeText(ctx, R.string.call_detector_already_blocked, Toast.LENGTH_SHORT).show();
         }
-        else db.addBlocking(new Block(tm.getLine1Number(), phoneNumber, category, "", rating));
+        else db.addBlocking(new Block(myPhoneNumber, phoneNumber, category, "", rating));
     }
 
     /**
@@ -393,11 +393,13 @@ public class CallDetector
      * Settings a Listener on listening calls state.
      * Settings a registerReceiver on retrieving a outgoing calls.
      */
+    @SuppressLint("HardwareIds")
     public void start()
     {
-        Log.e("test", "CallDetector - start() method");
+        Log.e("CallDetector", "start() method");
         tm = (TelephonyManager) ctx.getSystemService(Context.TELEPHONY_SERVICE);
         tm.listen(callStateListener, PhoneStateListener.LISTEN_CALL_STATE);
+
 
         //Save the user phone number (declarant)
         if (ActivityCompat.checkSelfPermission(ctx, Manifest.permission.READ_SMS)
@@ -408,7 +410,8 @@ public class CallDetector
                 != PackageManager.PERMISSION_GRANTED) {
             return;
         }
-        myPhoneNumber = tm.getLine1Number();
+        myPhoneNumber = !tm.getLine1Number().equals("") ? tm.getLine1Number() : tm.getSimSerialNumber();
+        Log.e("PHONE_NUMBER", myPhoneNumber);
 
         IntentFilter intentFilter = new IntentFilter(Intent.ACTION_NEW_OUTGOING_CALL);
         ctx.registerReceiver(outgoingReceiver, intentFilter);
