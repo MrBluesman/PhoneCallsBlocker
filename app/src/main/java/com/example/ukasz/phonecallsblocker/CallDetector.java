@@ -33,11 +33,13 @@ import java.util.List;
  * Created by Łukasz Parysek on 2017-03-05.
  * This class describes Listener, and Retriever for Incoming and Outgoing calls.
  */
-public class CallDetector {
+public class CallDetector
+{
     /**
      * Local private class which describes Listener for Incoming calls.
      */
-    private class CallStateListener extends PhoneStateListener {
+    private class CallStateListener extends PhoneStateListener
+    {
         /**
          * This method runs when the Listener is working, and call state has changed.
          * Creating a Toast and Notification when the calls incoming.

@@ -27,6 +27,7 @@ public class SettingsFragment extends Fragment
 {
     private Switch blockServiceSwitch;
     private Switch autoBlockSwitch;
+    private Switch foreignBlockSwitch;
 
     //Apps data
     private SharedPreferences data;
@@ -62,11 +63,6 @@ public class SettingsFragment extends Fragment
     {
         super.onCreate(savedInstanceState);
         Log.e("HomeFragment", "onCreate() method");
-        if (getArguments() != null)
-        {
-//            mParam1 = getArguments().getString(ARG_PARAM1);
-//            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
     }
 
     /**
@@ -92,8 +88,9 @@ public class SettingsFragment extends Fragment
         super.onActivityCreated(savedInstanceState);
         Log.e("HomeFragment","onActivityCreated() method");
         //Switcher to enable/disable blocking
-        blockServiceSwitch = getView().findViewById(R.id.home_fragment_switch1_block_service);
-        autoBlockSwitch = getView().findViewById(R.id.home_fragment_switch2_automatic_block);
+        blockServiceSwitch = getView().findViewById(R.id.settings_fragment_switch1_block_service);
+        autoBlockSwitch = getView().findViewById(R.id.settings_fragment_switch2_automatic_block);
+        foreignBlockSwitch = getView().findViewById(R.id.settings_fragment_switch3_foreign_block);
 
         loadSettingsState();
 
@@ -111,8 +108,10 @@ public class SettingsFragment extends Fragment
                 sA.setDetectEnabled(detectEnabled);
 
                 blockServiceSwitch.setChecked(detectEnabled);
-                //autoblock switch option depends on detectEnabled
+
+                //rest of switch block options depends on detectEnabled
                 autoBlockSwitch.setEnabled(detectEnabled);
+                foreignBlockSwitch.setEnabled(detectEnabled);
 
                 //Save setting in SharedPreference
                 SharedPreferences.Editor editDataSettings = data.edit();
@@ -121,7 +120,7 @@ public class SettingsFragment extends Fragment
             }
         });
 
-        //Click listener for enable or disable phone calls catching
+        //Click listener for enable or disable auto blocking
         autoBlockSwitch.setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -139,15 +138,23 @@ public class SettingsFragment extends Fragment
             }
         });
 
+        //Click listener for enable or disable foreign numbers blocking
+        foreignBlockSwitch.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                //get foreignBlockEnabled from data SharedPreferences
+                boolean foreignBlockEnabled = !data.getBoolean("foreignBlockEnabled", false);
 
-        //DATABASE IMPLEMENTATION TESTING ---------------------------------------------------------
-        DatabaseHandler db = new DatabaseHandler(getActivity());
-        //Insertings blocks
-        Log.d("Insert: ", "Inserting..");
-        //db.addBlocking(new Block("721315333", "665693959", 0, "a", true));
-        //db.addBlocking(new Block("721315345", "665693959", 0, "a", true));
-        //db.deleteBlocking(new Block("721315778", "665693959", 0, "a", true));
-        //db.deleteBlocking(new Block("+48721315778", "665693959", 0, "a", true));
+                foreignBlockSwitch.setChecked(foreignBlockEnabled);
+
+                //Save setting in SharedPreferences
+                SharedPreferences.Editor editDataSettings = data.edit();
+                editDataSettings.putBoolean("foreignBlockEnabled", foreignBlockEnabled);
+                editDataSettings.apply(); //commit
+            }
+        });
     }
 
     /**
@@ -156,13 +163,17 @@ public class SettingsFragment extends Fragment
      */
     private void loadSettingsState()
     {
-        boolean  detectEnabled = data.getBoolean("detectEnabled", false);
+        boolean detectEnabled = data.getBoolean("detectEnabled", false);
         boolean autoBlockEnabled = data.getBoolean("autoBlockEnabled", false);
-        blockServiceSwitch.setChecked(detectEnabled);
-        //autoblock switch option depends on detectEnabled
-        autoBlockSwitch.setEnabled(detectEnabled);
+        boolean foreignBlockEnabled = data.getBoolean("foreignBlockEnabled", false);
 
+        blockServiceSwitch.setChecked(detectEnabled);
         autoBlockSwitch.setChecked(autoBlockEnabled);
+        foreignBlockSwitch.setChecked(foreignBlockEnabled);
+
+        //rest of switch block options depends on detectEnabled
+        autoBlockSwitch.setEnabled(detectEnabled);
+        foreignBlockSwitch.setEnabled(detectEnabled);
     }
 
     /**

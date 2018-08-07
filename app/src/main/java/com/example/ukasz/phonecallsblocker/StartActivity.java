@@ -31,13 +31,10 @@ import android.support.v4.view.ViewPager;
 import android.os.Bundle;
 import android.telephony.TelephonyManager;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.ukasz.androidsqlite.Block;
@@ -65,8 +62,10 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
     //The {@link TelephonyManager} for fetch user phone number
     private TelephonyManager tm;
 
+    //Block options
     private boolean detectEnabled;
     private boolean autoBlockEnabled;
+    private boolean foreignBlockEnabled;
 
     //The {@link com.github.clans.fab.FloatingActionMenu} instance.
     com.github.clans.fab.FloatingActionMenu fab;
@@ -187,6 +186,7 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
         data = getSharedPreferences("data", Context.MODE_PRIVATE);
         detectEnabled = data.getBoolean("detectEnabled", false);
         autoBlockEnabled = data.getBoolean("autoBlockEnabled", false);
+        foreignBlockEnabled = data.getBoolean("foreignBlockEnabled", false);
 
         Log.e("Loading data", "MainActivity - loadSettingsState() method");
 
@@ -348,47 +348,15 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
         return autoBlockEnabled;
     }
 
-//
-//    /**
-//     * A placeholder fragment containing a simple view.
-//     */
-//    public static class PlaceholderFragment extends Fragment
-//    {
-//        /**
-//         * The fragment argument representing the section number for this.
-//         * fragment.
-//         */
-//        private static final String ARG_SECTION_NUMBER = "section_number";
-//
-//        public PlaceholderFragment()
-//        {
-//
-//        }
-//
-//        /**
-//         * Returns a new instance of this fragment for the given section
-//         * number.
-//         */
-//        public static PlaceholderFragment newInstance(int sectionNumber)
-//        {
-//            Log.e("sectionNumber:", String.valueOf(sectionNumber));
-//            PlaceholderFragment fragment = new PlaceholderFragment();
-//            Bundle args = new Bundle();
-//            args.putInt(ARG_SECTION_NUMBER, sectionNumber);
-//            fragment.setArguments(args);
-//            return fragment;
-//        }
-//
-//        @Override
-//        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-//                                 Bundle savedInstanceState)
-//        {
-//            View rootView = inflater.inflate(R.layout.fragment_start, container, false);
-//            TextView textView = rootView.findViewById(R.id.section_label);
-//            textView.setText(getString(R.string.start_activity_section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
-//            return rootView;
-//        }
-//    }
+    /**
+     * foreignBlockEnabled getter.
+     *
+     * @return value of foreignBlockEnabled
+     */
+    public boolean getForeignBlockEnabled()
+    {
+        return foreignBlockEnabled;
+    }
 
     /**
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
