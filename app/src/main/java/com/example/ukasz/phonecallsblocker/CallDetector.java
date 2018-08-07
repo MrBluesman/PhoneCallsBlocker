@@ -149,6 +149,7 @@ public class CallDetector {
                                                 public void onClick(DialogInterface dialog, int categoryId)
                                                 {
                                                     addPhoneBlock(db, incomingNumber, categoryId, true);
+                                                    declinePhone(ctx);
                                                     registerPhoneBlock(db, incomingNumber, true);
                                                 }
                                             }
