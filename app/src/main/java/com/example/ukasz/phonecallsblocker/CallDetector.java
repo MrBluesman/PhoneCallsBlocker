@@ -95,11 +95,16 @@ public class CallDetector
 
                         if(canDrawOverlays)
                         {
-                            //If number is blocked by user show dialog box with possibility to change to positive number
-                            AlertDialog alertDialog = db.existBlock(myPhoneNumber, incomingNumberFormatted, true)
+                            AlertDialog alertDialog;
+                            //If number is private show dialog box with limited options - only block and allow
+                            if(incomingNumber == null) alertDialog = createIncomingCallDialogPrivateNumber(incomingNumberFormatted, db);
+                            else
+                            {
+                                //If number is blocked by user show dialog box with possibility to change to positive number
+                                alertDialog = db.existBlock(myPhoneNumber, incomingNumberFormatted, true)
                                     ? createIncomingCallDialogBlockedNumber(incomingNumberFormatted, db)
                                     : createIncomingCallDialogNewNumber(incomingNumberFormatted, db);
-
+                            }
 
                             alertDialog.getWindow().setType(getDialogLayoutFlag());
                             alertDialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
@@ -243,6 +248,45 @@ public class CallDetector
 
                                 //Allow
                                 case 2:
+                                    Toast.makeText(ctx, R.string.call_detector_has_allowed, Toast.LENGTH_SHORT).show();
+                                    registerPhoneBlock(db, incomingNumber, false);
+                                    break;
+                            }
+                        }
+                    });
+
+            return builder.create();
+        }
+
+        /**
+         * Creates a {@link AlertDialog} for incoming call of private number
+         *
+         * @param incomingNumber contains the number of incoming call (equals to Private number)
+         * @param db database for registering blocking in registry list
+         * @return created {@link AlertDialog} with options for incoming call dialog for private number
+         */
+        private AlertDialog createIncomingCallDialogPrivateNumber(final String incomingNumber, final DatabaseHandler db)
+        {
+            final AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
+            builder.setTitle(incomingNumber);
+
+            builder.setItems(R.array.incoming_private_number_options,
+                    new DialogInterface.OnClickListener()
+                    {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which)
+                        {
+                            switch(which)
+                            {
+                                //Block
+                                case 0:
+                                    declinePhone(ctx);
+                                    registerPhoneBlock(db, incomingNumber, true);
+                                    Toast.makeText(ctx, R.string.call_detector_has_blocked, Toast.LENGTH_SHORT).show();
+                                    break;
+
+                                //Allow
+                                case 1:
                                     Toast.makeText(ctx, R.string.call_detector_has_allowed, Toast.LENGTH_SHORT).show();
                                     registerPhoneBlock(db, incomingNumber, false);
                                     break;
