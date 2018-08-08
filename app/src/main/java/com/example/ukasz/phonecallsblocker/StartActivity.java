@@ -62,10 +62,11 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
     //The {@link TelephonyManager} for fetch user phone number
     private TelephonyManager tm;
 
-    //Block options
+    //Blocking options
     private boolean detectEnabled;
     private boolean autoBlockEnabled;
     private boolean foreignBlockEnabled;
+    private boolean privateBlockEnabled;
 
     //The {@link com.github.clans.fab.FloatingActionMenu} instance.
     com.github.clans.fab.FloatingActionMenu fab;
@@ -110,6 +111,8 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
 
         //Floating Action Button Menu
         fab = findViewById(R.id.start_activity_fab);
+
+        //Add manualy click listener
         com.github.clans.fab.FloatingActionButton fab_add_manually = findViewById(R.id.start_activity_add_manually);
         fab_add_manually.setOnClickListener(new View.OnClickListener()
         {
@@ -121,7 +124,7 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
             }
         });
 
-
+        //Add from contacts listener
         com.github.clans.fab.FloatingActionButton fab_add_contacts = findViewById(R.id.start_activity_add_contacts);
         fab_add_contacts.setOnClickListener(new View.OnClickListener()
         {
@@ -137,6 +140,7 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
             }
         });
 
+        //Add from registyr listener
         com.github.clans.fab.FloatingActionButton fab_add_calls_registry = findViewById(R.id.start_activity_add_calls_registry);
         fab_add_calls_registry.setOnClickListener(new View.OnClickListener()
         {
@@ -187,6 +191,7 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
         detectEnabled = data.getBoolean("detectEnabled", false);
         autoBlockEnabled = data.getBoolean("autoBlockEnabled", false);
         foreignBlockEnabled = data.getBoolean("foreignBlockEnabled", false);
+        privateBlockEnabled = data.getBoolean("privateBlockEnabled", false);
 
         Log.e("Loading data", "MainActivity - loadSettingsState() method");
 
@@ -356,6 +361,16 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
     public boolean getForeignBlockEnabled()
     {
         return foreignBlockEnabled;
+    }
+
+    /**
+     * privateBlockEnabled getter.
+     *
+     * @return value of privateBlockEnabled
+     */
+    public boolean getPrivateBlockEnabled()
+    {
+        return privateBlockEnabled;
     }
 
     /**
@@ -667,7 +682,7 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
         if(!db.existBlock(newBlock))
         {
             db.addBlocking(newBlock);
-            //ADD to bloicking list to make notify data changed possible for adapter
+            //ADD to blocking list to make notify data changed possible for adapter
             Toast.makeText(StartActivity.this, "Numer dodany", Toast.LENGTH_SHORT).show();
             PhoneBlockFragment.blockings.add(newBlock);
         }

@@ -25,9 +25,11 @@ import com.example.ukasz.androidsqlite.DatabaseHandler;
  */
 public class SettingsFragment extends Fragment
 {
+    //Setting switches
     private Switch blockServiceSwitch;
     private Switch autoBlockSwitch;
     private Switch foreignBlockSwitch;
+    private Switch privateBlockSwitch;
 
     //Apps data
     private SharedPreferences data;
@@ -62,7 +64,7 @@ public class SettingsFragment extends Fragment
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        Log.e("HomeFragment", "onCreate() method");
+        Log.e("SettingsFragment", "onCreate() method");
     }
 
     /**
@@ -77,7 +79,7 @@ public class SettingsFragment extends Fragment
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState)
     {
-        Log.e("HomeFragment", "onCreateView() method");
+        Log.e("SettingsFragment", "onCreateView() method");
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_settings, container, false);
     }
@@ -86,11 +88,12 @@ public class SettingsFragment extends Fragment
     public void onActivityCreated(Bundle savedInstanceState)
     {
         super.onActivityCreated(savedInstanceState);
-        Log.e("HomeFragment","onActivityCreated() method");
-        //Switcher to enable/disable blocking
+        Log.e("SettingsFragment","onActivityCreated() method");
+        //Switchers to enable/disable blocking options
         blockServiceSwitch = getView().findViewById(R.id.settings_fragment_switch1_block_service);
         autoBlockSwitch = getView().findViewById(R.id.settings_fragment_switch2_automatic_block);
         foreignBlockSwitch = getView().findViewById(R.id.settings_fragment_switch3_foreign_block);
+        privateBlockSwitch = getView().findViewById(R.id.settings_fragment_switch4_private_block);
 
         loadSettingsState();
 
@@ -112,6 +115,7 @@ public class SettingsFragment extends Fragment
                 //rest of switch block options depends on detectEnabled
                 autoBlockSwitch.setEnabled(detectEnabled);
                 foreignBlockSwitch.setEnabled(detectEnabled);
+                privateBlockSwitch.setEnabled(detectEnabled);
 
                 //Save setting in SharedPreference
                 SharedPreferences.Editor editDataSettings = data.edit();
@@ -155,6 +159,24 @@ public class SettingsFragment extends Fragment
                 editDataSettings.apply(); //commit
             }
         });
+
+        //Click listener for enable or disable private numbers blocking
+        privateBlockSwitch.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                //get foreignBlockEnabled from data SharedPreferences
+                boolean privateBlockEnabled = !data.getBoolean("privateBlockEnabled", false);
+
+                privateBlockSwitch.setChecked(privateBlockEnabled);
+
+                //Save setting in SharedPreferences
+                SharedPreferences.Editor editDataSettings = data.edit();
+                editDataSettings.putBoolean("privateBlockEnabled", privateBlockEnabled);
+                editDataSettings.apply(); //commit
+            }
+        });
     }
 
     /**
@@ -166,14 +188,17 @@ public class SettingsFragment extends Fragment
         boolean detectEnabled = data.getBoolean("detectEnabled", false);
         boolean autoBlockEnabled = data.getBoolean("autoBlockEnabled", false);
         boolean foreignBlockEnabled = data.getBoolean("foreignBlockEnabled", false);
+        boolean privateBlockEnabled = data.getBoolean("privateBlockEnabled", false);
 
         blockServiceSwitch.setChecked(detectEnabled);
         autoBlockSwitch.setChecked(autoBlockEnabled);
         foreignBlockSwitch.setChecked(foreignBlockEnabled);
+        privateBlockSwitch.setChecked(privateBlockEnabled);
 
         //rest of switch block options depends on detectEnabled
         autoBlockSwitch.setEnabled(detectEnabled);
         foreignBlockSwitch.setEnabled(detectEnabled);
+        privateBlockSwitch.setEnabled(detectEnabled);
     }
 
     /**
@@ -183,7 +208,7 @@ public class SettingsFragment extends Fragment
     public void onResume()
     {
         super.onResume();
-        Log.e("HomeFragment","onResume() method");
+        Log.e("SettingsFragment","onResume() method");
         //loadSettingsState();
     }
 
@@ -195,7 +220,7 @@ public class SettingsFragment extends Fragment
     @Override
     public void onAttach(Context context)
     {
-        Log.e("HomeFragment","onAttach() method");
+        Log.e("SettingsFragment","onAttach() method");
 
         data = context.getSharedPreferences("data", Context.MODE_PRIVATE);
         super.onAttach(context);
@@ -217,7 +242,7 @@ public class SettingsFragment extends Fragment
     @Override
     public void onDetach()
     {
-        Log.e("HomeFragment","onDetach() method");
+        Log.e("SettingsFragment","onDetach() method");
         super.onDetach();
         mListener = null;
     }
