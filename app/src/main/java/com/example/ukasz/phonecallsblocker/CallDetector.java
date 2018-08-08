@@ -55,35 +55,37 @@ public class CallDetector
          */
         @RequiresApi(api = Build.VERSION_CODES.M)
         @Override
-        public void onCallStateChanged(int state, final String incomingNumber)
+        public void onCallStateChanged(int state, String incomingNumber)
         {
+            final String incomingNumberFormatted = incomingNumber != null ? incomingNumber : "Numer prywatny";
+
             switch (state)
             {
                 case TelephonyManager.CALL_STATE_RINGING:
-                    {
-                        isForeignIncomingCall(incomingNumber);
-//-------------------------------------------------------------------------
-                    Log.e("test", "CallDetector - onCallStateChanged() method in CALL STATE LISTENER");
-                    Toast.makeText(ctx,"Połączenie przychodzące: "+incomingNumber, Toast.LENGTH_LONG).show();
+                {
+                    Toast.makeText(ctx, "Połączenie przychodzące: " + incomingNumberFormatted, Toast.LENGTH_LONG).show();
 //                    createNotification(incomingNumber);
-                    Log.e("incomingNumber", incomingNumber);
-
+                    Log.e("incomingNumber", incomingNumberFormatted);
+                    //database and settings load
                     final DatabaseHandler db = new DatabaseHandler(ctx);
-
                     SharedPreferences data;
                     data = ctx.getSharedPreferences("data", Context.MODE_PRIVATE);
                     boolean autoBlockEnabled = data.getBoolean("autoBlockEnabled", false);
                     boolean foreignBlockEnabled = data.getBoolean("foreignBlockEnabled", false);
+                    boolean privateBlockEnabled = data.getBoolean("privateBlockEnabled", false);
 
-                    //Checks if we should autoblocked (only for negative phone numbers)
-                    if((autoBlockEnabled && db.getNumberBlockingsCount(incomingNumber, true) > 0)
-                            || (foreignBlockEnabled && isForeignIncomingCall(incomingNumber)))
+                    //Check if we should autoblocked (only for negative phone numbers)
+                    if((autoBlockEnabled && db.getNumberBlockingsCount(incomingNumberFormatted, true) > 0) //Phone number is blocked and autoBlock is enabled
+                            || (foreignBlockEnabled && isForeignIncomingCall(incomingNumberFormatted)) //OR phone number is foreign and foreignBlock is enabled
+                            || (privateBlockEnabled) && incomingNumber == null) //OR phone number is private and privateBlock is enabled
+
                     {
                         declinePhone(ctx);
-                        registerPhoneBlock(db, incomingNumber, true);
+                        registerPhoneBlock(db, incomingNumberFormatted, true);
                     }
-                    else if(!db.existBlock(myPhoneNumber, incomingNumber, false))
+                    else if(!db.existBlock(myPhoneNumber, incomingNumberFormatted, false))
                     {
+
                         //Can draw overlays depends on SDK version
                         boolean canDrawOverlays = true;
                         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
@@ -94,9 +96,9 @@ public class CallDetector
                         if(canDrawOverlays)
                         {
                             //If number is blocked by user show dialog box with possibility to change to positive number
-                            AlertDialog alertDialog = db.existBlock(myPhoneNumber, incomingNumber, true)
-                                    ? createIncomingCallDialogBlockedNumber(incomingNumber, db)
-                                    : createIncomingCallDialogNewNumber(incomingNumber, db);
+                            AlertDialog alertDialog = db.existBlock(myPhoneNumber, incomingNumberFormatted, true)
+                                    ? createIncomingCallDialogBlockedNumber(incomingNumberFormatted, db)
+                                    : createIncomingCallDialogNewNumber(incomingNumberFormatted, db);
 
 
                             alertDialog.getWindow().setType(getDialogLayoutFlag());
@@ -109,12 +111,14 @@ public class CallDetector
                     }
                     else
                     {
-                        registerPhoneBlock(db, incomingNumber, false);
+                        registerPhoneBlock(db, incomingNumberFormatted, false);
                     }
+                    break;
                 }
                 case TelephonyManager.CALL_STATE_OFFHOOK:
                 {
                     Log.e("ABC", "już nie dzwoni");
+                    break;
                 }
             }
         }
