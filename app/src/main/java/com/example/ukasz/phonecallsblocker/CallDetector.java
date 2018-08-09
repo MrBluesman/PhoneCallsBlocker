@@ -78,11 +78,13 @@ public class CallDetector
                     boolean autoBlockEnabled = data.getBoolean("autoBlockEnabled", false);
                     boolean foreignBlockEnabled = data.getBoolean("foreignBlockEnabled", false);
                     boolean privateBlockEnabled = data.getBoolean("privateBlockEnabled", false);
+                    boolean unknownBlockEnabled = data.getBoolean("unknownBlockEnabled", false);
 
                     //Check if we should autoblocked (only for negative phone numbers)
                     if((autoBlockEnabled && db.getNumberBlockingsCount(incomingNumberFormatted, true) > 0) //Phone number is blocked and autoBlock is enabled
                             || (foreignBlockEnabled && isForeignIncomingCall(incomingNumberFormatted)) //OR phone number is foreign and foreignBlock is enabled
-                            || (privateBlockEnabled) && incomingNumber == null) //OR phone number is private and privateBlock is enabled
+                            || (privateBlockEnabled && incomingNumber == null) //OR phone number is private and privateBlock is enabled
+                            || (unknownBlockEnabled && incomingContactName == null)) //OR phone number is unknown and uknownBlock is enabled
 
                     {
                         declinePhone(ctx);
