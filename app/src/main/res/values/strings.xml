@@ -57,6 +57,7 @@
     <string name="settings_fragment_autoblock_switch">Blokowanie automatyczne z listy</string>
     <string name="settings_fragment_foreign_block_switch">Blokowanie numerów zagranicznych</string>
     <string name="settings_fragment_private_block_switch">Blokowanie numerów zastrzeżonych</string>
+    <string name="settings_fragment_unknown_block_switch">Blokowanie nieznanych numerów</string>
 
     <!-- String related to PhoneBlockFragment -->
     <string name="phone_block_fragment_action_settings">Ustawienia</string>

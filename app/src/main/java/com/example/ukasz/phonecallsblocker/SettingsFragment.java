@@ -30,6 +30,7 @@ public class SettingsFragment extends Fragment
     private Switch autoBlockSwitch;
     private Switch foreignBlockSwitch;
     private Switch privateBlockSwitch;
+    private Switch unknownBlockSwitch;
 
     //Apps data
     private SharedPreferences data;
@@ -94,6 +95,7 @@ public class SettingsFragment extends Fragment
         autoBlockSwitch = getView().findViewById(R.id.settings_fragment_switch2_automatic_block);
         foreignBlockSwitch = getView().findViewById(R.id.settings_fragment_switch3_foreign_block);
         privateBlockSwitch = getView().findViewById(R.id.settings_fragment_switch4_private_block);
+        unknownBlockSwitch = getView().findViewById(R.id.settings_fragment_switch5_unknown_block);
 
         loadSettingsState();
 
@@ -116,6 +118,7 @@ public class SettingsFragment extends Fragment
                 autoBlockSwitch.setEnabled(detectEnabled);
                 foreignBlockSwitch.setEnabled(detectEnabled);
                 privateBlockSwitch.setEnabled(detectEnabled);
+                unknownBlockSwitch.setEnabled(detectEnabled);
 
                 //Save setting in SharedPreference
                 SharedPreferences.Editor editDataSettings = data.edit();
@@ -177,6 +180,24 @@ public class SettingsFragment extends Fragment
                 editDataSettings.apply(); //commit
             }
         });
+
+        //Click listener for enable or disable unknown numbers blocking
+        unknownBlockSwitch.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                //get foreignBlockEnabled from data SharedPreferences
+                boolean unknownBlockEnabled = !data.getBoolean("unknownBlockEnabled", false);
+
+                unknownBlockSwitch.setChecked(unknownBlockEnabled);
+
+                //Save setting in SharedPreferences
+                SharedPreferences.Editor editDataSettings = data.edit();
+                editDataSettings.putBoolean("unknownBlockEnabled", unknownBlockEnabled);
+                editDataSettings.apply(); //commit
+            }
+        });
     }
 
     /**
@@ -189,16 +210,19 @@ public class SettingsFragment extends Fragment
         boolean autoBlockEnabled = data.getBoolean("autoBlockEnabled", false);
         boolean foreignBlockEnabled = data.getBoolean("foreignBlockEnabled", false);
         boolean privateBlockEnabled = data.getBoolean("privateBlockEnabled", false);
+        boolean unknownBlockEnabled = data.getBoolean("unknownBlockEnabled", false);
 
         blockServiceSwitch.setChecked(detectEnabled);
         autoBlockSwitch.setChecked(autoBlockEnabled);
         foreignBlockSwitch.setChecked(foreignBlockEnabled);
         privateBlockSwitch.setChecked(privateBlockEnabled);
+        unknownBlockSwitch.setChecked(unknownBlockEnabled);
 
         //rest of switch block options depends on detectEnabled
         autoBlockSwitch.setEnabled(detectEnabled);
         foreignBlockSwitch.setEnabled(detectEnabled);
         privateBlockSwitch.setEnabled(detectEnabled);
+        unknownBlockSwitch.setEnabled(detectEnabled);
     }
 
     /**

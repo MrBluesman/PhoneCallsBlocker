@@ -50,4 +50,14 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/settings_fragment_switch3_foreign_block" />
 
+    <Switch
+        android:id="@+id/settings_fragment_switch5_unknown_block"
+        android:layout_width="match_parent"
+        android:layout_height="20pt"
+        android:text="@string/settings_fragment_unknown_block_switch"
+        android:visibility="visible"
+
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/settings_fragment_switch4_private_block" />
+
 </android.support.constraint.ConstraintLayout>
