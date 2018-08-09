@@ -4,13 +4,17 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Build;
+import android.provider.ContactsContract;
 import android.provider.Settings;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
@@ -58,6 +62,7 @@ public class CallDetector
         public void onCallStateChanged(int state, String incomingNumber)
         {
             final String incomingNumberFormatted = incomingNumber != null ? incomingNumber : "Numer prywatny";
+            final String incomingContactName = !incomingNumberFormatted.isEmpty()? getContactName(ctx, incomingNumberFormatted) : null;
 
             switch (state)
             {
@@ -83,27 +88,24 @@ public class CallDetector
                         declinePhone(ctx);
                         registerPhoneBlock(db, incomingNumberFormatted, true);
                     }
-                    else if(!db.existBlock(myPhoneNumber, incomingNumberFormatted, false))
-                    {
+                    else if(!db.existBlock(myPhoneNumber, incomingNumberFormatted, false)) {
 
                         //Can draw overlays depends on SDK version
                         boolean canDrawOverlays = true;
-                        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
-                        {
-                            if(!Settings.canDrawOverlays(ctx)) canDrawOverlays = false;
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                            if (!Settings.canDrawOverlays(ctx)) canDrawOverlays = false;
                         }
 
-                        if(canDrawOverlays)
-                        {
+                        if (canDrawOverlays) {
                             AlertDialog alertDialog;
                             //If number is private show dialog box with limited options - only block and allow
-                            if(incomingNumber == null) alertDialog = createIncomingCallDialogPrivateNumber(incomingNumberFormatted, db);
-                            else
-                            {
+                            if (incomingNumber == null)
+                                alertDialog = createIncomingCallDialogPrivateNumber(incomingNumberFormatted, db);
+                            else {
                                 //If number is blocked by user show dialog box with possibility to change to positive number
                                 alertDialog = db.existBlock(myPhoneNumber, incomingNumberFormatted, true)
-                                    ? createIncomingCallDialogBlockedNumber(incomingNumberFormatted, db)
-                                    : createIncomingCallDialogNewNumber(incomingNumberFormatted, db);
+                                        ? createIncomingCallDialogBlockedNumber(incomingNumberFormatted, db)
+                                        : createIncomingCallDialogNewNumber(incomingNumberFormatted, db);
                             }
 
                             alertDialog.getWindow().setType(getDialogLayoutFlag());
@@ -321,6 +323,32 @@ public class CallDetector
             }
 
             return false;
+        }
+
+        /**
+         * Gets the contact name of incoming phone call.
+         *
+         * @param context context of the app for the {@link CallDetector} object.
+         * @param incomingNumber contains the number of incoming call
+         * @return contact name or null if it's unknown phone number
+         */
+        private String getContactName(final Context context, final String incomingNumber)
+        {
+            ContentResolver cr = context.getContentResolver();
+            Uri uri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(incomingNumber));
+
+            Cursor cursor = cr.query(uri, new String[]{ContactsContract.PhoneLookup.DISPLAY_NAME}, null, null, null);
+            if (cursor == null) return null;
+
+            String contactName = null;
+            if(cursor.moveToFirst())
+            {
+                contactName = cursor.getString(cursor.getColumnIndex(ContactsContract.PhoneLookup.DISPLAY_NAME));
+            }
+
+            if(!cursor.isClosed()) cursor.close();
+
+            return contactName;
         }
     }
 

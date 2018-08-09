@@ -299,8 +299,8 @@ public class DatabaseHandler extends SQLiteOpenHelper
     {
         int sqlRating = rating ? 1 : 0;
         String countBlockingsByRating = "SELECT * FROM " + TABLE_BLOCKING
-                + " WHERE " + BLOCKED_KEY_T_B + "=" + nr_blocked
-                + " AND " + RATING_T_B + "=" + sqlRating + ";";
+                + " WHERE " + BLOCKED_KEY_T_B + "='" + nr_blocked
+                + "' AND " + RATING_T_B + "=" + sqlRating + ";";
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(countBlockingsByRating, null);
         int count = cursor.getCount();
