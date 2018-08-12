@@ -1,18 +1,22 @@
 package com.example.ukasz.phonecallsblocker;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Switch;
+import android.widget.Toast;
 
-import com.example.ukasz.androidsqlite.DatabaseHandler;
+import java.util.Objects;
 
 
 /**
@@ -34,6 +38,9 @@ public class SettingsFragment extends Fragment
 
     //Apps data
     private SharedPreferences data;
+
+    //request unique codes
+    private final int READ_CONTACTS_PERMISSION_REQUEST_CODE = 1112;
 
     private OnFragmentInteractionListener mListener;
 
@@ -190,12 +197,16 @@ public class SettingsFragment extends Fragment
                 //get foreignBlockEnabled from data SharedPreferences
                 boolean unknownBlockEnabled = !data.getBoolean("unknownBlockEnabled", false);
 
-                unknownBlockSwitch.setChecked(unknownBlockEnabled);
+                if(unknownBlockEnabled && !hasGrantedReadContactsPermission()) requestReadContactsPermission();
+                else
+                {
+                    unknownBlockSwitch.setChecked(unknownBlockEnabled);
 
-                //Save setting in SharedPreferences
-                SharedPreferences.Editor editDataSettings = data.edit();
-                editDataSettings.putBoolean("unknownBlockEnabled", unknownBlockEnabled);
-                editDataSettings.apply(); //commit
+                    //Save setting in SharedPreferences
+                    SharedPreferences.Editor editDataSettings = data.edit();
+                    editDataSettings.putBoolean("unknownBlockEnabled", unknownBlockEnabled);
+                    editDataSettings.apply(); //commit
+                }
             }
         });
     }
@@ -223,6 +234,69 @@ public class SettingsFragment extends Fragment
         foreignBlockSwitch.setEnabled(detectEnabled);
         privateBlockSwitch.setEnabled(detectEnabled);
         unknownBlockSwitch.setEnabled(detectEnabled);
+    }
+
+    /**
+     * Opens a window to ask for a permission to read contacts.
+     */
+    public void requestReadContactsPermission()
+    {
+        //Request the permission
+        Log.e("ReadContacts", "true");
+        requestPermissions(new String[]{Manifest.permission.READ_CONTACTS}, READ_CONTACTS_PERMISSION_REQUEST_CODE);
+    }
+
+    /**
+     * Checks if the read contacts permission is granted.
+     *
+     * @return true if it is granted, false if it's are not
+     */
+    public boolean hasGrantedReadContactsPermission()
+    {
+        return ContextCompat.checkSelfPermission(Objects.requireNonNull(getActivity()), Manifest.permission.READ_CONTACTS)
+                == PackageManager.PERMISSION_GRANTED;
+    }
+
+    /**
+     * Runs as a result of requesting for a grant a permissions.
+     *
+     * @param requestCode code of the request, identify a request
+     * @param permissions array of permissions
+     * @param grantResults array of granted permissions
+     */
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults)
+    {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        switch (requestCode)
+        {
+            case READ_CONTACTS_PERMISSION_REQUEST_CODE:
+            {
+                boolean unknownBlockEnabled = false;
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+                {
+                    //permission was granted, we can save a allow read contacts setting in
+                    //SharedPreferences
+                    if (hasGrantedReadContactsPermission())
+                    {
+                        //Set read contact setting as true
+                        unknownBlockEnabled = true;
+                    }
+                }
+                else Toast.makeText(getActivity(), "Do blokowania nieznanych numerów potrzebujemy Twojej zgody na odczyt listy kontaktów.",
+                        Toast.LENGTH_LONG).show();
+
+                //Save setting in SharedPreferences
+                unknownBlockSwitch.setChecked(unknownBlockEnabled);
+                SharedPreferences.Editor editDataSettings = data.edit();
+                editDataSettings.putBoolean("unknownBlockEnabled", unknownBlockEnabled);
+                editDataSettings.apply(); //commit
+                break;
+            }
+        }
     }
 
     /**
