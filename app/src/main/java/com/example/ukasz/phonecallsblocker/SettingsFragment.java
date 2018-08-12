@@ -227,13 +227,22 @@ public class SettingsFragment extends Fragment
         autoBlockSwitch.setChecked(autoBlockEnabled);
         foreignBlockSwitch.setChecked(foreignBlockEnabled);
         privateBlockSwitch.setChecked(privateBlockEnabled);
-        unknownBlockSwitch.setChecked(unknownBlockEnabled);
 
         //rest of switch block options depends on detectEnabled
         autoBlockSwitch.setEnabled(detectEnabled);
         foreignBlockSwitch.setEnabled(detectEnabled);
         privateBlockSwitch.setEnabled(detectEnabled);
         unknownBlockSwitch.setEnabled(detectEnabled);
+
+        //SwitchOff unknownBLockEnabled if permissions are disabled
+        if(unknownBlockEnabled && !hasGrantedReadContactsPermission())
+        {
+            unknownBlockSwitch.setChecked(false);
+            //Save setting in SharedPreferences
+            SharedPreferences.Editor editDataSettings = data.edit();
+            editDataSettings.putBoolean("unknownBlockEnabled", false);
+            editDataSettings.apply(); //commit
+        } else unknownBlockSwitch.setChecked(unknownBlockEnabled);
     }
 
     /**
@@ -307,7 +316,17 @@ public class SettingsFragment extends Fragment
     {
         super.onResume();
         Log.e("SettingsFragment","onResume() method");
-        //loadSettingsState();
+
+        //SwitchOff unknownBLockEnabled if permissions are disabled
+        boolean unknownBlockEnabled = data.getBoolean("unknownBlockEnabled", false);
+        if(unknownBlockEnabled && !hasGrantedReadContactsPermission())
+        {
+            unknownBlockSwitch.setChecked(false);
+            //Save setting in SharedPreferences
+            SharedPreferences.Editor editDataSettings = data.edit();
+            editDataSettings.putBoolean("unknownBlockEnabled", false);
+            editDataSettings.apply(); //commit
+        } else unknownBlockSwitch.setChecked(unknownBlockEnabled);
     }
 
     /**

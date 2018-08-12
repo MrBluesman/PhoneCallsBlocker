@@ -61,8 +61,17 @@ public class CallDetector
         @Override
         public void onCallStateChanged(int state, String incomingNumber)
         {
+            //Settings data
+            SharedPreferences data;
+            data = ctx.getSharedPreferences("data", Context.MODE_PRIVATE);
+            boolean autoBlockEnabled = data.getBoolean("autoBlockEnabled", false);
+            boolean foreignBlockEnabled = data.getBoolean("foreignBlockEnabled", false);
+            boolean privateBlockEnabled = data.getBoolean("privateBlockEnabled", false);
+            boolean unknownBlockEnabled = data.getBoolean("unknownBlockEnabled", false);
+
             final String incomingNumberFormatted = incomingNumber != null ? incomingNumber : "Numer prywatny";
-            final String incomingContactName = !incomingNumberFormatted.isEmpty()? getContactName(ctx, incomingNumberFormatted) : null;
+            String incomingContactName = null;
+            if(unknownBlockEnabled) incomingContactName = !incomingNumberFormatted.isEmpty()? getContactName(ctx, incomingNumberFormatted) : null;
 
             switch (state)
             {
@@ -73,12 +82,6 @@ public class CallDetector
                     Log.e("incomingNumber", incomingNumberFormatted);
                     //database and settings load
                     final DatabaseHandler db = new DatabaseHandler(ctx);
-                    SharedPreferences data;
-                    data = ctx.getSharedPreferences("data", Context.MODE_PRIVATE);
-                    boolean autoBlockEnabled = data.getBoolean("autoBlockEnabled", false);
-                    boolean foreignBlockEnabled = data.getBoolean("foreignBlockEnabled", false);
-                    boolean privateBlockEnabled = data.getBoolean("privateBlockEnabled", false);
-                    boolean unknownBlockEnabled = data.getBoolean("unknownBlockEnabled", false);
 
                     //Check if we should autoblocked (only for negative phone numbers)
                     if((autoBlockEnabled && db.getNumberBlockingsCount(incomingNumberFormatted, true) > 0) //Phone number is blocked and autoBlock is enabled
@@ -402,7 +405,6 @@ public class CallDetector
         try
         {
             db.addBlockingRegistry(new RegistryBlock(phoneNumber, rating, new Date()));
-
             RegistryFragment.loadRegistryBlockings();
         }
         catch(ParseException e)
