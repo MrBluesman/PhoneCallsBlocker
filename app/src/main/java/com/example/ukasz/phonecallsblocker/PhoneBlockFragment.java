@@ -247,7 +247,7 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.menu_action_settings)
+        if (id == R.id.menu_action_clear_registry)
         {
             Toast.makeText(getActivity(), "Search...", Toast.LENGTH_SHORT).show();
             return true;

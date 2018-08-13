@@ -40,6 +40,8 @@ import android.widget.Toast;
 import com.example.ukasz.androidsqlite.Block;
 import com.example.ukasz.androidsqlite.DatabaseHandler;
 
+import java.text.ParseException;
+
 public class StartActivity extends AppCompatActivity implements SettingsFragment.OnFragmentInteractionListener
 {
 
@@ -294,10 +296,18 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.menu_action_settings)
-//        R.id.start
+        //clear registry action
+        if (id == R.id.menu_action_clear_registry)
         {
+            clearRegistryBlockings();
+            try
+            {
+                RegistryFragment.loadRegistryBlockings();
+            }
+            catch (ParseException e)
+            {
+                e.printStackTrace();
+            }
             return true;
         }
 
@@ -703,4 +713,14 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
             Toast.makeText(StartActivity.this, "Numer jest już na liście", Toast.LENGTH_SHORT).show();
         }
     }
+
+    /**
+     * Clears a registry blockings.
+     */
+    public void clearRegistryBlockings()
+    {
+        DatabaseHandler db = new DatabaseHandler(StartActivity.this);
+        db.clearRegistryBlockings();
+    }
+
 }

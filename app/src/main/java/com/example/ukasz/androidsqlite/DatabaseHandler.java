@@ -590,4 +590,22 @@ public class DatabaseHandler extends SQLiteOpenHelper
         return cursor.getCount();
     }
 
+    /**
+     * Deletes all {@link RegistryBlock} instances from database.
+     */
+    public void clearRegistryBlockings()
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        //drop and create new a blocking registry table
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_BLOCKING_REGISTRY);
+        String createBlockingRegistryTable = "CREATE TABLE " + TABLE_BLOCKING_REGISTRY
+                + "("
+                + ID_KEY_T_BR + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+                + BLOCKED_KEY_T_BR + " VARCHAR(15) NOT NULL, "
+                + RATING_T_BR + " BOOLEAN NOT NULL, "
+                + BLOCKING_DATE_T_BR + " DATETIME NOT NULL"
+                + ")";
+        db.execSQL(createBlockingRegistryTable);
+    }
+
 }

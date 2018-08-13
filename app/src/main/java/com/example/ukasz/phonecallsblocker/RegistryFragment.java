@@ -29,7 +29,7 @@ public class RegistryFragment extends Fragment implements MyRegistryRecyclerView
 
     private static final String ARG_COLUMN_COUNT = "column-count";
     private int mColumnCount = 1;
-    private MyRegistryRecyclerViewAdapter adapter;
+    private static MyRegistryRecyclerViewAdapter adapter;
     private RecyclerView recyclerView;
     public static List<RegistryBlock> registryBlockings = new ArrayList<>(); //adapter data
     private static DatabaseHandler db;
@@ -159,7 +159,7 @@ public class RegistryFragment extends Fragment implements MyRegistryRecyclerView
         Log.e("Tresc", String.valueOf(registryBlockings.size()));
         registryBlockings.clear();
         registryBlockings.addAll(registryBlockingsToAddFromDb);
-//        adapter.notifyDataSetChanged();
+        adapter.notifyDataSetChanged();
 //        swipeRefreshLayout.setRefreshing(false);
     }
 
