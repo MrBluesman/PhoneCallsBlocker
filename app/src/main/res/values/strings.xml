@@ -41,6 +41,8 @@
 
     <!-- String related to StartActivity -->
     <string name="start_activity_action_clear_registry">Wyczyść rejestr</string>
+    <string name="phone_block_fragment_clear_registry_confirm">Czy na pewno chcesz usunąć wszystkie dane z rejestru?</string>
+    <string name="phone_block_fragment_clear_registry_confirm_title">Czyszczenie rejestru</string>
     <string name="start_activity_section_format">Hello World from section: %1$d</string>
     <string name="start_activity_title_activity_start">StartActivity</string>
     <string name="start_activity_tab_text_1">Start</string>

@@ -31,6 +31,7 @@ import android.support.v4.view.ViewPager;
 import android.os.Bundle;
 import android.telephony.TelephonyManager;
 import android.util.Log;
+import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -299,15 +300,7 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
         //clear registry action
         if (id == R.id.menu_action_clear_registry)
         {
-            clearRegistryBlockings();
-            try
-            {
-                RegistryFragment.loadRegistryBlockings();
-            }
-            catch (ParseException e)
-            {
-                e.printStackTrace();
-            }
+            confirmClearRegistryBlockings().show();
             return true;
         }
 
@@ -721,6 +714,45 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
     {
         DatabaseHandler db = new DatabaseHandler(StartActivity.this);
         db.clearRegistryBlockings();
+        try
+        {
+            RegistryFragment.loadRegistryBlockings();
+        }
+        catch (ParseException e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Creates a confirmation {@link android.app.AlertDialog} for clear registry blockings..
+     *
+     * @return {@link android.app.AlertDialog} with confirmation for deleting selected blockings
+     */
+    private android.app.AlertDialog confirmClearRegistryBlockings()
+    {
+        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(StartActivity.this);
+
+        //Add the buttons
+        builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener()
+        {
+            @Override
+            public void onClick(DialogInterface dialog, int which)
+            {
+                clearRegistryBlockings();
+            }
+        });
+
+        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener()
+        {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {}
+        });
+
+        builder.setMessage(R.string.phone_block_fragment_clear_registry_confirm)
+                .setTitle(R.string.phone_block_fragment_clear_registry_confirm_title);
+
+        return builder.create();
     }
 
 }
