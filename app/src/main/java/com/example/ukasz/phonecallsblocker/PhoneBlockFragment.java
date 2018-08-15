@@ -357,7 +357,7 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
     }
 
     /**
-     * Inner class for creating a action mode - deleting blockings.
+     * Inner class for creating a action mode after select blockings.
      */
     private class ActionModeCallback implements ActionMode.Callback
     {
@@ -406,12 +406,15 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
             switch (item.getItemId())
             {
                 case R.id.action_delete:
-                    // delete all the selected blockings
-
+                    //delete all the selected blockings
                     //alert dialog for confirmation
                     confirmDelete(mode).show();
                     return true;
-
+                case R.id.menu_action_set_as_positive:
+                    //set all selected blockings as positive (not blocked)
+                    setBlockings(false);
+                    mode.finish();
+                    return true;
                 default:
                     mode.finish();
                     return false;
@@ -461,6 +464,25 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
         adapter.notifyDataSetChanged();
     }
 
+    /**
+     * Sets up the rating of selected blockings.
+     * @param rating rating which will be set up for all selected blockings
+     *               true if block, false if allow
+     */
+    private void setBlockings(boolean rating)
+    {
+        adapter.resetAnimationIndex();
+        List<Integer> selectedItemPositions =
+                adapter.getSelectedItems();
+        for (int i = selectedItemPositions.size() - 1; i >= 0; i--)
+        {
+            int positionToChange = selectedItemPositions.get(i);
+            Block b = blockings.get(positionToChange);
+            b.setNrRating(rating);
+            db.updateBlocking(b);
+        }
+        adapter.notifyDataSetChanged();
+    }
 
     /**
      * Creates a confirmation {@link AlertDialog} for deleting selected blockings from list.
