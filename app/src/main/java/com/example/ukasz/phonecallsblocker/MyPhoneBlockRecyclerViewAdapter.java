@@ -352,6 +352,17 @@ public class MyPhoneBlockRecyclerViewAdapter extends RecyclerView.Adapter<MyPhon
     }
 
     /**
+     * Getter for the first selected item.
+     *
+     * @return position of the first selected item
+     */
+    public Integer getSelectedItem()
+    {
+        if(getSelectedItemCount() > 0) return selectedItems.keyAt(0);
+        return null;
+    }
+
+    /**
      * Getter for amount of selected blockings.
      *
      * @return amount of selected blockings

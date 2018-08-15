@@ -314,11 +314,7 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
         {
             // read the block which removes bold from the row
             Block block = blockings.get(position);
-            Intent detailsBlockIntent = new Intent(getContext(), DetailsPhoneBlock.class);
-            Bundle b = new Bundle();
-            b.putString("phoneNumber", block.getNrBlocked());
-            detailsBlockIntent.putExtras(b);
-            startActivity(detailsBlockIntent);
+            startDetailsActivityForBlocking(block.getNrBlocked());
         }
     }
 
@@ -422,6 +418,13 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
                     //delete all the selected blockings
                     //alert dialog for confirmation
                     confirmDelete(mode).show();
+                    return true;
+                case R.id.menu_action_details:
+                    //go to the number details
+                    Integer itemPosition = adapter.getSelectedItem();
+                    Block b = blockings.get(itemPosition);
+                    startDetailsActivityForBlocking(b.getNrBlocked());
+                    mode.finish();
                     return true;
                 case R.id.menu_action_set_as_negative:
                     //set all selected blockings as positive (not blocked)
@@ -532,5 +535,19 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
                 .setTitle(R.string.phone_block_fragment_delete_confirm_title);
 
         return builder.create();
+    }
+
+    /**
+     * Starts a {@link DetailsPhoneBlock} activity for the selected blocking.
+     *
+     * @param phoneNumber phone number of the selected blocking
+     */
+    private void startDetailsActivityForBlocking(String phoneNumber)
+    {
+        Intent detailsBlockIntent = new Intent(getContext(), DetailsPhoneBlock.class);
+        Bundle b = new Bundle();
+        b.putString("phoneNumber", phoneNumber);
+        detailsBlockIntent.putExtras(b);
+        startActivity(detailsBlockIntent);
     }
 }
