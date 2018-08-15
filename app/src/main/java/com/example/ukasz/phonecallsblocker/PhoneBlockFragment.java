@@ -410,6 +410,11 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
                     //alert dialog for confirmation
                     confirmDelete(mode).show();
                     return true;
+                case R.id.menu_action_set_as_negative:
+                    //set all selected blockings as positive (not blocked)
+                    setBlockings(true);
+                    mode.finish();
+                    return true;
                 case R.id.menu_action_set_as_positive:
                     //set all selected blockings as positive (not blocked)
                     setBlockings(false);
