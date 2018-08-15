@@ -3,7 +3,6 @@ package com.example.ukasz.phonecallsblocker;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -28,10 +27,9 @@ public class AddPhoneBlock extends AppCompatActivity implements AdapterView.OnIt
     private Spinner category;
     private EditText description;
     private Button addButton;
-    private View lineDivider;
 
     /**
-     * Initialize var instances and view for start Activity.
+     * Initialize var instances and view for start {@link AddPhoneBlock} activity.
      *
      * @param savedInstanceState Instance state.
      */
@@ -41,11 +39,9 @@ public class AddPhoneBlock extends AppCompatActivity implements AdapterView.OnIt
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_phone_block);
 
-//        //set toolbar
+        //set toolbar
         mActionBar = findViewById(R.id.add_phone_block_toolbar);
         setSupportActionBar(mActionBar);
-//        mActionBar.setTitle(R.string.add_phone_block_title);
-//
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 

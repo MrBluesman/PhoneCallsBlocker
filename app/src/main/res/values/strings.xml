@@ -1,5 +1,5 @@
 <resources>
-    <!-- General strings -->
+    <!-- Common strings -->
     <string name="app_name">Phone Calls Blocker</string>
     <string name="menu_settings">Ustawienia</string>
     <string name="title_activity_main">Blokowanie połączeń</string>
@@ -75,6 +75,9 @@
     <string name="add_phone_block_description_hint">Opisz powód blokowania</string>
     <string name="add_phone_block_button_add">Dodaj numer do listy</string>
     <string name="add_phone_block_is_positive_switch">Dodaj jako pozytywny (tolerowany)</string>
+
+    <!-- Strings related to DetailsPhoneBlock -->
+    <string name="details_phone_block_title">Szczegóły numeru</string>
 
     <!-- String related to CallDetector -->
     <string name="call_detector_choose_category_title">Wybierz kategorię</string>

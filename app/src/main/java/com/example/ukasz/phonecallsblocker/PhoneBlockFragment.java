@@ -314,10 +314,11 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
         {
             // read the block which removes bold from the row
             Block block = blockings.get(position);
-            blockings.set(position, block);
-            adapter.notifyDataSetChanged();
-
-            Toast.makeText(getActivity(), "Read: " + block.getNrBlocked(), Toast.LENGTH_SHORT).show();
+            Intent detailsBlockIntent = new Intent(getContext(), DetailsPhoneBlock.class);
+            Bundle b = new Bundle();
+            b.putString("phoneNumber", block.getNrBlocked());
+            detailsBlockIntent.putExtras(b);
+            startActivity(detailsBlockIntent);
         }
     }
 
