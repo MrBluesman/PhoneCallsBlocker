@@ -69,6 +69,8 @@
     <string name="phone_block_fragment_delete_confirm">Czy na pewno usunąć zaznaczone numery?</string>
     <string name="phone_block_fragment_action_set_as_negative">Blokuj</string>
     <string name="phone_block_fragment_action_set_as_positive">Toleruj</string>
+    <string name="phone_block_fragment_action_details">Szczegóły</string>
+    <string name="phone_block_fragment_action_edit">Edytuj</string>
 
     <!-- Strings related to AddPhoneBlock -->
     <string name="add_phone_block_title">Nowy numer</string>

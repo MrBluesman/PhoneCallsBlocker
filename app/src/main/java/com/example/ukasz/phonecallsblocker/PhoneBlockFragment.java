@@ -345,12 +345,25 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
         adapter.toggleSelection(position);
         int count = adapter.getSelectedItemCount();
 
+        Menu actionMenu = actionMode.getMenu();
+
         if (count == 0)
         {
             actionMode.finish();
         }
         else
         {
+            //Different menu actions depends on selected one or more blockings
+            if(count > 1)
+            {
+                actionMenu.findItem(R.id.menu_action_details).setVisible(false);
+                actionMenu.findItem(R.id.menu_action_edit).setVisible(false);
+            }
+            else
+            {
+                actionMenu.findItem(R.id.menu_action_details).setVisible(true);
+                actionMenu.findItem(R.id.menu_action_edit).setVisible(true);
+            }
             actionMode.setTitle(String.valueOf(count));
             actionMode.invalidate();
         }
