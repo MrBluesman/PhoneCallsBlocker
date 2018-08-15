@@ -45,7 +45,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".AddPhoneBlock" />
-        <activity android:name=".DetailsPhoneBlock"></activity>
+        <activity android:name=".DetailsPhoneBlock" />
+        <activity android:name=".EditPhoneBlock"></activity>
     </application>
 
 </manifest>

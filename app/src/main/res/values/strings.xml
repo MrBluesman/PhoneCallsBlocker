@@ -83,6 +83,9 @@
     <!-- Strings related to DetailsPhoneBlock -->
     <string name="details_phone_block_title">Szczegóły numeru</string>
 
+    <!-- Strings related to EditPhoneBlock -->
+    <string name="edit_phone_block_title">Edycja numeru</string>
+
     <!-- String related to CallDetector -->
     <string name="call_detector_choose_category_title">Wybierz kategorię</string>
     <string name="call_detector_has_blocked">Zablokowano</string>

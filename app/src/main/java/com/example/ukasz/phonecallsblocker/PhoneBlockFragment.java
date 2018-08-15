@@ -412,6 +412,9 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
         @Override
         public boolean onActionItemClicked(ActionMode mode, MenuItem item)
         {
+            Integer itemPosition = null;
+            Block b = null;
+
             switch (item.getItemId())
             {
                 case R.id.action_delete:
@@ -421,9 +424,16 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
                     return true;
                 case R.id.menu_action_details:
                     //go to the number details
-                    Integer itemPosition = adapter.getSelectedItem();
-                    Block b = blockings.get(itemPosition);
+                    itemPosition = adapter.getSelectedItem();
+                    b = blockings.get(itemPosition);
                     startDetailsActivityForBlocking(b.getNrBlocked());
+                    mode.finish();
+                    return true;
+                case R.id.menu_action_edit:
+                    //go to the number details
+                    itemPosition = adapter.getSelectedItem();
+                    b = blockings.get(itemPosition);
+                    startEditActivityForBlocking(b.getNrBlocked());
                     mode.finish();
                     return true;
                 case R.id.menu_action_set_as_negative:
@@ -549,5 +559,19 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
         b.putString("phoneNumber", phoneNumber);
         detailsBlockIntent.putExtras(b);
         startActivity(detailsBlockIntent);
+    }
+
+    /**
+     * Starts a {@link EditPhoneBlock} activity for the selected blocking.
+     *
+     * @param phoneNumber phone number of the selected blocking
+     */
+    private void startEditActivityForBlocking(String phoneNumber)
+    {
+        Intent editBlockIntent = new Intent(getContext(), EditPhoneBlock.class);
+        Bundle b = new Bundle();
+        b.putString("phoneNumber", phoneNumber);
+        editBlockIntent.putExtras(b);
+        startActivity(editBlockIntent);
     }
 }
