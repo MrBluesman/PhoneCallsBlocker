@@ -352,6 +352,17 @@ public class MyPhoneBlockRecyclerViewAdapter extends RecyclerView.Adapter<MyPhon
     }
 
     /**
+     * Select all blockings from list in {@link MyPhoneBlockRecyclerViewAdapter}.
+     */
+    public void selectAllItems()
+    {
+        for(int i = 0; i < mBlockings.size(); i++)
+        {
+            if(!selectedItems.get(i)) toggleSelection(i);
+        }
+    }
+
+    /**
      * Getter for the first selected item.
      *
      * @return position of the first selected item

@@ -445,13 +445,17 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
                     return true;
                 case R.id.menu_action_set_as_negative:
                     //set all selected blockings as positive (not blocked)
-                    setBlockings(true);
+                    setBlockingsRating(true);
                     mode.finish();
                     return true;
                 case R.id.menu_action_set_as_positive:
                     //set all selected blockings as positive (not blocked)
-                    setBlockings(false);
+                    setBlockingsRating(false);
                     mode.finish();
+                    return true;
+                case R.id.menu_action_select_all:
+                    //select all blockings
+                    adapter.selectAllItems();
                     return true;
                 default:
                     mode.finish();
@@ -512,7 +516,7 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
      * @param rating rating which will be set up for all selected blockings
      *               true if block, false if allow
      */
-    private void setBlockings(boolean rating)
+    private void setBlockingsRating(boolean rating)
     {
         adapter.resetAnimationIndex();
         List<Integer> selectedItemPositions =

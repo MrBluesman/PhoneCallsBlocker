@@ -71,6 +71,8 @@
     <string name="phone_block_fragment_action_set_as_positive">Toleruj</string>
     <string name="phone_block_fragment_action_details">Szczegóły</string>
     <string name="phone_block_fragment_action_edit">Edytuj</string>
+    <string name="phone_block_fragment_action_select_all">Zaznacz wszystkie</string>
+    <string name="phone_block_fragment_action_unselect_all">Odznacz wszystkie</string>
 
     <!-- Strings related to AddPhoneBlock -->
     <string name="add_phone_block_title">Nowy numer</string>
