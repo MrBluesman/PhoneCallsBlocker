@@ -370,6 +370,8 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
      */
     private class ActionModeCallback implements ActionMode.Callback
     {
+        private int statusBarColor;
+        private int toolbarColor;
 
         /**
          * Action on creating a action mode.
@@ -384,6 +386,11 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
         {
             mode.getMenuInflater().inflate(R.menu.menu_action_mode, menu);
             // disable swipe refresh if action mode is enabled
+            //hold current color of status bar
+            statusBarColor = Objects.requireNonNull(getActivity()).getWindow().getStatusBarColor();
+            //set the colors of status and bars
+            getActivity().getWindow().setStatusBarColor(getResources().getColor(R.color.bg_status_bar_action_mode));
+            getActivity().findViewById(R.id.start_activity_tabs).setBackgroundColor(getResources().getColor(R.color.bg_action_mode));
             swipeRefreshLayout.setEnabled(false);
             return true;
         }
@@ -462,6 +469,11 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
         @Override
         public void onDestroyActionMode(ActionMode mode)
         {
+            //back a colors of status and tool bars
+            Objects.requireNonNull(getActivity()).getWindow().setStatusBarColor(statusBarColor);
+            getActivity().findViewById(R.id.start_activity_tabs).setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+            //Back the toolbar
+            getActivity().findViewById(R.id.start_activity_tabs).setVisibility(View.VISIBLE);
             adapter.clearSelections();
             swipeRefreshLayout.setEnabled(true);
             actionMode = null;
