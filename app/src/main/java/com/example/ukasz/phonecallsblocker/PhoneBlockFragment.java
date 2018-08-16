@@ -412,8 +412,8 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
         @Override
         public boolean onActionItemClicked(ActionMode mode, MenuItem item)
         {
-            Integer itemPosition = null;
-            Block b = null;
+            Integer itemPosition;
+            Block b;
 
             switch (item.getItemId())
             {
