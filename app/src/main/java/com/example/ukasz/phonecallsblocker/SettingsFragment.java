@@ -29,12 +29,15 @@ import java.util.Objects;
  */
 public class SettingsFragment extends Fragment
 {
-    //Setting switches
+    //Blockings settings switches
     private Switch blockServiceSwitch;
     private Switch autoBlockSwitch;
     private Switch foreignBlockSwitch;
     private Switch privateBlockSwitch;
     private Switch unknownBlockSwitch;
+
+    //Notifications settings switches
+    private Switch notificationBlockSwitch;
 
     //Apps data
     private SharedPreferences data;
@@ -97,12 +100,15 @@ public class SettingsFragment extends Fragment
     {
         super.onActivityCreated(savedInstanceState);
         Log.e("SettingsFragment","onActivityCreated() method");
-        //Switchers to enable/disable blocking options
+        //Switches to enable/disable blocking options
         blockServiceSwitch = getView().findViewById(R.id.settings_fragment_switch1_block_service);
         autoBlockSwitch = getView().findViewById(R.id.settings_fragment_switch2_automatic_block);
         foreignBlockSwitch = getView().findViewById(R.id.settings_fragment_switch3_foreign_block);
         privateBlockSwitch = getView().findViewById(R.id.settings_fragment_switch4_private_block);
         unknownBlockSwitch = getView().findViewById(R.id.settings_fragment_switch5_unknown_block);
+
+        //Switches to enable/disable notifications options
+        notificationBlockSwitch = getView().findViewById(R.id.settings_fragment_switch6_notification_block);
 
         loadSettingsState();
 
@@ -209,6 +215,24 @@ public class SettingsFragment extends Fragment
                 }
             }
         });
+
+        //Click listener for enable or disable block notification
+        notificationBlockSwitch.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                //get notificationBlockEnabled from data SharedPreferences
+                boolean notificationBlockEnabled = !data.getBoolean("notificationBlockEnabled", false);
+
+                notificationBlockSwitch.setEnabled(notificationBlockEnabled);
+
+                //Save setting in SharedPreferences
+                SharedPreferences.Editor editDataSettings = data.edit();
+                editDataSettings.putBoolean("notificationBlockEnabled", notificationBlockEnabled);
+                editDataSettings.apply(); //commit
+            }
+        });
     }
 
     /**
@@ -222,11 +246,16 @@ public class SettingsFragment extends Fragment
         boolean foreignBlockEnabled = data.getBoolean("foreignBlockEnabled", false);
         boolean privateBlockEnabled = data.getBoolean("privateBlockEnabled", false);
         boolean unknownBlockEnabled = data.getBoolean("unknownBlockEnabled", false);
+        boolean notificationBlockEnabled = data.getBoolean("notificationBlockEnabled", false);
 
+        //block settings
         blockServiceSwitch.setChecked(detectEnabled);
         autoBlockSwitch.setChecked(autoBlockEnabled);
         foreignBlockSwitch.setChecked(foreignBlockEnabled);
         privateBlockSwitch.setChecked(privateBlockEnabled);
+
+        //notification settings
+        notificationBlockSwitch.setChecked(notificationBlockEnabled);
 
         //rest of switch block options depends on detectEnabled
         autoBlockSwitch.setEnabled(detectEnabled);

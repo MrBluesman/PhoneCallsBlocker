@@ -72,6 +72,9 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
     private boolean privateBlockEnabled;
     private boolean unknownBlockEnabled;
 
+    //Notifications options
+    private boolean notificationBlockEnabled;
+
     //The {@link com.github.clans.fab.FloatingActionMenu} instance.
     com.github.clans.fab.FloatingActionMenu fab;
 
@@ -188,13 +191,18 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
      */
     private void loadSettingsState()
     {
-        //load data settings
+        //load data settings:
+        //blocking settings
         data = getSharedPreferences("data", Context.MODE_PRIVATE);
         detectEnabled = data.getBoolean("detectEnabled", false);
         autoBlockEnabled = data.getBoolean("autoBlockEnabled", false);
         foreignBlockEnabled = data.getBoolean("foreignBlockEnabled", false);
         privateBlockEnabled = data.getBoolean("privateBlockEnabled", false);
         unknownBlockEnabled = data.getBoolean("unknownBlockEnabled", false);
+
+        //notification settings
+        notificationBlockEnabled = data.getBoolean("notificationBlockEnabled", false);
+
 
         Log.e("Loading data", "MainActivity - loadSettingsState() method");
 
@@ -384,6 +392,16 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
     public boolean getUnknownBlockEnabled()
     {
         return unknownBlockEnabled;
+    }
+
+    /**
+     * notificationBlockEnabled getter.
+     *
+     * @return value of notificationBlockEnabled
+     */
+    public boolean getNotificationBlockEnabled()
+    {
+        return notificationBlockEnabled;
     }
 
     /**
