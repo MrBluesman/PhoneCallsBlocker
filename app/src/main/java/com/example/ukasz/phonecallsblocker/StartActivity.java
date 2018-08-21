@@ -27,11 +27,9 @@ import android.support.v7.widget.Toolbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.view.ViewPager;
 import android.os.Bundle;
 import android.telephony.TelephonyManager;
 import android.util.Log;
-import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -40,6 +38,7 @@ import android.widget.Toast;
 
 import com.example.ukasz.androidsqlite.Block;
 import com.example.ukasz.androidsqlite.DatabaseHandler;
+import com.example.ukasz.phonecallsblocker.tab_layout_helper.CustomViewPager;
 
 import java.text.ParseException;
 
@@ -57,7 +56,8 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
 
 
     //The {@link ViewPager} that will host the section contents.
-    private ViewPager mViewPager;
+    private CustomViewPager mViewPager;
+    private TabLayout tabLayout;
 
     //The {@link SharedPreferences} where are saved a app settings.
     private SharedPreferences data;
@@ -109,10 +109,16 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
         tm = (TelephonyManager) StartActivity.this.getSystemService(Context.TELEPHONY_SERVICE);
 
         //Set up the listeners
-        TabLayout tabLayout = findViewById(R.id.start_activity_tabs);
+        tabLayout = findViewById(R.id.start_activity_tabs);
         mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
         tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(mViewPager));
 
+        //Log.e("TAB_LAYOUT", String.valueOf());
+//        View item1 = ((ViewGroup) tabLayout.getChildAt(0)).getChildAt(2);
+//        item1.setEnabled(false);
+//        mViewPager.setPagingEnabled(false);
+//        tabLayout.getChildAt(0).setEnabled(false);
+//        tabLayout.getChildAt(1).setEnabled(false);
         //Floating Action Button Menu
         fab = findViewById(R.id.start_activity_fab);
 
@@ -386,6 +392,26 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
     public boolean getUnknownBlockEnabled()
     {
         return unknownBlockEnabled;
+    }
+
+    /**
+     * mViewPager getter.
+     *
+     * @return value of mViewPager.
+     */
+    public CustomViewPager getMViewPager()
+    {
+        return mViewPager;
+    }
+
+    /**
+     * tabLayout getter.
+     *
+     * @return value of tabLayout.
+     */
+    public TabLayout getTabLayout()
+    {
+        return tabLayout;
     }
 
     /**

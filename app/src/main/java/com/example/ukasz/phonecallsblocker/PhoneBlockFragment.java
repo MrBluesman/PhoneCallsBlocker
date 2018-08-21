@@ -346,6 +346,8 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
         if (count == 0)
         {
             actionMode.finish();
+            //Enable other tabs
+            setOtherFragmentsEnabled(true);
         }
         else
         {
@@ -362,7 +364,22 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
             }
             actionMode.setTitle(String.valueOf(count));
             actionMode.invalidate();
+
+            //Disable other tabs
+            setOtherFragmentsEnabled(false);
         }
+    }
+
+    /**
+     * Sets other fragments enabled or disabled to swipe and click.
+     *
+     * @param enabled disable or enable access to fragments.
+     */
+    private void setOtherFragmentsEnabled(boolean enabled)
+    {
+        ((StartActivity) Objects.requireNonNull(getActivity())).getMViewPager().setPagingEnabled(enabled);
+        ((ViewGroup) ((StartActivity)getActivity()).getTabLayout().getChildAt(0)).getChildAt(2).setEnabled(enabled);
+        ((ViewGroup) ((StartActivity)getActivity()).getTabLayout().getChildAt(0)).getChildAt(0).setEnabled(enabled);
     }
 
     /**
@@ -421,6 +438,7 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
         {
             Integer itemPosition;
             Block b;
+            setOtherFragmentsEnabled(true);
 
             switch (item.getItemId())
             {
