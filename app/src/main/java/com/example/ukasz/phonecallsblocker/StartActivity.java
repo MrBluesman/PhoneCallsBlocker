@@ -113,12 +113,6 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
         mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
         tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(mViewPager));
 
-        //Log.e("TAB_LAYOUT", String.valueOf());
-//        View item1 = ((ViewGroup) tabLayout.getChildAt(0)).getChildAt(2);
-//        item1.setEnabled(false);
-//        mViewPager.setPagingEnabled(false);
-//        tabLayout.getChildAt(0).setEnabled(false);
-//        tabLayout.getChildAt(1).setEnabled(false);
         //Floating Action Button Menu
         fab = findViewById(R.id.start_activity_fab);
 
@@ -175,7 +169,6 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
         super.onResume();
         if (fab.isOpened()) fab.toggle(true);
         Log.e("StartActivity", "onResume() method");
-        //loadSettingsState();
     }
 
     /**
@@ -187,7 +180,6 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
         super.onRestart();
         if (fab.isOpened()) fab.toggle(true);
         Log.e("StartActivity", "onRestart() method");
-        //loadSettingsState();
     }
 
     /**
@@ -397,7 +389,7 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
     /**
      * mViewPager getter.
      *
-     * @return value of mViewPager.
+     * @return value of mViewPager
      */
     public CustomViewPager getMViewPager()
     {
@@ -407,11 +399,21 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
     /**
      * tabLayout getter.
      *
-     * @return value of tabLayout.
+     * @return value of tabLayout
      */
     public TabLayout getTabLayout()
     {
         return tabLayout;
+    }
+
+    /**
+     * fab action menu getter.
+     *
+     * @return value of fab
+     */
+    public com.github.clans.fab.FloatingActionMenu getFab()
+    {
+        return fab;
     }
 
     /**

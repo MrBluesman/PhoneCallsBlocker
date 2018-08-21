@@ -380,6 +380,9 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
         ((StartActivity) Objects.requireNonNull(getActivity())).getMViewPager().setPagingEnabled(enabled);
         ((ViewGroup) ((StartActivity)getActivity()).getTabLayout().getChildAt(0)).getChildAt(2).setEnabled(enabled);
         ((ViewGroup) ((StartActivity)getActivity()).getTabLayout().getChildAt(0)).getChildAt(0).setEnabled(enabled);
+        if(enabled) ((StartActivity)getActivity()).getFab().showMenu(true);
+        else ((StartActivity)getActivity()).getFab().hideMenu(true);
+
     }
 
     /**
