@@ -225,7 +225,7 @@ public class SettingsFragment extends Fragment
                 //get notificationBlockEnabled from data SharedPreferences
                 boolean notificationBlockEnabled = !data.getBoolean("notificationBlockEnabled", false);
 
-                notificationBlockSwitch.setEnabled(notificationBlockEnabled);
+                notificationBlockSwitch.setChecked(notificationBlockEnabled);
 
                 //Save setting in SharedPreferences
                 SharedPreferences.Editor editDataSettings = data.edit();

@@ -548,31 +548,4 @@ public class CallDetector
         //callStateListener = null;
         ctx.unregisterReceiver(outgoingReceiver);
     }
-
-
-
-//    /**
-//     *  This method creating a notification
-//     *
-//     * @param phoneNumber   phone number which we wants to show in notification
-//     */
-//    private void createNotification(String phoneNumber)
-//    {
-//        //Bitmap icon = BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher);
-//
-//        Notification noti = new NotificationCompat.Builder(ctx)
-//                .setContentTitle("Nowe połączenie")
-//                .setContentText(phoneNumber)
-//                //.setTicker("Masz wiadomość")
-//                .setSmallIcon(android.R.drawable.ic_dialog_info)
-//                //.setLargeIcon(icon)
-//                .setAutoCancel(true)
-//                //.setContentIntent(pIntent)
-//                .build();
-//
-//        NotificationManager notificationManager = (NotificationManager) ctx.getSystemService(NOTIFICATION_SERVICE);
-//
-//
-//        notificationManager.notify(0, noti);
-//    }
 }
