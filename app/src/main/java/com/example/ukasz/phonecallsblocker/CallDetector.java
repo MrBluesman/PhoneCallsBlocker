@@ -3,6 +3,8 @@ package com.example.ukasz.phonecallsblocker;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -18,6 +20,8 @@ import android.provider.ContactsContract;
 import android.provider.Settings;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationManagerCompat;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.util.Log;
@@ -76,6 +80,7 @@ public class CallDetector
             {
                 case TelephonyManager.CALL_STATE_RINGING:
                 {
+                    createNotification(incomingNumberFormatted);
                     Toast.makeText(ctx, "Połączenie przychodzące: " + incomingNumberFormatted, Toast.LENGTH_LONG).show();
 //                    createNotification(incomingNumber);
                     Log.e("incomingNumber", incomingNumberFormatted);
@@ -303,6 +308,20 @@ public class CallDetector
             return builder.create();
         }
 
+        private void createNotification(final String incomingNumber)
+        {
+            NotificationManagerCompat notificationManager = NotificationManagerCompat.from(ctx);
+
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(ctx, CHANNEL_CALL_DETECTOR_ID);
+            builder.setSmallIcon(R.drawable.ic_call_end_white_24dp)
+                    .setContentTitle("costam")
+                    .setContentText("costam tresc")
+                    .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+
+            // notificationId is a unique int for each notification that you must define
+            notificationManager.notify(0, builder.build());
+        }
+
         /**
          * Checks if the incoming number is from foreign country.
          *
@@ -486,6 +505,8 @@ public class CallDetector
     private int myCountryDialCode;
     private CallStateListener callStateListener;
     private OutgoingReceiver outgoingReceiver;
+    //CallDetextor channel for notification manager
+    private static final String CHANNEL_CALL_DETECTOR_ID = "CallDetector";
 
     /**
      * Constructor.
@@ -500,6 +521,7 @@ public class CallDetector
         ctx = _ctx;
         callStateListener = new CallStateListener();
         outgoingReceiver = new OutgoingReceiver();
+        createNotificationChannel();
     }
 
     /**
@@ -547,5 +569,27 @@ public class CallDetector
 
         //callStateListener = null;
         ctx.unregisterReceiver(outgoingReceiver);
+    }
+
+    /**
+     * Creates a notification channel for {@link CallDetector} notifications.
+     */
+    private void createNotificationChannel()
+    {
+        // Create the NotificationChannel, but only on API 26+ because
+        // the NotificationChannel class is new and not in the support library
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+        {
+            CharSequence name = ctx.getString(R.string.call_detector_channel_name);
+            String description = ctx.getString(R.string.call_detector_channel_description);
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            NotificationChannel channel = new NotificationChannel(CHANNEL_CALL_DETECTOR_ID, name, importance);
+            channel.setDescription(description);
+            // Register the channel with the system; you can't change the importance
+            // or other notification behaviors after this
+            NotificationManager notificationManager = ctx.getSystemService(NotificationManager.class);
+            assert notificationManager != null;
+            notificationManager.createNotificationChannel(channel);
+        }
     }
 }

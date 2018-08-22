@@ -98,4 +98,6 @@
     <string name="call_detector_has_saved_positive">Zapisano jako tolerowany</string>
     <string name="call_detector_changed_to_positive">Zmieniono na tolerowany</string>
     <string name="call_detector_already_blocked">Numer jest już zablokowany!</string>
+    <string name="call_detector_channel_name">Blokowanie połączeń</string>
+    <string name="call_detector_channel_description">Kanał przeznaczony do zarządzania powiadomieniami związanymi z blokowaniem połączeń</string>
 </resources>

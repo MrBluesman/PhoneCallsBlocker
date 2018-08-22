@@ -441,7 +441,7 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
         {
             Integer itemPosition;
             Block b;
-            
+
             switch (item.getItemId())
             {
                 case R.id.action_delete:
