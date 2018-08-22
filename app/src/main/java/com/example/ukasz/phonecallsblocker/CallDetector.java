@@ -31,6 +31,7 @@ import android.widget.Toast;
 import com.example.ukasz.androidsqlite.Block;
 import com.example.ukasz.androidsqlite.DatabaseHandler;
 import com.example.ukasz.androidsqlite.RegistryBlock;
+import com.example.ukasz.phonecallsblocker.notification_helper.NotificationID;
 import com.google.i18n.phonenumbers.NumberParseException;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.Phonenumber;
@@ -72,6 +73,8 @@ public class CallDetector
             boolean privateBlockEnabled = data.getBoolean("privateBlockEnabled", false);
             boolean unknownBlockEnabled = data.getBoolean("unknownBlockEnabled", false);
 
+            boolean notificationBlockEnabled = data.getBoolean("notificationBlockEnabled", false);
+
             final String incomingNumberFormatted = incomingNumber != null ? incomingNumber : "Numer prywatny";
             String incomingContactName = null;
             if(unknownBlockEnabled) incomingContactName = !incomingNumberFormatted.isEmpty()? getContactName(ctx, incomingNumberFormatted) : null;
@@ -80,7 +83,6 @@ public class CallDetector
             {
                 case TelephonyManager.CALL_STATE_RINGING:
                 {
-                    createNotification(incomingNumberFormatted);
                     Toast.makeText(ctx, "Połączenie przychodzące: " + incomingNumberFormatted, Toast.LENGTH_LONG).show();
                     Log.e("incomingNumber", incomingNumberFormatted);
                     //database and settings load
@@ -93,6 +95,7 @@ public class CallDetector
                             || (unknownBlockEnabled && incomingContactName == null)) //OR phone number is unknown and uknownBlock is enabled
 
                     {
+                        if(notificationBlockEnabled) notificationManager.notify(NotificationID.getID(), createNotification(incomingNumberFormatted).build());
                         declinePhone(ctx);
                         registerPhoneBlock(db, incomingNumberFormatted, true);
                     }
@@ -307,16 +310,15 @@ public class CallDetector
             return builder.create();
         }
 
-        private void createNotification(final String incomingNumber)
+        private NotificationCompat.Builder createNotification(final String incomingNumber)
         {
             NotificationCompat.Builder builder = new NotificationCompat.Builder(ctx, CHANNEL_CALL_DETECTOR_ID);
             builder.setSmallIcon(R.drawable.ic_call_end_white_24dp)
-                    .setContentTitle("costam")
-                    .setContentText("costam tresc")
+                    .setContentTitle(incomingNumber)
+                    .setContentText(ctx.getString(R.string.call_detector_has_blocked)+".")
                     .setPriority(NotificationCompat.PRIORITY_DEFAULT);
 
-            // notificationId is a unique int for each notification that you must define
-//            notificationManager.notify(0, builder.build());
+            return builder;
         }
 
         /**
