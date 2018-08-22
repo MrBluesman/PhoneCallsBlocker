@@ -82,7 +82,6 @@ public class CallDetector
                 {
                     createNotification(incomingNumberFormatted);
                     Toast.makeText(ctx, "Połączenie przychodzące: " + incomingNumberFormatted, Toast.LENGTH_LONG).show();
-//                    createNotification(incomingNumber);
                     Log.e("incomingNumber", incomingNumberFormatted);
                     //database and settings load
                     final DatabaseHandler db = new DatabaseHandler(ctx);
@@ -310,8 +309,6 @@ public class CallDetector
 
         private void createNotification(final String incomingNumber)
         {
-            NotificationManagerCompat notificationManager = NotificationManagerCompat.from(ctx);
-
             NotificationCompat.Builder builder = new NotificationCompat.Builder(ctx, CHANNEL_CALL_DETECTOR_ID);
             builder.setSmallIcon(R.drawable.ic_call_end_white_24dp)
                     .setContentTitle("costam")
@@ -319,7 +316,7 @@ public class CallDetector
                     .setPriority(NotificationCompat.PRIORITY_DEFAULT);
 
             // notificationId is a unique int for each notification that you must define
-            notificationManager.notify(0, builder.build());
+//            notificationManager.notify(0, builder.build());
         }
 
         /**
@@ -507,6 +504,8 @@ public class CallDetector
     private OutgoingReceiver outgoingReceiver;
     //CallDetextor channel for notification manager
     private static final String CHANNEL_CALL_DETECTOR_ID = "CallDetector";
+    private NotificationManagerCompat notificationManager;
+
 
     /**
      * Constructor.
@@ -521,6 +520,7 @@ public class CallDetector
         ctx = _ctx;
         callStateListener = new CallStateListener();
         outgoingReceiver = new OutgoingReceiver();
+        notificationManager = NotificationManagerCompat.from(ctx);
         createNotificationChannel();
     }
 
