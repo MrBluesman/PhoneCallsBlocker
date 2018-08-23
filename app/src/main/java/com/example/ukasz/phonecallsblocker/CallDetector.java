@@ -5,6 +5,7 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -16,6 +17,7 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.provider.Settings;
 import android.support.annotation.RequiresApi;
@@ -310,13 +312,30 @@ public class CallDetector
             return builder.create();
         }
 
+        /**
+         * Creates a notification for incoming number.
+         *
+         * @param incomingNumber contains the number of incoming call
+         * @return {@link NotificationCompat.Builder} builder with created notification to build and show
+         */
         private NotificationCompat.Builder createNotification(final String incomingNumber)
         {
+            // Create an explicit intent for an DetailsActivity after click on notification
+            Intent detailsBlockIntent = new Intent(ctx, DetailsPhoneBlock.class);
+            Bundle b = new Bundle();
+            b.putString("phoneNumber", incomingNumber);
+            detailsBlockIntent.putExtras(b);
+            detailsBlockIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            PendingIntent pendingIntent = PendingIntent.getActivity(ctx, 0, detailsBlockIntent, 0);
+
             NotificationCompat.Builder builder = new NotificationCompat.Builder(ctx, CHANNEL_CALL_DETECTOR_ID);
             builder.setSmallIcon(R.drawable.ic_call_end_white_24dp)
                     .setContentTitle(incomingNumber)
                     .setContentText(ctx.getString(R.string.call_detector_has_blocked)+".")
-                    .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+                    .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                    // Set the intent that will fire when the user taps the notification
+                    .setContentIntent(pendingIntent)
+                    .setAutoCancel(true);
 
             return builder;
         }
