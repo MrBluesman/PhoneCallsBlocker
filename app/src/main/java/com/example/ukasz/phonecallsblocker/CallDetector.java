@@ -76,6 +76,7 @@ public class CallDetector
             boolean unknownBlockEnabled = data.getBoolean("unknownBlockEnabled", false);
 
             boolean notificationBlockEnabled = data.getBoolean("notificationBlockEnabled", false);
+            boolean notificationAllowEnabled = data.getBoolean("notificationAllowEnabled", false);
 
             final String incomingNumberFormatted = incomingNumber != null ? incomingNumber : "Numer prywatny";
             String incomingContactName = null;
@@ -97,7 +98,12 @@ public class CallDetector
                             || (unknownBlockEnabled && incomingContactName == null)) //OR phone number is unknown and uknownBlock is enabled
 
                     {
-                        if(notificationBlockEnabled) notificationManager.notify(NotificationID.getID(), createNotification(incomingNumberFormatted).build());
+                        //if notification block is enabled - show a notification
+                        if(notificationBlockEnabled) notificationManager.notify(
+                                NotificationID.getID(),
+                                createNotification(incomingNumberFormatted, NOTIFICATION_BLOCKED).build()
+                        );
+                        //decline and register
                         declinePhone(ctx);
                         registerPhoneBlock(db, incomingNumberFormatted, true);
                     }
@@ -129,8 +135,13 @@ public class CallDetector
                             alertDialog.show();
                         }
                     }
-                    else
+                    else //Phone call allowed
                     {
+                        //if notification allow is enabled - show a notification
+                        if(notificationAllowEnabled) notificationManager.notify(
+                                NotificationID.getID(),
+                                createNotification(incomingNumberFormatted, NOTIFICATION_ALLOWED).build()
+                        );
                         registerPhoneBlock(db, incomingNumberFormatted, false);
                     }
                     break;
@@ -316,9 +327,10 @@ public class CallDetector
          * Creates a notification for incoming number.
          *
          * @param incomingNumber contains the number of incoming call
+         * @param type type of notification (blocked or allowed call)
          * @return {@link NotificationCompat.Builder} builder with created notification to build and show
          */
-        private NotificationCompat.Builder createNotification(final String incomingNumber)
+        private NotificationCompat.Builder createNotification(final String incomingNumber, int type)
         {
             // Create an explicit intent for an DetailsActivity after click on notification
             Intent detailsBlockIntent = new Intent(ctx, DetailsPhoneBlock.class);
@@ -329,9 +341,24 @@ public class CallDetector
             PendingIntent pendingIntent = PendingIntent.getActivity(ctx, 0, detailsBlockIntent, 0);
 
             NotificationCompat.Builder builder = new NotificationCompat.Builder(ctx, CHANNEL_CALL_DETECTOR_ID);
-            builder.setSmallIcon(R.drawable.ic_call_end_white_24dp)
-                    .setContentTitle(incomingNumber)
-                    .setContentText(ctx.getString(R.string.call_detector_has_blocked)+".")
+
+            //Notification body depends on notification type (allowed or blocked)
+            switch(type)
+            {
+                case NOTIFICATION_BLOCKED:
+                {
+                    builder.setSmallIcon(R.drawable.ic_call_end_white_24dp)
+                            .setContentText(ctx.getString(R.string.call_detector_has_blocked)+".");
+                    break;
+                }
+                default:
+                {
+                    builder.setSmallIcon(R.drawable.ic_done_white_24dp)
+                            .setContentText(ctx.getString(R.string.call_detector_has_allowed)+".");
+                }
+            }
+
+            builder.setContentTitle(incomingNumber)
                     .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                     // Set the intent that will fire when the user taps the notification
                     .setContentIntent(pendingIntent)
@@ -526,6 +553,9 @@ public class CallDetector
     //CallDetextor channel for notification manager
     private static final String CHANNEL_CALL_DETECTOR_ID = "CallDetector";
     private NotificationManagerCompat notificationManager;
+    //final static fields for notification type
+    private final static int NOTIFICATION_BLOCKED = 0;
+    private final static int NOTIFICATION_ALLOWED = 1;
 
 
     /**
