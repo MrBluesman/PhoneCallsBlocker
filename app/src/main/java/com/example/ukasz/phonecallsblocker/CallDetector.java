@@ -339,6 +339,7 @@ public class CallDetector
             detailsBlockIntent.putExtras(b);
             detailsBlockIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             //instance of pending intent with unique id
+            //!!! FLAG_UPDATE_CURRENT - for redirecting to Registry (maybe in future)
             int uniquePendingIntentId = (int) (System.currentTimeMillis() & 0xfffffff);
             PendingIntent pendingIntent = PendingIntent.getActivity(ctx, uniquePendingIntentId, detailsBlockIntent, 0);
 

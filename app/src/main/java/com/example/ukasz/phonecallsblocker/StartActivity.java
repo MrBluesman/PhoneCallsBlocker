@@ -115,7 +115,17 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
         //Set up the listeners
         tabLayout = findViewById(R.id.start_activity_tabs);
         mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
-        tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(mViewPager));
+        tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(mViewPager)
+        {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab)
+            {
+                super.onTabSelected(tab);
+                int position = tab.getPosition();
+                if(position == 2) getFab().hideMenu(true);
+                else getFab().showMenu(true);
+            }
+        });
 
         //Floating Action Button Menu
         fab = findViewById(R.id.start_activity_fab);
