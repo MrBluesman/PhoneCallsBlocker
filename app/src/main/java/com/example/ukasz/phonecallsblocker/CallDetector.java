@@ -338,7 +338,9 @@ public class CallDetector
             b.putString("phoneNumber", incomingNumber);
             detailsBlockIntent.putExtras(b);
             detailsBlockIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            PendingIntent pendingIntent = PendingIntent.getActivity(ctx, 0, detailsBlockIntent, 0);
+            //instance of pending intent with unique id
+            int uniquePendingIntentId = (int) (System.currentTimeMillis() & 0xfffffff);
+            PendingIntent pendingIntent = PendingIntent.getActivity(ctx, uniquePendingIntentId, detailsBlockIntent, 0);
 
             NotificationCompat.Builder builder = new NotificationCompat.Builder(ctx, CHANNEL_CALL_DETECTOR_ID);
 
