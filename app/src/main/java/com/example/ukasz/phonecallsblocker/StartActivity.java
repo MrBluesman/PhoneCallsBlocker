@@ -74,6 +74,7 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
 
     //Notifications options
     private boolean notificationBlockEnabled;
+    private boolean notificationAllowEnabled;
 
     //The {@link com.github.clans.fab.FloatingActionMenu} instance.
     com.github.clans.fab.FloatingActionMenu fab;
@@ -202,7 +203,7 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
 
         //notification settings
         notificationBlockEnabled = data.getBoolean("notificationBlockEnabled", false);
-
+        notificationAllowEnabled = data.getBoolean("notificationAllowEnabled", false);
 
         Log.e("Loading data", "MainActivity - loadSettingsState() method");
 
@@ -402,6 +403,16 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
     public boolean getNotificationBlockEnabled()
     {
         return notificationBlockEnabled;
+    }
+
+    /**
+     * notificationAllowEnabled getter.
+     *
+     * @return value of notificationAllowEnabled
+     */
+    public boolean getNotificationAllowEnabled()
+    {
+        return notificationAllowEnabled;
     }
 
     /**

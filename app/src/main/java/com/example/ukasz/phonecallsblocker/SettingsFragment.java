@@ -38,6 +38,7 @@ public class SettingsFragment extends Fragment
 
     //Notifications settings switches
     private Switch notificationBlockSwitch;
+    private Switch notificationAllowSwitch;
 
     //Apps data
     private SharedPreferences data;
@@ -109,6 +110,7 @@ public class SettingsFragment extends Fragment
 
         //Switches to enable/disable notifications options
         notificationBlockSwitch = getView().findViewById(R.id.settings_fragment_switch6_notification_block);
+        notificationAllowSwitch = getView().findViewById(R.id.settings_fragment_switch7_notification_allow);
 
         loadSettingsState();
 
@@ -233,6 +235,24 @@ public class SettingsFragment extends Fragment
                 editDataSettings.apply(); //commit
             }
         });
+
+        //Click listener for enable or disable allow call notification
+        notificationAllowSwitch.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                //get notificationAllowEnabled from data SharedPreferences
+                boolean notificationAllowEnabled = !data.getBoolean("notificationAllowEnabled", false);
+
+                notificationAllowSwitch.setChecked(notificationAllowEnabled);
+
+                //Save setting in Shared Preferences
+                SharedPreferences.Editor editDataSettings = data.edit();
+                editDataSettings.putBoolean("notificationAllowEnabled", notificationAllowEnabled);
+                editDataSettings.apply();
+            }
+        });
     }
 
     /**
@@ -247,6 +267,7 @@ public class SettingsFragment extends Fragment
         boolean privateBlockEnabled = data.getBoolean("privateBlockEnabled", false);
         boolean unknownBlockEnabled = data.getBoolean("unknownBlockEnabled", false);
         boolean notificationBlockEnabled = data.getBoolean("notificationBlockEnabled", false);
+        boolean notificationAllowEnabled = data.getBoolean("notificationAllowEnabled", false);
 
         //block settings
         blockServiceSwitch.setChecked(detectEnabled);
@@ -256,6 +277,7 @@ public class SettingsFragment extends Fragment
 
         //notification settings
         notificationBlockSwitch.setChecked(notificationBlockEnabled);
+        notificationAllowSwitch.setChecked(notificationAllowEnabled);
 
         //rest of switch block options depends on detectEnabled
         autoBlockSwitch.setEnabled(detectEnabled);
