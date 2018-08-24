@@ -1,101 +1,112 @@
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/home_fragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.example.ukasz.phonecallsblocker.SettingsFragment">
 
-    <TextView
-        android:id="@+id/settings_fragment_blocking_section_title"
-        android:layout_width="wrap_content"
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/home_fragment"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="@string/settings_fragment_blocking_section_title"
-        android:textAlignment="viewStart"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:typeface="normal"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:paddingBottom="@dimen/activity_vertical_margin"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/activity_vertical_margin"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-    <Switch
-        android:id="@+id/settings_fragment_switch1_block_service"
-        android:layout_width="match_parent"
-        android:layout_height="20pt"
-        android:layout_marginTop="8dp"
-        android:text="@string/settings_fragment_block_switch"
+        <TextView
+            android:id="@+id/settings_fragment_blocking_section_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/settings_fragment_blocking_section_title"
+            android:textAlignment="viewStart"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:typeface="normal"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-        android:visibility="visible"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/settings_fragment_blocking_section_title" />
+        <Switch
+            android:id="@+id/settings_fragment_switch1_block_service"
+            android:layout_width="match_parent"
+            android:layout_height="20pt"
+            android:layout_marginTop="8dp"
+            android:text="@string/settings_fragment_block_switch"
 
-    <Switch
-        android:id="@+id/settings_fragment_switch2_automatic_block"
-        android:layout_width="match_parent"
-        android:layout_height="20pt"
-        android:text="@string/settings_fragment_autoblock_switch"
-        android:visibility="visible"
+            android:visibility="visible"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/settings_fragment_blocking_section_title" />
 
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/settings_fragment_switch1_block_service" />
+        <Switch
+            android:id="@+id/settings_fragment_switch2_automatic_block"
+            android:layout_width="match_parent"
+            android:layout_height="20pt"
+            android:text="@string/settings_fragment_autoblock_switch"
+            android:visibility="visible"
 
-    <Switch
-        android:id="@+id/settings_fragment_switch3_foreign_block"
-        android:layout_width="match_parent"
-        android:layout_height="20pt"
-        android:text="@string/settings_fragment_foreign_block_switch"
-        android:visibility="visible"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/settings_fragment_switch1_block_service" />
 
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/settings_fragment_switch2_automatic_block" />
+        <Switch
+            android:id="@+id/settings_fragment_switch3_foreign_block"
+            android:layout_width="match_parent"
+            android:layout_height="20pt"
+            android:text="@string/settings_fragment_foreign_block_switch"
+            android:visibility="visible"
 
-    <Switch
-        android:id="@+id/settings_fragment_switch4_private_block"
-        android:layout_width="match_parent"
-        android:layout_height="20pt"
-        android:text="@string/settings_fragment_private_block_switch"
-        android:visibility="visible"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/settings_fragment_switch2_automatic_block" />
 
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/settings_fragment_switch3_foreign_block" />
+        <Switch
+            android:id="@+id/settings_fragment_switch4_private_block"
+            android:layout_width="match_parent"
+            android:layout_height="20pt"
+            android:text="@string/settings_fragment_private_block_switch"
+            android:visibility="visible"
 
-    <Switch
-        android:id="@+id/settings_fragment_switch5_unknown_block"
-        android:layout_width="match_parent"
-        android:layout_height="20pt"
-        android:text="@string/settings_fragment_unknown_block_switch"
-        android:visibility="visible"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/settings_fragment_switch3_foreign_block" />
 
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/settings_fragment_switch4_private_block" />
+        <Switch
+            android:id="@+id/settings_fragment_switch5_unknown_block"
+            android:layout_width="match_parent"
+            android:layout_height="20pt"
+            android:text="@string/settings_fragment_unknown_block_switch"
+            android:visibility="visible"
 
-    <TextView
-        android:id="@+id/settings_fragment_notification_section_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="@string/settings_fragment_notification_section_title"
-        android:textAlignment="viewStart"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:typeface="normal"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/settings_fragment_switch5_unknown_block" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/settings_fragment_switch4_private_block" />
 
-    <Switch
-        android:id="@+id/settings_fragment_switch6_notification_block"
-        android:layout_width="match_parent"
-        android:layout_height="20pt"
-        android:layout_marginTop="8dp"
-        android:text="@string/settings_fragment_notification_block_switch"
+        <TextView
+            android:id="@+id/settings_fragment_notification_section_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/settings_fragment_notification_section_title"
+            android:textAlignment="viewStart"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:typeface="normal"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/settings_fragment_switch5_unknown_block" />
 
-        android:visibility="visible"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/settings_fragment_notification_section_title" />
+        <Switch
+            android:id="@+id/settings_fragment_switch6_notification_block"
+            android:layout_width="match_parent"
+            android:layout_height="20pt"
+            android:layout_marginTop="8dp"
+            android:text="@string/settings_fragment_notification_block_switch"
 
-</android.support.constraint.ConstraintLayout>
+            android:visibility="visible"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/settings_fragment_notification_section_title" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="50dp" />
+
+    </android.support.constraint.ConstraintLayout>
+</android.support.v4.widget.NestedScrollView>
