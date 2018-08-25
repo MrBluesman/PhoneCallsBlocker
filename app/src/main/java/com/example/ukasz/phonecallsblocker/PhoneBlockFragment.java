@@ -221,48 +221,43 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
         loadBlockings();
     }
 
-//    /**
-//     * Creates a options menu by inflate a {@link Menu menu} to {@link MenuInflater inflater}.
-//     *
-//     * @param menu {@link Menu menu} to inflate.
-//     * @param inflater {@link MenuInflater inflater}.
-//     */
-//    @Override
-//    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
-//    {
-//        // Inflate the menu; this adds items to the action bar if it is present.
-//        menu.clear();
-//        inflater.inflate(R.menu.menu_registry, menu);
-//        super.onCreateOptionsMenu(menu, inflater);
-//    }
-//
-//    /**
-//     * Catch the selecting the menu options.
-//     *
-//     * @param item Selected option.
-//     * @return This method applied to superclass with this item.
-//     */
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item)
-//    {
-//        // Handle action bar item clicks here. The action bar will
-//        // automatically handle clicks on the Home/Up button, so long
-//        // as you specify a parent activity in AndroidManifest.xml.
-//        int id = item.getItemId();
-//        Log.d("OPTIONS SELECTED:", "Fragment.onOptionsItemSelected");
-//        //noinspection SimplifiableIfStatement
-//        if (id == R.id.menu_action_clear_registry)
-//        {
-//            Toast.makeText(getActivity(), "Search...", Toast.LENGTH_SHORT).show();
-//            return true;
-//        }
-//        else if(id == R.id.menu_action_select_all)
-//        {
-//            Log.e("BLA!", "BLA!");
-//            return true;
-//        }
-//        return true;
-//    }
+    /**
+     * Creates a options menu by inflate a {@link Menu menu} to {@link MenuInflater inflater}.
+     * Options menu dedicated only for {@link PhoneBlockFragment}.
+     *
+     * @param menu {@link Menu menu} to inflate
+     * @param inflater {@link MenuInflater inflater}
+     */
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
+    {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        menu.clear();
+        inflater.inflate(R.menu.menu_phoneblock, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    /**
+     * Catch the selected options menu.
+     *
+     * @param item selected option
+     * @return true
+     */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+        //noinspection SimplifiableIfStatement
+        if(id == R.id.menu_action_select_all)
+        {
+            toggleAll();
+            return true;
+        }
+        return true;
+    }
 
     /**
      * Runs on detaching this Fragment from the Activity.
@@ -287,7 +282,7 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
     }
 
     /**
-     * Turns on the action mode (deleting toolbar).
+     * Turns on the action mode toolbar.
      *
      * @param position position of selected item do toggle
      */
@@ -299,6 +294,17 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
             actionMode = Objects.requireNonNull(getActivity()).startActionMode(actionModeCallback);
         }
         toggleSelection(position);
+    }
+
+    /**
+     * Turns on the action mode toolbar.
+     */
+    private void enableActionMode()
+    {
+        if (actionMode == null)
+        {
+            actionMode = Objects.requireNonNull(getActivity()).startActionMode(actionModeCallback);
+        }
     }
 
 
@@ -345,6 +351,7 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
      */
     public void toggleAll()
     {
+        enableActionMode();
         for(int i = 0; i < adapter.getItemCount(); i++)
         {
             if(!adapter.getSelectedItems().get(i)) toggleSelection(i);
