@@ -78,6 +78,7 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
 
     //The {@link com.github.clans.fab.FloatingActionMenu} instance.
     com.github.clans.fab.FloatingActionMenu fab;
+    private Menu actionBarMenu = null;
 
     //request unique codes
     private final int ACTION_CONTACTS_CONTRACT_REQUEST_CODE = 1111;
@@ -117,13 +118,38 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
         mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
         tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(mViewPager)
         {
+            //Options depends on selected tabs (actionbar menu and floating action menu)
             @Override
             public void onTabSelected(TabLayout.Tab tab)
             {
                 super.onTabSelected(tab);
                 int position = tab.getPosition();
-                if(position == 2) getFab().hideMenu(true);
-                else getFab().showMenu(true);
+                switch(position)
+                {
+                    case 0:
+                    {
+                        actionBarMenu.findItem(R.id.menu_action_select_all).setVisible(false);
+                        getFab().showMenu(true);
+                        break;
+                    }
+                    case 1:
+                    {
+                        actionBarMenu.findItem(R.id.menu_action_select_all).setVisible(true);
+                        getFab().showMenu(true);
+                        break;
+                    }
+                    case 2:
+                    {
+                        actionBarMenu.findItem(R.id.menu_action_select_all).setVisible(false);
+                        getFab().hideMenu(true);
+                        break;
+                    }
+                    default:
+                    {
+                        actionBarMenu.findItem(R.id.menu_action_select_all).setVisible(true);
+                        getFab().showMenu(true);
+                    }
+                }
             }
         });
 
@@ -296,6 +322,7 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
     {
         // Inflate right side the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_start, menu);
+        actionBarMenu = menu;
         return true;
     }
 
@@ -423,6 +450,12 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
     public boolean getNotificationAllowEnabled()
     {
         return notificationAllowEnabled;
+    }
+
+    private Menu getActionBarMenu()
+    {
+        //use it like this
+        return actionBarMenu;
     }
 
     /**
