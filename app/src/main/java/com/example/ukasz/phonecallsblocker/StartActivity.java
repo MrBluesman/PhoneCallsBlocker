@@ -78,7 +78,6 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
 
     //The {@link com.github.clans.fab.FloatingActionMenu} instance.
     com.github.clans.fab.FloatingActionMenu fab;
-    private Menu actionBarMenu = null;
 
     //request unique codes
     private final int ACTION_CONTACTS_CONTRACT_REQUEST_CODE = 1111;
@@ -118,7 +117,7 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
         mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
         tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(mViewPager)
         {
-            //Options depends on selected tabs (actionbar menu and floating action menu)
+            //floating action menu available depends on selected tabs
             @Override
             public void onTabSelected(TabLayout.Tab tab)
             {
@@ -128,28 +127,21 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
                 {
                     case 0:
                     {
-                        actionBarMenu.findItem(R.id.menu_action_select_all).setVisible(false);
-                        actionBarMenu.findItem(R.id.menu_action_clear_registry).setVisible(true);
                         getFab().showMenu(true);
                         break;
                     }
                     case 1:
                     {
-                        actionBarMenu.findItem(R.id.menu_action_select_all).setVisible(true);
-                        actionBarMenu.findItem(R.id.menu_action_clear_registry).setVisible(true);
                         getFab().showMenu(true);
                         break;
                     }
                     case 2:
                     {
-                        actionBarMenu.findItem(R.id.menu_action_select_all).setVisible(false);
-                        actionBarMenu.findItem(R.id.menu_action_clear_registry).setVisible(false);
                         getFab().hideMenu(true);
                         break;
                     }
                     default:
                     {
-                        actionBarMenu.findItem(R.id.menu_action_select_all).setVisible(true);
                         getFab().showMenu(true);
                     }
                 }
@@ -315,49 +307,9 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
     }
 
     /**
-     * Creates a right side options menu (expandable).
-     * @param menu Menu which will be created.
-     *
-     * @return true if created, false if it's not
-     */
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu)
-    {
-        // Inflate right side the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_start, menu);
-        actionBarMenu = menu;
-        return true;
-    }
-
-    /**
-     * Handles right side options menu item clicks.
-     * Actions depends on item choose.
-     *
-     * @param item selected right side options item
-     * @return true if actions ran correctly, false if it didn't
-     */
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item)
-    {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //clear registry action
-        if (id == R.id.menu_action_clear_registry)
-        {
-            confirmClearRegistryBlockings().show();
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    /**
      * Actions on fragment interaction.
      *
-     * @param uri Uri
+     * @param uri UriactionBarMenu
      */
     @Override
     public void onFragmentInteraction(Uri uri)
@@ -453,12 +405,6 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
     public boolean getNotificationAllowEnabled()
     {
         return notificationAllowEnabled;
-    }
-
-    private Menu getActionBarMenu()
-    {
-        //use it like this
-        return actionBarMenu;
     }
 
     /**
@@ -809,53 +755,4 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
             Toast.makeText(StartActivity.this, "Numer jest już na liście", Toast.LENGTH_SHORT).show();
         }
     }
-
-    /**
-     * Clears a registry blockings.
-     */
-    public void clearRegistryBlockings()
-    {
-        DatabaseHandler db = new DatabaseHandler(StartActivity.this);
-        db.clearRegistryBlockings();
-        try
-        {
-            RegistryFragment.loadRegistryBlockings();
-        }
-        catch (ParseException e)
-        {
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * Creates a confirmation {@link android.app.AlertDialog} for clear registry blockings..
-     *
-     * @return {@link android.app.AlertDialog} with confirmation for deleting selected blockings
-     */
-    private android.app.AlertDialog confirmClearRegistryBlockings()
-    {
-        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(StartActivity.this);
-
-        //Add the buttons
-        builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener()
-        {
-            @Override
-            public void onClick(DialogInterface dialog, int which)
-            {
-                clearRegistryBlockings();
-            }
-        });
-
-        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener()
-        {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {}
-        });
-
-        builder.setMessage(R.string.phone_block_fragment_clear_registry_confirm)
-                .setTitle(R.string.phone_block_fragment_clear_registry_confirm_title);
-
-        return builder.create();
-    }
-
 }

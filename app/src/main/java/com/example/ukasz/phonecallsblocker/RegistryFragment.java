@@ -1,6 +1,7 @@
 package com.example.ukasz.phonecallsblocker;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -9,8 +10,12 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 
 import com.example.ukasz.androidsqlite.DatabaseHandler;
@@ -83,6 +88,9 @@ public class RegistryFragment extends Fragment implements MyRegistryRecyclerView
             mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
         }
 
+        //Options available in this fragment
+        setHasOptionsMenu(true);
+
         //set up the DatabaseHandler
         db = new DatabaseHandler(getActivity());
     }
@@ -150,6 +158,46 @@ public class RegistryFragment extends Fragment implements MyRegistryRecyclerView
     }
 
     /**
+     * Creates a options menu by inflate a {@link Menu menu} to {@link MenuInflater inflater}.
+     * Options menu dedicated only for {@link RegistryFragment}.
+     *
+     * @param menu {@link Menu menu} to inflate
+     * @param inflater {@link MenuInflater inflater}
+     */
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
+    {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        menu.clear();
+        inflater.inflate(R.menu.menu_registry, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    /**
+     * Catch the selected options menu.
+     *
+     * @param item selected option
+     * @return true
+     */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+        Log.d("OPTIONS SELECTED:", "Fragment.onOptionsItemSelected");
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.menu_action_clear_registry)
+        {
+            confirmClearRegistryBlockings().show();
+            return true;
+        }
+        return true;
+    }
+
+
+    /**
      * Loads all blockings from database.
      */
     public static void loadRegistryBlockings() throws ParseException
@@ -161,6 +209,54 @@ public class RegistryFragment extends Fragment implements MyRegistryRecyclerView
         registryBlockings.addAll(registryBlockingsToAddFromDb);
         adapter.notifyDataSetChanged();
 //        swipeRefreshLayout.setRefreshing(false);
+    }
+
+    /**
+     * Clears a registry blockings.
+     */
+    public void clearRegistryBlockings()
+    {
+        DatabaseHandler db = new DatabaseHandler(getActivity());
+        db.clearRegistryBlockings();
+        try
+        {
+            RegistryFragment.loadRegistryBlockings();
+        }
+        catch (ParseException e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Creates a confirmation {@link android.app.AlertDialog} for clear registry blockings..
+     *
+     * @return {@link android.app.AlertDialog} with confirmation for deleting selected blockings
+     */
+    private android.app.AlertDialog confirmClearRegistryBlockings()
+    {
+        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getActivity());
+
+        //Add the buttons
+        builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener()
+        {
+            @Override
+            public void onClick(DialogInterface dialog, int which)
+            {
+                clearRegistryBlockings();
+            }
+        });
+
+        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener()
+        {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {}
+        });
+
+        builder.setMessage(R.string.phone_block_fragment_clear_registry_confirm)
+                .setTitle(R.string.phone_block_fragment_clear_registry_confirm_title);
+
+        return builder.create();
     }
 
     @Override
