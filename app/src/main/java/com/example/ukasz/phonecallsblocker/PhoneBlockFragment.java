@@ -332,6 +332,17 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
     }
 
     /**
+     * Toggle all positions to another state (to delete or not).
+     */
+    private void toggleAll()
+    {
+        for(int i = 0; i < adapter.getItemCount(); i++)
+        {
+            if(!adapter.getSelectedItems().get(i)) toggleSelection(i);
+        }
+    }
+
+    /**
      * Toggle selected position to another state (to delete or not).
      *
      * @param position position of the Block to toggle
@@ -475,7 +486,8 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
                     return true;
                 case R.id.menu_action_select_all:
                     //select all blockings
-                    adapter.selectAllItems();
+//                    adapter.selectAllItems();
+                    toggleAll();
                     return true;
                 default:
                     mode.finish();
@@ -523,7 +535,7 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
     {
         adapter.resetAnimationIndex();
         List<Integer> selectedItemPositions =
-                adapter.getSelectedItems();
+                adapter.getSelectedItemsAsList();
         for (int i = selectedItemPositions.size() - 1; i >= 0; i--)
         {
             int positionToDelete = selectedItemPositions.get(i);
@@ -543,7 +555,7 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
     {
         adapter.resetAnimationIndex();
         List<Integer> selectedItemPositions =
-                adapter.getSelectedItems();
+                adapter.getSelectedItemsAsList();
         for (int i = selectedItemPositions.size() - 1; i >= 0; i--)
         {
             int positionToChange = selectedItemPositions.get(i);

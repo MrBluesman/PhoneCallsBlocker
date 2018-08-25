@@ -337,11 +337,11 @@ public class MyPhoneBlockRecyclerViewAdapter extends RecyclerView.Adapter<MyPhon
     }
 
     /**
-     * Getter for already selected blockings.
+     * Getter for already selected blockings as list.
      *
      * @return {@link List} of positions of selected blockings
      */
-    public List<Integer> getSelectedItems()
+    public List<Integer> getSelectedItemsAsList()
     {
         List<Integer> items = new ArrayList<>(selectedItems.size());
         for (int i = 0; i < selectedItems.size(); i++)
@@ -352,14 +352,13 @@ public class MyPhoneBlockRecyclerViewAdapter extends RecyclerView.Adapter<MyPhon
     }
 
     /**
-     * Select all blockings from list in {@link MyPhoneBlockRecyclerViewAdapter}.
+     *Getter for already selected blockings as {@link SparseBooleanArray}.
+     *
+     * @return {@link SparseBooleanArray} of all positions with flag if the position is selected or not
      */
-    public void selectAllItems()
+    public SparseBooleanArray getSelectedItems()
     {
-        for(int i = 0; i < mBlockings.size(); i++)
-        {
-            if(!selectedItems.get(i)) toggleSelection(i);
-        }
+        return selectedItems;
     }
 
     /**
