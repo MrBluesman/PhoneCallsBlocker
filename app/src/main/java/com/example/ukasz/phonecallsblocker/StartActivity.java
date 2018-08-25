@@ -129,18 +129,21 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
                     case 0:
                     {
                         actionBarMenu.findItem(R.id.menu_action_select_all).setVisible(false);
+                        actionBarMenu.findItem(R.id.menu_action_clear_registry).setVisible(true);
                         getFab().showMenu(true);
                         break;
                     }
                     case 1:
                     {
                         actionBarMenu.findItem(R.id.menu_action_select_all).setVisible(true);
+                        actionBarMenu.findItem(R.id.menu_action_clear_registry).setVisible(true);
                         getFab().showMenu(true);
                         break;
                     }
                     case 2:
                     {
                         actionBarMenu.findItem(R.id.menu_action_select_all).setVisible(false);
+                        actionBarMenu.findItem(R.id.menu_action_clear_registry).setVisible(false);
                         getFab().hideMenu(true);
                         break;
                     }
