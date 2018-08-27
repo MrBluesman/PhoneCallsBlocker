@@ -20,6 +20,7 @@ import android.widget.Toast;
 
 import com.example.ukasz.androidsqlite.DatabaseHandler;
 import com.example.ukasz.androidsqlite.RegistryBlock;
+import com.example.ukasz.phonecallsblocker.list_helper.DividerItemDecoration;
 
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -130,6 +131,7 @@ public class RegistryFragment extends Fragment implements MyRegistryRecyclerView
             }
 
             adapter = new MyRegistryRecyclerViewAdapter(context, registryBlockings, this);
+            recyclerView.addItemDecoration(new DividerItemDecoration(context, LinearLayoutManager.VERTICAL));
             recyclerView.setAdapter(adapter);
             try
             {
@@ -204,7 +206,6 @@ public class RegistryFragment extends Fragment implements MyRegistryRecyclerView
     {
         Log.e("RegistryFragment", "loadRegistryBlockings()");
         List<RegistryBlock> registryBlockingsToAddFromDb = db.getAllRegistryBlockings();
-        Log.e("Tresc", String.valueOf(registryBlockings.size()));
         registryBlockings.clear();
         registryBlockings.addAll(registryBlockingsToAddFromDb);
         adapter.notifyDataSetChanged();

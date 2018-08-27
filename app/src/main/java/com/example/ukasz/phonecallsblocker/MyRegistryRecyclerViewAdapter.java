@@ -32,7 +32,7 @@ public class MyRegistryRecyclerViewAdapter extends RecyclerView.Adapter<MyRegist
         final View mViewContainer;
         //        final TextView mIdView;
         final TextView mNrRegisteredBlock;
-        final TextView mNrRating;
+        final TextView mNrDate;
 
 
 
@@ -47,7 +47,7 @@ public class MyRegistryRecyclerViewAdapter extends RecyclerView.Adapter<MyRegist
             mViewContainer = view;
 //            mIdView = (TextView) view.findViewById(R.id.item_number);
             mNrRegisteredBlock = view.findViewById(R.id.registry_item_phone_number);
-            mNrRating = view.findViewById(R.id.registry_item_rating);
+            mNrDate = view.findViewById(R.id.registry_item_date);
         }
 
 
@@ -76,7 +76,6 @@ public class MyRegistryRecyclerViewAdapter extends RecyclerView.Adapter<MyRegist
         mContext = context;
         mRegistryBlockings = registryBlockings;
         mListener = listener;
-
     }
 
     /**
@@ -105,10 +104,8 @@ public class MyRegistryRecyclerViewAdapter extends RecyclerView.Adapter<MyRegist
     public void onBindViewHolder(@NonNull final ViewHolder holder, int position)
     {
         RegistryBlock rBlock = mRegistryBlockings.get(position);
-        holder.mNrRegisteredBlock.setText(rBlock.getNrBlocked() + " (" + rBlock.getNrBlockingDate() + ")");
-        if(!rBlock.getNrRating()) holder.mNrRating.setText("X");
-        else holder.mNrRating.setText("Y");
-
+        holder.mNrRegisteredBlock.setText(rBlock.getNrBlocked());
+        holder.mNrDate.setText(rBlock.getNrBlockingDate().toString());
     }
 
     @Override

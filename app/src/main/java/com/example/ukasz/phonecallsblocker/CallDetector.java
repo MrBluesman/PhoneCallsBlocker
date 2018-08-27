@@ -107,20 +107,24 @@ public class CallDetector
                         declinePhone(ctx);
                         registerPhoneBlock(db, incomingNumberFormatted, true);
                     }
-                    else if(!db.existBlock(myPhoneNumber, incomingNumberFormatted, false)) {
+                    else if(!db.existBlock(myPhoneNumber, incomingNumberFormatted, false))
+                    {
 
                         //Can draw overlays depends on SDK version
                         boolean canDrawOverlays = true;
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+                        {
                             if (!Settings.canDrawOverlays(ctx)) canDrawOverlays = false;
                         }
 
-                        if (canDrawOverlays) {
+                        if (canDrawOverlays)
+                        {
                             AlertDialog alertDialog;
                             //If number is private show dialog box with limited options - only block and allow
                             if (incomingNumber == null)
                                 alertDialog = createIncomingCallDialogPrivateNumber(incomingNumberFormatted, db);
-                            else {
+                            else
+                            {
                                 //If number is blocked by user show dialog box with possibility to change to positive number
                                 alertDialog = db.existBlock(myPhoneNumber, incomingNumberFormatted, true)
                                         ? createIncomingCallDialogBlockedNumber(incomingNumberFormatted, db)
