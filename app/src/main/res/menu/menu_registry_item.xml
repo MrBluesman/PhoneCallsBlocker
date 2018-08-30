@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/menu_action_details"
+        android:orderInCategory="100"
+        android:title="@string/registry_fragment_action_details" />
+    <item
+        android:id="@+id/menu_action_delete"
+        android:orderInCategory="100"
+        android:title="@string/registry_fragment_action_delete" />
+    <item
+        android:id="@+id/menu_action_delete_all_related"
+        android:orderInCategory="100"
+        android:title="@string/registry_fragment_action_delete_all_related" />
+</menu>

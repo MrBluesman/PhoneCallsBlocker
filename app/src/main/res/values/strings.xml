@@ -65,6 +65,11 @@
     <string name="settings_fragment_notification_block_switch">Powiadomienia o blokowaniach</string>
     <string name="settings_fragment_notification_allow_switch">Powiadamiaj również o przepuszczonych połączeniach</string>
 
+    <!-- Strings related to RegistryFragment -->
+    <string name="registry_fragment_action_details">Szczegóły</string>
+    <string name="registry_fragment_action_delete">Usuń</string>
+    <string name="registry_fragment_action_delete_all_related">Usuń wystąpienia</string>
+
     <!-- String related to PhoneBlockFragment -->
     <string name="phone_block_fragment_action_settings">Ustawienia</string>
     <string name="phone_block_fragment_action_search">Wyszukaj</string>
