@@ -7,8 +7,8 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.PopupMenu;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.example.ukasz.androidsqlite.RegistryBlock;
@@ -36,7 +36,7 @@ public class MyRegistryRecyclerViewAdapter extends RecyclerView.Adapter<MyRegist
         //        final TextView mIdView;
         final TextView mNrRegisteredBlock;
         final TextView mDate;
-        final ImageView mItemOptions;
+        final RelativeLayout mItemOptionsContainer;
 
 
         /**
@@ -51,7 +51,7 @@ public class MyRegistryRecyclerViewAdapter extends RecyclerView.Adapter<MyRegist
 //            mIdView = (TextView) view.findViewById(R.id.item_number);
             mNrRegisteredBlock = view.findViewById(R.id.registry_item_phone_number);
             mDate = view.findViewById(R.id.registry_item_date);
-            mItemOptions = view.findViewById(R.id.registry_item_options);
+            mItemOptionsContainer = view.findViewById(R.id.registry_item_options_container);
         }
 
 
@@ -112,14 +112,14 @@ public class MyRegistryRecyclerViewAdapter extends RecyclerView.Adapter<MyRegist
         holder.mDate.setText(rBlock.getNrBlockingDate().toString());
 
         //show item menu
-        holder.mItemOptions.setOnClickListener(new View.OnClickListener()
+        holder.mItemOptionsContainer.setOnClickListener(new View.OnClickListener()
         {
 
             @Override
             public void onClick(View v)
             {
                 //creating a popup menu
-                PopupMenu popup = new PopupMenu(mContext, holder.mItemOptions);
+                PopupMenu popup = new PopupMenu(mContext, holder.mItemOptionsContainer);
                 //inflating menu from xml resource
                 popup.inflate(R.menu.menu_registry_item);
                 //adding click listener
@@ -156,7 +156,7 @@ public class MyRegistryRecyclerViewAdapter extends RecyclerView.Adapter<MyRegist
     }
 
     /**
-     * Interface for BlockAdapterListener.
+     * Interface for RegistryAdapterListener.
      */
     public interface RegistryAdapterListener
     {
