@@ -3,10 +3,12 @@ package com.example.ukasz.phonecallsblocker;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.view.HapticFeedbackConstants;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -30,12 +32,13 @@ public class MyRegistryRecyclerViewAdapter extends RecyclerView.Adapter<MyRegist
     /**
      * ViewHolder class for single {@link RegistryBlock} view.
      */
-    public class ViewHolder extends RecyclerView.ViewHolder
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnLongClickListener
     {
         final View mViewContainer;
         //        final TextView mIdView;
         final TextView mNrRegisteredBlock;
         final TextView mDate;
+        private LinearLayout mRegistryItemContainer;
         final RelativeLayout mItemOptionsContainer;
 
 
@@ -52,6 +55,7 @@ public class MyRegistryRecyclerViewAdapter extends RecyclerView.Adapter<MyRegist
             mNrRegisteredBlock = view.findViewById(R.id.registry_item_phone_number);
             mDate = view.findViewById(R.id.registry_item_date);
             mItemOptionsContainer = view.findViewById(R.id.registry_item_options_container);
+            mRegistryItemContainer = view.findViewById(R.id.registry_item_container);
         }
 
 
@@ -66,6 +70,19 @@ public class MyRegistryRecyclerViewAdapter extends RecyclerView.Adapter<MyRegist
             return super.toString() + " '" + mNrRegisteredBlock.getText() + "'";
         }
 
+        /**
+         * Action after long click on single Block view.
+         *
+         * @param v single Block view
+         * @return true
+         */
+        @Override
+        public boolean onLongClick(View v)
+        {
+            mListener.onRowLongClicked(getAdapterPosition());
+            v.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
+            return true;
+        }
     }
 
     /**
@@ -111,40 +128,82 @@ public class MyRegistryRecyclerViewAdapter extends RecyclerView.Adapter<MyRegist
         holder.mNrRegisteredBlock.setText(rBlock.getNrBlocked());
         holder.mDate.setText(rBlock.getNrBlockingDate().toString());
 
-        //show item menu
+        //apply click events
+        applyClickEvents(holder, position);
+//        //show item menu
+//        holder.mItemOptionsContainer.setOnClickListener(new View.OnClickListener()
+//        {
+//
+//            @Override
+//            public void onClick(View v)
+//            {
+//                //creating a popup menu
+//                PopupMenu popup = new PopupMenu(mContext, holder.mItemOptionsContainer);
+//                //inflating menu from xml resource
+//                popup.inflate(R.menu.menu_registry_item);
+//                //adding click listener
+//                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener()
+//                {
+//                    @Override
+//                    public boolean onMenuItemClick(MenuItem item)
+//                    {
+//                        switch (item.getItemId())
+//                        {
+//                            case R.id.menu_action_details:
+//                                //handle details click
+//                                break;
+//                            case R.id.menu_action_delete:
+//                                //handle delete click
+//                                break;
+//                            case R.id.menu_action_delete_all_related:
+//                                //handle delete all related click
+//                                break;
+//                        }
+//                        return false;
+//                    }
+//                });
+//                //displaying the popup
+//                popup.show();
+//            }
+//        });
+    }
+
+    /**
+     * Applier for click events.
+     * Sets up the listeners to catch click events.
+     *
+     * @param holder {@link MyRegistryRecyclerViewAdapter.ViewHolder holder} for Block at position
+     * @param position position of single Block
+     */
+    private void applyClickEvents(MyRegistryRecyclerViewAdapter.ViewHolder holder, final int position)
+    {
         holder.mItemOptionsContainer.setOnClickListener(new View.OnClickListener()
         {
-
             @Override
-            public void onClick(View v)
+            public void onClick(View view)
             {
-                //creating a popup menu
-                PopupMenu popup = new PopupMenu(mContext, holder.mItemOptionsContainer);
-                //inflating menu from xml resource
-                popup.inflate(R.menu.menu_registry_item);
-                //adding click listener
-                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener()
-                {
-                    @Override
-                    public boolean onMenuItemClick(MenuItem item)
-                    {
-                        switch (item.getItemId())
-                        {
-                            case R.id.menu_action_details:
-                                //handle details click
-                                break;
-                            case R.id.menu_action_delete:
-                                //handle delete click
-                                break;
-                            case R.id.menu_action_delete_all_related:
-                                //handle delete all related click
-                                break;
-                        }
-                        return false;
-                    }
-                });
-                //displaying the popup
-                popup.show();
+                mListener.onOptionsClicked(position);
+            }
+        });
+
+
+        holder.mRegistryItemContainer.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View view)
+            {
+                mListener.onRegistryRowClicked(position);
+            }
+        });
+
+        holder.mRegistryItemContainer.setOnLongClickListener(new View.OnLongClickListener()
+        {
+            @Override
+            public boolean onLongClick(View view)
+            {
+                mListener.onRowLongClicked(position);
+                view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
+                return true;
             }
         });
     }
@@ -160,8 +219,10 @@ public class MyRegistryRecyclerViewAdapter extends RecyclerView.Adapter<MyRegist
      */
     public interface RegistryAdapterListener
     {
-        void onBlockRowClicked(int position);
+        void onRegistryRowClicked(int position);
 
         void onRowLongClicked(int position);
+
+        void onOptionsClicked(int position);
     }
 }

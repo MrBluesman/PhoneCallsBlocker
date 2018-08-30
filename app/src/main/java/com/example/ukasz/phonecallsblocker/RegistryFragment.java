@@ -266,15 +266,35 @@ public class RegistryFragment extends Fragment implements MyRegistryRecyclerView
         super.onDetach();
     }
 
-    @Override
-    public void onBlockRowClicked(int position)
+    /**
+     * Action after short click (tap) a row of position.
+     *
+     * @param position position of the clicked row
+     */
+    public void onRegistryRowClicked(int position)
     {
-
+        Toast.makeText(getContext(), "CLICK: " + position, Toast.LENGTH_SHORT).show();
     }
 
+    /**
+     * Action after long click a row of position.
+     *
+     * @param position position of the clicked row
+     */
     @Override
     public void onRowLongClicked(int position)
     {
+        Toast.makeText(getContext(), "LONG CLICK: " + position, Toast.LENGTH_SHORT).show();
+    }
 
+    /**
+     * Action after click a options menu for the row identified by position.
+     *
+     * @param position icon position
+     */
+    @Override
+    public void onOptionsClicked(int position)
+    {
+        Toast.makeText(getContext(), "OPTIONS CLICK: " + position, Toast.LENGTH_SHORT).show();
     }
 }
