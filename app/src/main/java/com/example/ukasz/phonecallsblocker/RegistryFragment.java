@@ -15,6 +15,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.PopupMenu;
 import android.widget.Toast;
 
 
@@ -280,21 +281,62 @@ public class RegistryFragment extends Fragment implements MyRegistryRecyclerView
      * Action after long click a row of position.
      *
      * @param position position of the clicked row
+     * @param view view of the item clicked (container)
      */
     @Override
-    public void onRowLongClicked(int position)
+    public void onRowLongClicked(int position, View view)
     {
-        Toast.makeText(getContext(), "LONG CLICK: " + position, Toast.LENGTH_SHORT).show();
+        //create and show menu for registry item
+        createRegistryItemMenu(getContext(), view).show();
     }
 
     /**
      * Action after click a options menu for the row identified by position.
      *
      * @param position icon position
+     * @param view view of the item clicked (container)
      */
     @Override
-    public void onOptionsClicked(int position)
+    public void onOptionsClicked(int position, View view)
     {
-        Toast.makeText(getContext(), "OPTIONS CLICK: " + position, Toast.LENGTH_SHORT).show();
+        //create and show menu for registry item
+        createRegistryItemMenu(getContext(), view).show();
+    }
+
+    /**
+     * Builds a {@link PopupMenu} for single registry item {@link RegistryBlock}.
+     *
+     * @param ctx Context of the app
+     * @param view view of the item clicked (container)
+     * @return
+     */
+    private PopupMenu createRegistryItemMenu(Context ctx, View view)
+    {
+        PopupMenu registerItemPopupMenu = new PopupMenu(ctx, view);
+        //inflating menu from xml resource
+        registerItemPopupMenu.inflate(R.menu.menu_registry_item);
+        //adding click listener
+        registerItemPopupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener()
+        {
+            @Override
+            public boolean onMenuItemClick(MenuItem item)
+            {
+                switch (item.getItemId())
+                {
+                    case R.id.menu_action_details:
+                        //handle details click
+                        break;
+                    case R.id.menu_action_delete:
+                        //handle delete click
+                        break;
+                    case R.id.menu_action_delete_all_related:
+                        //handle delete all related click
+                        break;
+                }
+                return false;
+            }
+        });
+        return registerItemPopupMenu;
     }
 }
+

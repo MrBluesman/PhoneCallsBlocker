@@ -5,11 +5,9 @@ import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.HapticFeedbackConstants;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
-import android.widget.PopupMenu;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -79,7 +77,7 @@ public class MyRegistryRecyclerViewAdapter extends RecyclerView.Adapter<MyRegist
         @Override
         public boolean onLongClick(View v)
         {
-            mListener.onRowLongClicked(getAdapterPosition());
+            mListener.onRowLongClicked(getAdapterPosition(), v);
             v.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
             return true;
         }
@@ -175,14 +173,14 @@ public class MyRegistryRecyclerViewAdapter extends RecyclerView.Adapter<MyRegist
      * @param holder {@link MyRegistryRecyclerViewAdapter.ViewHolder holder} for Block at position
      * @param position position of single Block
      */
-    private void applyClickEvents(MyRegistryRecyclerViewAdapter.ViewHolder holder, final int position)
+    private void applyClickEvents(final MyRegistryRecyclerViewAdapter.ViewHolder holder, final int position)
     {
         holder.mItemOptionsContainer.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View view)
             {
-                mListener.onOptionsClicked(position);
+                mListener.onOptionsClicked(position, holder.mItemOptionsContainer);
             }
         });
 
@@ -201,7 +199,7 @@ public class MyRegistryRecyclerViewAdapter extends RecyclerView.Adapter<MyRegist
             @Override
             public boolean onLongClick(View view)
             {
-                mListener.onRowLongClicked(position);
+                mListener.onRowLongClicked(position, holder.mRegistryItemContainer);
                 view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
                 return true;
             }
@@ -221,8 +219,8 @@ public class MyRegistryRecyclerViewAdapter extends RecyclerView.Adapter<MyRegist
     {
         void onRegistryRowClicked(int position);
 
-        void onRowLongClicked(int position);
+        void onRowLongClicked(int position, View view);
 
-        void onOptionsClicked(int position);
+        void onOptionsClicked(int position, View view);
     }
 }
