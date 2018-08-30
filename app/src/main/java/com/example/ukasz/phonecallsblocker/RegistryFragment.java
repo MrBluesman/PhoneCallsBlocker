@@ -2,6 +2,7 @@ package com.example.ukasz.phonecallsblocker;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -19,6 +20,7 @@ import android.widget.PopupMenu;
 import android.widget.Toast;
 
 
+import com.example.ukasz.androidsqlite.Block;
 import com.example.ukasz.androidsqlite.DatabaseHandler;
 import com.example.ukasz.androidsqlite.RegistryBlock;
 import com.example.ukasz.phonecallsblocker.list_helper.DividerItemDecoration;
@@ -274,7 +276,9 @@ public class RegistryFragment extends Fragment implements MyRegistryRecyclerView
      */
     public void onRegistryRowClicked(int position)
     {
-        Toast.makeText(getContext(), "CLICK: " + position, Toast.LENGTH_SHORT).show();
+        // read the block which removes bold from the row
+        RegistryBlock registryBlock = registryBlockings.get(position);
+        startDetailsActivityForBlocking(registryBlock.getNrBlocked());
     }
 
     /**
@@ -287,7 +291,7 @@ public class RegistryFragment extends Fragment implements MyRegistryRecyclerView
     public void onRowLongClicked(int position, View view)
     {
         //create and show menu for registry item
-        createRegistryItemMenu(getContext(), view).show();
+        createRegistryItemMenu(position, getContext(), view).show();
     }
 
     /**
@@ -300,17 +304,18 @@ public class RegistryFragment extends Fragment implements MyRegistryRecyclerView
     public void onOptionsClicked(int position, View view)
     {
         //create and show menu for registry item
-        createRegistryItemMenu(getContext(), view).show();
+        createRegistryItemMenu(position, getContext(), view).show();
     }
 
     /**
      * Builds a {@link PopupMenu} for single registry item {@link RegistryBlock}.
      *
+     * @param position position of selected registry item on the list
      * @param ctx Context of the app
      * @param view view of the item clicked (container)
-     * @return
+     * @return built {@link PopupMenu} for single registry item {@link RegistryBlock}
      */
-    private PopupMenu createRegistryItemMenu(Context ctx, View view)
+    private PopupMenu createRegistryItemMenu(final int position, Context ctx, final View view)
     {
         PopupMenu registerItemPopupMenu = new PopupMenu(ctx, view);
         //inflating menu from xml resource
@@ -324,7 +329,8 @@ public class RegistryFragment extends Fragment implements MyRegistryRecyclerView
                 switch (item.getItemId())
                 {
                     case R.id.menu_action_details:
-                        //handle details click
+                        RegistryBlock registryBlock = registryBlockings.get(position);
+                        startDetailsActivityForBlocking(registryBlock.getNrBlocked());
                         break;
                     case R.id.menu_action_delete:
                         //handle delete click
@@ -337,6 +343,20 @@ public class RegistryFragment extends Fragment implements MyRegistryRecyclerView
             }
         });
         return registerItemPopupMenu;
+    }
+
+    /**
+     * Starts a {@link DetailsPhoneBlock} activity for the selected registry blocking.
+     *
+     * @param phoneNumber phone number of the selected blocking
+     */
+    private void startDetailsActivityForBlocking(String phoneNumber)
+    {
+        Intent detailsBlockIntent = new Intent(getContext(), DetailsPhoneBlock.class);
+        Bundle b = new Bundle();
+        b.putString("phoneNumber", phoneNumber);
+        detailsBlockIntent.putExtras(b);
+        startActivity(detailsBlockIntent);
     }
 }
 
