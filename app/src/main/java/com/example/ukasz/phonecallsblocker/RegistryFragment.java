@@ -17,10 +17,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.PopupMenu;
-import android.widget.Toast;
 
-
-import com.example.ukasz.androidsqlite.Block;
 import com.example.ukasz.androidsqlite.DatabaseHandler;
 import com.example.ukasz.androidsqlite.RegistryBlock;
 import com.example.ukasz.phonecallsblocker.list_helper.DividerItemDecoration;
@@ -220,7 +217,6 @@ public class RegistryFragment extends Fragment implements MyRegistryRecyclerView
      */
     public void clearRegistryBlockings()
     {
-        DatabaseHandler db = new DatabaseHandler(getActivity());
         db.clearRegistryBlockings();
         try
         {
@@ -323,17 +319,27 @@ public class RegistryFragment extends Fragment implements MyRegistryRecyclerView
         //adding click listener
         registerItemPopupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener()
         {
+            RegistryBlock registryBlock;
             @Override
             public boolean onMenuItemClick(MenuItem item)
             {
                 switch (item.getItemId())
                 {
                     case R.id.menu_action_details:
-                        RegistryBlock registryBlock = registryBlockings.get(position);
+                        registryBlock = registryBlockings.get(position);
                         startDetailsActivityForBlocking(registryBlock.getNrBlocked());
                         break;
                     case R.id.menu_action_delete:
-                        //handle delete click
+                        registryBlock = registryBlockings.get(position);
+                        db.deleteRegistryBlocking(registryBlock);
+                        try
+                        {
+                            RegistryFragment.loadRegistryBlockings();
+                        }
+                        catch (ParseException e)
+                        {
+                            e.printStackTrace();
+                        }
                         break;
                     case R.id.menu_action_delete_all_related:
                         //handle delete all related click

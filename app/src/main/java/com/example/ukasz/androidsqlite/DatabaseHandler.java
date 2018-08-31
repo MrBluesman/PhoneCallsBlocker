@@ -428,9 +428,9 @@ public class DatabaseHandler extends SQLiteOpenHelper
     }
 
     /**
-     * Deletes instance of block from database.
+     * Deletes instance of {@link Block} from database.
      *
-     * @param block Block instance which will be deleted from database
+     * @param block {@link Block} instance which will be deleted from database
      */
     public void deleteBlocking(Block block)
     {
@@ -438,6 +438,25 @@ public class DatabaseHandler extends SQLiteOpenHelper
         db.delete(TABLE_BLOCKING, DECLARANT_KEY_T_B + " = ?" +
                         " AND " + BLOCKED_KEY_T_B + " = ?",
                 new String[] { String.valueOf(block.getNrDeclarant()), String.valueOf(block.getNrBlocked()) });
+
+        db.close();
+    }
+
+    /**
+     * Deletes instance of {@link RegistryBlock} from database.
+     *
+     * @param registryBlock {@link RegistryBlock} instance which will be deleted from database
+     */
+    public void deleteRegistryBlocking(RegistryBlock registryBlock)
+    {
+        //Format to fetch a date in specified format
+        @SuppressLint("SimpleDateFormat")
+        DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(TABLE_BLOCKING_REGISTRY, BLOCKED_KEY_T_BR + " = ?" +
+                        " AND " + BLOCKING_DATE_T_BR + " = ?",
+                new String[] { String.valueOf(registryBlock.getNrBlocked()), String.valueOf(df.format(registryBlock.getNrBlockingDate())) });
 
         db.close();
     }

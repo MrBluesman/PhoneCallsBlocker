@@ -128,42 +128,6 @@ public class MyRegistryRecyclerViewAdapter extends RecyclerView.Adapter<MyRegist
 
         //apply click events
         applyClickEvents(holder, position);
-//        //show item menu
-//        holder.mItemOptionsContainer.setOnClickListener(new View.OnClickListener()
-//        {
-//
-//            @Override
-//            public void onClick(View v)
-//            {
-//                //creating a popup menu
-//                PopupMenu popup = new PopupMenu(mContext, holder.mItemOptionsContainer);
-//                //inflating menu from xml resource
-//                popup.inflate(R.menu.menu_registry_item);
-//                //adding click listener
-//                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener()
-//                {
-//                    @Override
-//                    public boolean onMenuItemClick(MenuItem item)
-//                    {
-//                        switch (item.getItemId())
-//                        {
-//                            case R.id.menu_action_details:
-//                                //handle details click
-//                                break;
-//                            case R.id.menu_action_delete:
-//                                //handle delete click
-//                                break;
-//                            case R.id.menu_action_delete_all_related:
-//                                //handle delete all related click
-//                                break;
-//                        }
-//                        return false;
-//                    }
-//                });
-//                //displaying the popup
-//                popup.show();
-//            }
-//        });
     }
 
     /**
