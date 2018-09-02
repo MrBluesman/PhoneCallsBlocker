@@ -133,15 +133,10 @@ public class RegistryFragment extends Fragment implements MyRegistryRecyclerView
             adapter = new MyRegistryRecyclerViewAdapter(context, registryBlockings, this);
             recyclerView.addItemDecoration(new DividerItemDecoration(context, LinearLayoutManager.VERTICAL));
             recyclerView.setAdapter(adapter);
-            try
-            {
-                loadRegistryBlockings();
-                adapter.notifyDataSetChanged();
-            }
-            catch (ParseException e)
-            {
-                e.printStackTrace();
-            }
+
+            //Refresh data
+            loadRegistryBlockings();
+            adapter.notifyDataSetChanged();
         }
 
         return rootView;
@@ -202,14 +197,21 @@ public class RegistryFragment extends Fragment implements MyRegistryRecyclerView
     /**
      * Loads all blockings from database.
      */
-    public static void loadRegistryBlockings() throws ParseException
+    public static void loadRegistryBlockings()
     {
         Log.e("RegistryFragment", "loadRegistryBlockings()");
-        List<RegistryBlock> registryBlockingsToAddFromDb = db.getAllRegistryBlockings();
+        List<RegistryBlock> registryBlockingsToAddFromDb = null;
+        try
+        {
+            registryBlockingsToAddFromDb = db.getAllRegistryBlockings();
+        }
+        catch (ParseException e)
+        {
+            e.printStackTrace();
+        }
         registryBlockings.clear();
-        registryBlockings.addAll(registryBlockingsToAddFromDb);
+        if (registryBlockingsToAddFromDb != null) registryBlockings.addAll(registryBlockingsToAddFromDb);
         adapter.notifyDataSetChanged();
-//        swipeRefreshLayout.setRefreshing(false);
     }
 
     /**
@@ -218,14 +220,7 @@ public class RegistryFragment extends Fragment implements MyRegistryRecyclerView
     public void clearRegistryBlockings()
     {
         db.clearRegistryBlockings();
-        try
-        {
-            RegistryFragment.loadRegistryBlockings();
-        }
-        catch (ParseException e)
-        {
-            e.printStackTrace();
-        }
+        RegistryFragment.loadRegistryBlockings();
     }
 
     /**
@@ -332,14 +327,7 @@ public class RegistryFragment extends Fragment implements MyRegistryRecyclerView
                     case R.id.menu_action_delete:
                         registryBlock = registryBlockings.get(position);
                         db.deleteRegistryBlocking(registryBlock);
-                        try
-                        {
-                            RegistryFragment.loadRegistryBlockings();
-                        }
-                        catch (ParseException e)
-                        {
-                            e.printStackTrace();
-                        }
+                        RegistryFragment.loadRegistryBlockings();
                         break;
                     case R.id.menu_action_delete_all_related:
                         //handle delete all related click
