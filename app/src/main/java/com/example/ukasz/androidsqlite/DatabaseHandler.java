@@ -462,6 +462,25 @@ public class DatabaseHandler extends SQLiteOpenHelper
     }
 
     /**
+     * Deletes all registry blockings which blocked number is equal to
+     * blocked number of instance of {@link RegistryBlock} from database.
+     *
+     * @param registryBlock {@link RegistryBlock} instance which blocked number determines deleting
+     */
+    public void deleteRegistryBlockings(RegistryBlock registryBlock)
+    {
+        //Format to fetch a date in specified format
+        @SuppressLint("SimpleDateFormat")
+        DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(TABLE_BLOCKING_REGISTRY, BLOCKED_KEY_T_BR + " = ?",
+                new String[] { String.valueOf(registryBlock.getNrBlocked()) });
+
+        db.close();
+    }
+
+    /**
      * Gets count of all categories in database.
      *
      * @return count of all categories in database

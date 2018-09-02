@@ -314,23 +314,22 @@ public class RegistryFragment extends Fragment implements MyRegistryRecyclerView
         //adding click listener
         registerItemPopupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener()
         {
-            RegistryBlock registryBlock;
+            RegistryBlock registryBlock = registryBlockings.get(position);
             @Override
             public boolean onMenuItemClick(MenuItem item)
             {
                 switch (item.getItemId())
                 {
                     case R.id.menu_action_details:
-                        registryBlock = registryBlockings.get(position);
                         startDetailsActivityForBlocking(registryBlock.getNrBlocked());
                         break;
                     case R.id.menu_action_delete:
-                        registryBlock = registryBlockings.get(position);
                         db.deleteRegistryBlocking(registryBlock);
                         RegistryFragment.loadRegistryBlockings();
                         break;
                     case R.id.menu_action_delete_all_related:
-                        //handle delete all related click
+                        db.deleteRegistryBlockings(registryBlock);
+                        RegistryFragment.loadRegistryBlockings();
                         break;
                 }
                 return false;
