@@ -50,7 +50,6 @@ public class MyPhoneBlockRecyclerViewAdapter extends RecyclerView.Adapter<MyPhon
     {
 
         final View mViewContainer;
-        //        final TextView mIdView;
         final TextView mNrBlocked;
         private ImageView mImgBlock;
         private LinearLayout mPhoneblockContainer;
@@ -66,7 +65,6 @@ public class MyPhoneBlockRecyclerViewAdapter extends RecyclerView.Adapter<MyPhon
         {
             super(view);
             mViewContainer = view;
-//            mIdView = (TextView) view.findViewById(R.id.item_number);
             mNrBlocked = view.findViewById(R.id.phoneblock_number);
             mImgBlock = view.findViewById(R.id.icon_block);
             mPhoneblockContainer = view.findViewById(R.id.phoneblock_container);
@@ -148,7 +146,6 @@ public class MyPhoneBlockRecyclerViewAdapter extends RecyclerView.Adapter<MyPhon
         Block block = mBlockings.get(position);
 
         //displaying text content of blockings
-//        holder.mIdView.setText(mValues.get(position).id);
         holder.mNrBlocked.setText(mBlockings.get(position).getNrBlocked());
 
         //change the row state to activated
@@ -308,7 +305,7 @@ public class MyPhoneBlockRecyclerViewAdapter extends RecyclerView.Adapter<MyPhon
      * Toggles blocking at the pos.
      * Notifies item changes.
      *
-     * @param pos
+     * @param pos item position
      */
     public void toggleSelection(int pos)
     {

@@ -1,8 +1,10 @@
 package com.example.ukasz.phonecallsblocker;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.util.SparseBooleanArray;
 import android.view.HapticFeedbackConstants;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,6 +28,8 @@ public class MyRegistryRecyclerViewAdapter extends RecyclerView.Adapter<MyRegist
     private final RegistryAdapterListener mListener;
     //Context
     private final Context mContext;
+    //Selected blockings
+    private SparseBooleanArray selectedItems;
 
     /**
      * ViewHolder class for single {@link RegistryBlock} view.
@@ -33,7 +37,6 @@ public class MyRegistryRecyclerViewAdapter extends RecyclerView.Adapter<MyRegist
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnLongClickListener
     {
         final View mViewContainer;
-        //        final TextView mIdView;
         final TextView mNrRegisteredBlock;
         final TextView mDate;
         private LinearLayout mRegistryItemContainer;
@@ -49,11 +52,11 @@ public class MyRegistryRecyclerViewAdapter extends RecyclerView.Adapter<MyRegist
         {
             super(view);
             mViewContainer = view;
-//            mIdView = (TextView) view.findViewById(R.id.item_number);
             mNrRegisteredBlock = view.findViewById(R.id.registry_item_phone_number);
             mDate = view.findViewById(R.id.registry_item_date);
             mItemOptionsContainer = view.findViewById(R.id.registry_item_options_container);
             mRegistryItemContainer = view.findViewById(R.id.registry_item_container);
+            view.setOnLongClickListener(this);
         }
 
 
@@ -94,6 +97,7 @@ public class MyRegistryRecyclerViewAdapter extends RecyclerView.Adapter<MyRegist
     {
         mContext = context;
         mRegistryBlockings = registryBlockings;
+        selectedItems = new SparseBooleanArray();
         mListener = listener;
     }
 
@@ -126,8 +130,23 @@ public class MyRegistryRecyclerViewAdapter extends RecyclerView.Adapter<MyRegist
         holder.mNrRegisteredBlock.setText(rBlock.getNrBlocked());
         holder.mDate.setText(rBlock.getNrBlockingDate().toString());
 
+        //change the row state to activated (grey background)
+        holder.itemView.setActivated(selectedItems.get(position, false));
+
         //apply click events
         applyClickEvents(holder, position);
+    }
+
+    /**
+     * Toggle item activation (selection)
+     *
+     * @param pos item position
+     */
+    public void toggleActivation(int pos)
+    {
+        if (selectedItems.get(pos, false)) selectedItems.delete(pos);
+        else selectedItems.put(pos, true);
+        notifyItemChanged(pos);
     }
 
     /**
