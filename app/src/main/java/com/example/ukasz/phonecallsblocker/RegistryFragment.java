@@ -330,6 +330,8 @@ public class RegistryFragment extends Fragment implements MyRegistryRecyclerView
                 {
                     case R.id.menu_action_details:
                         startDetailsActivityForBlocking(registryBlock.getNrBlocked());
+                        //toggle item activation state
+                        adapter.toggleActivation(position);
                         break;
                     case R.id.menu_action_delete:
                         db.deleteRegistryBlocking(registryBlock);
