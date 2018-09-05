@@ -8,6 +8,7 @@ import android.view.HapticFeedbackConstants;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -38,7 +39,7 @@ public class MyRegistryRecyclerViewAdapter extends RecyclerView.Adapter<MyRegist
         final TextView mDate;
         private LinearLayout mRegistryItemContainer;
         final RelativeLayout mItemOptionsContainer;
-
+        ImageView mRegistryItemIcon;
 
         /**
          * ViewHolder constructor.
@@ -53,6 +54,7 @@ public class MyRegistryRecyclerViewAdapter extends RecyclerView.Adapter<MyRegist
             mDate = view.findViewById(R.id.registry_item_date);
             mItemOptionsContainer = view.findViewById(R.id.registry_item_options_container);
             mRegistryItemContainer = view.findViewById(R.id.registry_item_container);
+            mRegistryItemIcon = view.findViewById(R.id.registry_item_icon);
             view.setOnLongClickListener(this);
         }
 
@@ -127,6 +129,9 @@ public class MyRegistryRecyclerViewAdapter extends RecyclerView.Adapter<MyRegist
         holder.mNrRegisteredBlock.setText(rBlock.getNrBlocked());
 
         holder.mDate.setText(String.valueOf(rBlock.getNrBlockingDateFormatted("MM/dd/yyyy HH:mm")));
+
+        if(rBlock.getNrRating()) holder.mRegistryItemIcon.setImageResource(R.drawable.bg_circle_negative);
+        else holder.mRegistryItemIcon.setImageResource(R.drawable.bg_circle_positive);
 
         //change the row state to activated (grey background)
         holder.itemView.setActivated(selectedItems.get(position, false));

@@ -560,10 +560,13 @@ public class DatabaseHandler extends SQLiteOpenHelper
     public void addBlockingRegistry(RegistryBlock rBlock)
     {
         SQLiteDatabase db = this.getWritableDatabase();
-        String addBlockingRegistry = "INSERT INTO " + TABLE_BLOCKING_REGISTRY
-                + " (" + BLOCKED_KEY_T_BR + "," + RATING_T_BR + "," + BLOCKING_DATE_T_BR + ") VALUES " +
-                "('" + rBlock.getNrBlocked() + "', '" + rBlock.getNrRating() + "', '" + rBlock.getNrBlockingDateFormatted("MM/dd/yyyy HH:mm:ss") + "')";
-        db.execSQL(addBlockingRegistry);
+
+        ContentValues values = new ContentValues();
+        values.put(BLOCKED_KEY_T_BR, rBlock.getNrBlocked());
+        values.put(RATING_T_BR, rBlock.getNrRating());
+        values.put(BLOCKING_DATE_T_BR, rBlock.getNrBlockingDateFormatted("MM/dd/yyyy HH:mm:ss"));
+
+        db.insert(TABLE_BLOCKING_REGISTRY, null, values);
         db.close();
     }
 

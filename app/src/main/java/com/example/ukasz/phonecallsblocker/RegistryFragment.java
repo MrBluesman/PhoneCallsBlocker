@@ -18,6 +18,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.PopupMenu;
+import android.widget.Toast;
 
 import com.example.ukasz.androidsqlite.DatabaseHandler;
 import com.example.ukasz.androidsqlite.RegistryBlock;
@@ -316,6 +317,9 @@ public class RegistryFragment extends Fragment implements MyRegistryRecyclerView
         adapter.toggleActivation(position);
 
         PopupMenu registerItemPopupMenu = new PopupMenu(ctx, view);
+
+        RegistryBlock registryBlock = registryBlockings.get(position);
+        Toast.makeText(ctx, String.valueOf(registryBlock.getNrRating()), Toast.LENGTH_SHORT).show();
 
         //inflating menu from xml resource
         registerItemPopupMenu.inflate(R.menu.menu_registry_item);
