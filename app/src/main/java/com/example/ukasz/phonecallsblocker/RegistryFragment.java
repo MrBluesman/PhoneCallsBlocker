@@ -42,8 +42,6 @@ public class RegistryFragment extends Fragment implements MyRegistryRecyclerView
     public static List<RegistryBlock> registryBlockings = new ArrayList<>(); //adapter data
     private static DatabaseHandler db;
 
-    private boolean hasItemMenuOpened;
-
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
@@ -317,9 +315,6 @@ public class RegistryFragment extends Fragment implements MyRegistryRecyclerView
         adapter.toggleActivation(position);
 
         PopupMenu registerItemPopupMenu = new PopupMenu(ctx, view);
-
-        RegistryBlock registryBlock = registryBlockings.get(position);
-        Toast.makeText(ctx, String.valueOf(registryBlock.getNrRating()), Toast.LENGTH_SHORT).show();
 
         //inflating menu from xml resource
         registerItemPopupMenu.inflate(R.menu.menu_registry_item);
