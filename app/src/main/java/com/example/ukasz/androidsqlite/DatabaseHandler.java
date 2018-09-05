@@ -449,14 +449,11 @@ public class DatabaseHandler extends SQLiteOpenHelper
      */
     public void deleteRegistryBlocking(RegistryBlock registryBlock)
     {
-        //Format to fetch a date in specified format
-        @SuppressLint("SimpleDateFormat")
-        DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
-
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(TABLE_BLOCKING_REGISTRY, BLOCKED_KEY_T_BR + " = ?" +
                         " AND " + BLOCKING_DATE_T_BR + " = ?",
-                new String[] { String.valueOf(registryBlock.getNrBlocked()), String.valueOf(df.format(registryBlock.getNrBlockingDate())) });
+                new String[] { String.valueOf(registryBlock.getNrBlocked()),
+                        String.valueOf(registryBlock.getNrBlockingDateFormatted("MM/dd/yyyy HH:mm:ss")) });
 
         db.close();
     }
@@ -469,10 +466,6 @@ public class DatabaseHandler extends SQLiteOpenHelper
      */
     public void deleteRegistryBlockings(RegistryBlock registryBlock)
     {
-        //Format to fetch a date in specified format
-        @SuppressLint("SimpleDateFormat")
-        DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
-
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(TABLE_BLOCKING_REGISTRY, BLOCKED_KEY_T_BR + " = ?",
                 new String[] { String.valueOf(registryBlock.getNrBlocked()) });
@@ -566,14 +559,10 @@ public class DatabaseHandler extends SQLiteOpenHelper
      */
     public void addBlockingRegistry(RegistryBlock rBlock)
     {
-        //Format to save a date in specified format
-        @SuppressLint("SimpleDateFormat")
-        DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
-
         SQLiteDatabase db = this.getWritableDatabase();
         String addBlockingRegistry = "INSERT INTO " + TABLE_BLOCKING_REGISTRY
                 + " (" + BLOCKED_KEY_T_BR + "," + RATING_T_BR + "," + BLOCKING_DATE_T_BR + ") VALUES " +
-                "('" + rBlock.getNrBlocked() + "', '" + rBlock.getNrRating() + "', '" + df.format(rBlock.getNrBlockingDate()) + "')";
+                "('" + rBlock.getNrBlocked() + "', '" + rBlock.getNrRating() + "', '" + rBlock.getNrBlockingDateFormatted("MM/dd/yyyy HH:mm:ss") + "')";
         db.execSQL(addBlockingRegistry);
         db.close();
     }
@@ -601,7 +590,6 @@ public class DatabaseHandler extends SQLiteOpenHelper
             do
             {
                 RegistryBlock rBlock = new RegistryBlock();
-//                block.setNrDeclarant(cursor.getString(0));
                 rBlock.setNrBlocked(cursor.getString(1));
                 rBlock.setNrRating("1".equals(cursor.getString(2)));
                 rBlock.setNrBlockingDate(df.parse(cursor.getString(3)));

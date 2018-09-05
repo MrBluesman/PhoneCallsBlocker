@@ -1,5 +1,9 @@
 package com.example.ukasz.androidsqlite;
 
+import android.annotation.SuppressLint;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class RegistryBlock
@@ -78,6 +82,19 @@ public class RegistryBlock
     public Date getNrBlockingDate()
     {
         return this.nr_blocking_date;
+    }
+
+    /**
+     * nr_blocking_date getter in specified format.
+     *
+     * @param format date format
+     * @return formatted nr_blocking_date of instance
+     */
+    public String getNrBlockingDateFormatted(String format)
+    {
+        @SuppressLint("SimpleDateFormat")
+        DateFormat df = new SimpleDateFormat(format);
+        return df.format(this.nr_blocking_date);
     }
 
     /**

@@ -1,7 +1,6 @@
 package com.example.ukasz.phonecallsblocker;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.SparseBooleanArray;
@@ -14,8 +13,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.example.ukasz.androidsqlite.RegistryBlock;
-
-
 import java.util.List;
 
 /**
@@ -128,7 +125,8 @@ public class MyRegistryRecyclerViewAdapter extends RecyclerView.Adapter<MyRegist
     {
         RegistryBlock rBlock = mRegistryBlockings.get(position);
         holder.mNrRegisteredBlock.setText(rBlock.getNrBlocked());
-        holder.mDate.setText(rBlock.getNrBlockingDate().toString());
+
+        holder.mDate.setText(String.valueOf(rBlock.getNrBlockingDateFormatted("MM/dd/yyyy HH:mm")));
 
         //change the row state to activated (grey background)
         holder.itemView.setActivated(selectedItems.get(position, false));
