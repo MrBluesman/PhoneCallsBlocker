@@ -6,12 +6,10 @@ import android.app.AlertDialog;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -39,7 +37,6 @@ import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.Phonenumber;
 
 import java.lang.reflect.Method;
-import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -490,11 +487,10 @@ public class CallDetector
         db.updateBlocking(updatedBlock);
     }
 
-
     /**
      * Method which decline/hang out/turn off incoming call.
      *
-     * @param context       Context of application.
+     * @param context context of application
      */
     private void declinePhone(Context context)
     {
@@ -518,50 +514,23 @@ public class CallDetector
         }
     }
 
-    /**
-     * Local private class which describes Receiver for Outgoing calls.
-     */
-    private class OutgoingReceiver extends BroadcastReceiver
-    {
-        public OutgoingReceiver() {}
-
-        /**
-         * This method runs, when we receiving a outgoing call in app context.
-         * Creating a Toast and Notification when the calls outgoing.
-         * (outgoing call).
-         *
-         * @param context   app context
-         * @param intent    intent of outgoing call action
-         */
-        @Override
-        public void onReceive(Context context, Intent intent)
-        {
-            Log.e("test", "CallDetector - onReceive() method on OUTGOING RECEIVER");
-            String outgoingNumber = intent.getStringExtra(Intent.EXTRA_PHONE_NUMBER);
-            Toast.makeText(ctx,"Połączenie wychodzące: "+outgoingNumber, Toast.LENGTH_LONG).show();
-//            createNotification(outgoingNumber);
-        }
-    }
-
     private Context ctx;
     private TelephonyManager tm;
     private String myPhoneNumber;
     private int myCountryDialCode;
     private CallStateListener callStateListener;
-    private OutgoingReceiver outgoingReceiver;
-    //CallDetextor channel for notification manager
+    //CallDetector channel for notification manager
     private static final String CHANNEL_CALL_DETECTOR_ID = "CallDetector";
     private NotificationManagerCompat notificationManager;
     //final static fields for notification type
     private final static int NOTIFICATION_BLOCKED = 0;
     private final static int NOTIFICATION_ALLOWED = 1;
 
-
     /**
      * Constructor.
      * Creating a Listener and Receiver for calls.
      *
-     * @param _ctx  param of setting the app context for the CallDetector object.
+     * @param _ctx  param of setting the app context for the CallDetector object
      */
     @SuppressLint("HardwareIds")
     public CallDetector(Context _ctx)
@@ -569,7 +538,6 @@ public class CallDetector
         Log.e("test","CallDetector - construct on creating detector (listener)");
         ctx = _ctx;
         callStateListener = new CallStateListener();
-        outgoingReceiver = new OutgoingReceiver();
         notificationManager = NotificationManagerCompat.from(ctx);
         createNotificationChannel();
     }
@@ -597,13 +565,9 @@ public class CallDetector
             return;
         }
 
-
         myPhoneNumber = !tm.getLine1Number().equals("") ? tm.getLine1Number() : tm.getSimSerialNumber();
         myCountryDialCode = PhoneNumberUtil.getInstance().getCountryCodeForRegion(tm.getSimCountryIso().toUpperCase());
         Log.e("PHONE_NUMBER", String.valueOf(myCountryDialCode));
-
-        IntentFilter intentFilter = new IntentFilter(Intent.ACTION_NEW_OUTGOING_CALL);
-        ctx.registerReceiver(outgoingReceiver, intentFilter);
     }
 
     /**
@@ -615,10 +579,6 @@ public class CallDetector
         Log.e("test", "CallDetector - stop() method !!!!!!!!!");
         tm = (TelephonyManager) ctx.getSystemService(Context.TELEPHONY_SERVICE);
         tm.listen(callStateListener, PhoneStateListener.LISTEN_NONE);
-        //Log.e("test",);
-
-        //callStateListener = null;
-        ctx.unregisterReceiver(outgoingReceiver);
     }
 
     /**
