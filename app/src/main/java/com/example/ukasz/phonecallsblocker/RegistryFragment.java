@@ -206,7 +206,7 @@ public class RegistryFragment extends Fragment implements MyRegistryRecyclerView
         List<RegistryBlock> registryBlockingsToAddFromDb = null;
         try
         {
-            registryBlockingsToAddFromDb = db.getAllRegistryBlockings();
+            if(db != null) registryBlockingsToAddFromDb = db.getAllRegistryBlockings();
         }
         catch (ParseException e)
         {
@@ -214,7 +214,7 @@ public class RegistryFragment extends Fragment implements MyRegistryRecyclerView
         }
         registryBlockings.clear();
         if (registryBlockingsToAddFromDb != null) registryBlockings.addAll(registryBlockingsToAddFromDb);
-        adapter.notifyDataSetChanged();
+        if(adapter != null) adapter.notifyDataSetChanged();
     }
 
     /**
