@@ -84,6 +84,9 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
     private final int READ_CONTACTS_PERMISSION_REQUEST_CODE = 1112;
     private final int READ_CALL_LOG_PERMISSION_REQUEST_CODE = 1113;
 
+    //job unique ids for job scheduler
+    private static final int CALL_DETECT_JOB_ID = 2000;
+
     /**
      * Method which runs on activity start.
      *
@@ -262,13 +265,42 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
 
         ComponentName componentName = new ComponentName(this, CallDetectService.class);
 
-        JobInfo jobInfo = new JobInfo.Builder(1, componentName)
+        JobInfo jobCallDetectInfo = new JobInfo.Builder(CALL_DETECT_JOB_ID, componentName)
                 .setPersisted(true)
                 .setOverrideDeadline(0)
                 .build();
 
-        //Schedule detecting only Job Scheduler object is set up
-        if (jobScheduler != null) jobScheduler.schedule(jobInfo);
+        //Schedule detecting only Job Scheduler object is set up and job is not scheduled
+        if (jobScheduler != null && !isJobScheduled(getApplicationContext(), CALL_DETECT_JOB_ID)) jobScheduler.schedule(jobCallDetectInfo);
+    }
+
+
+    /**
+     * Check whether selected job has been already scheduled.
+     *
+     * @param context context of the app
+     * @param jobId job unique id
+     * @return true if has been scheduled, false if hasn't
+     */
+    public static boolean isJobScheduled(Context context, int jobId)
+    {
+        JobScheduler jobScheduler = (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE) ;
+
+        boolean hasBeenScheduled = false;
+
+        if (jobScheduler != null)
+        {
+            for (JobInfo jobInfo : jobScheduler.getAllPendingJobs())
+            {
+                if (jobInfo.getId() == jobId)
+                {
+                    hasBeenScheduled = true ;
+                    break ;
+                }
+            }
+        }
+
+        return hasBeenScheduled ;
     }
 
     /**
@@ -280,7 +312,7 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
                 .getSystemService(JOB_SCHEDULER_SERVICE);
 
         //Cancel only Job Scheduler object is set up
-        if (jobScheduler != null) jobScheduler.cancel(1);
+        if (jobScheduler != null) jobScheduler.cancel(CALL_DETECT_JOB_ID);
     }
 
     /**

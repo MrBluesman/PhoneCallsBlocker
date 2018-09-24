@@ -122,10 +122,6 @@ public class SettingsFragment extends Fragment
             {
                 //get detectEnabled from data Shared Preferences
                 boolean detectEnabled = !data.getBoolean("detectEnabled", false);
-                //setDetectEnabled with changed value of detectEnabled
-                StartActivity sA = ((StartActivity)getActivity());
-                assert sA != null;
-                sA.setDetectEnabled(detectEnabled);
 
                 blockServiceSwitch.setChecked(detectEnabled);
 
@@ -139,6 +135,11 @@ public class SettingsFragment extends Fragment
                 SharedPreferences.Editor editDataSettings = data.edit();
                 editDataSettings.putBoolean("detectEnabled", detectEnabled);
                 editDataSettings.apply(); //commit
+
+                //setDetectEnabled with changed value of detectEnabled
+                StartActivity sA = ((StartActivity)getActivity());
+                assert sA != null;
+                sA.setDetectEnabled(detectEnabled);
             }
         });
 

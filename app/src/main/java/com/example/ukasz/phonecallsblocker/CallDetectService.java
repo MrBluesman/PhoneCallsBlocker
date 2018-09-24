@@ -2,6 +2,8 @@ package com.example.ukasz.phonecallsblocker;
 
 import android.app.job.JobParameters;
 import android.app.job.JobService;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -45,8 +47,11 @@ public class CallDetectService extends JobService
     public boolean onStopJob(JobParameters params)
     {
         Log.e("test","CallDetectService - onStopJob() method");
-        if(callDetector != null) callDetector.stop();
-        Toast.makeText(this, "service onDestroy", Toast.LENGTH_SHORT).show();
+        SharedPreferences data = getApplicationContext().getSharedPreferences("data", Context.MODE_PRIVATE);
+        boolean callDetectorEnabled = data.getBoolean("detectEnabled", false);
+        //Stop only if call detection service is not enabled
+        if(callDetector != null && !callDetectorEnabled) callDetector.stop();
+        jobFinished(params, false);
         return false;
     }
 }
