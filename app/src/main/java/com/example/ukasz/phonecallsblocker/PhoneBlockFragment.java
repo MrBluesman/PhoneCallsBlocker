@@ -169,19 +169,6 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
             );
         }
 
-        //Refresh list on every minute
-        intentFilter = new IntentFilter();
-        intentFilter.addAction(Intent.ACTION_TIME_TICK);
-
-        view.getContext().registerReceiver(new BroadcastReceiver()
-        {
-            @Override
-            public void onReceive(Context context, Intent intent)
-            {
-                adapter.notifyDataSetChanged();
-            }
-        }, intentFilter);
-
         return rootView;
     }
 

@@ -46,7 +46,7 @@
         </activity>
         <activity android:name=".AddPhoneBlock" />
         <activity android:name=".DetailsPhoneBlock" />
-        <activity android:name=".EditPhoneBlock"></activity>
+        <activity android:name=".EditPhoneBlock" />
     </application>
 
 </manifest>
