@@ -264,7 +264,7 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
 
         JobInfo jobInfo = new JobInfo.Builder(1, componentName)
                 .setPersisted(true)
-                .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
+                .setOverrideDeadline(0)
                 .build();
 
         //Schedule detecting only Job Scheduler object is set up

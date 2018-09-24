@@ -25,8 +25,11 @@ public class CallDetectService extends JobService
     public boolean onStartJob(JobParameters params)
     {
         Log.e("test","CallDetectService - onStartJob() method");
-        callDetector = new CallDetector(this);
-        callDetector.start();
+        if(callDetector == null)
+        {
+            callDetector = new CallDetector(this);
+            callDetector.start();
+        }
         return true;
     }
 
