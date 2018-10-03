@@ -2,7 +2,6 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 27
-    buildToolsVersion '27.0.3'
     defaultConfig {
         applicationId "com.example.ukasz.phonecallsblocker"
         minSdkVersion 21
@@ -25,6 +24,8 @@ dependencies {
     implementation 'com.android.support:design:27.1.1'
     implementation 'com.android.support:recyclerview-v7:27.1.1'
     implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'com.google.firebase:firebase-database:16.0.3'
+    implementation 'com.google.firebase:firebase-core:16.0.4'
     androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
@@ -44,3 +45,5 @@ dependencies {
     //libphonenumber
     implementation 'com.googlecode.libphonenumber:libphonenumber:8.2.0'
 }
+
+apply plugin: 'com.google.gms.google-services'
