@@ -6,7 +6,15 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.support.annotation.NonNull;
 import android.util.Log;
+
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -297,16 +305,34 @@ public class DatabaseHandler extends SQLiteOpenHelper
      */
     public int getNumberBlockingsCount(String nr_blocked, boolean rating)
     {
-        int sqlRating = rating ? 1 : 0;
-        String countBlockingsByRating = "SELECT * FROM " + TABLE_BLOCKING
-                + " WHERE " + BLOCKED_KEY_T_B + "='" + nr_blocked
-                + "' AND " + RATING_T_B + "=" + sqlRating + ";";
-        SQLiteDatabase db = this.getWritableDatabase();
-        Cursor cursor = db.rawQuery(countBlockingsByRating, null);
-        int count = cursor.getCount();
-        cursor.close();
+//        int sqlRating = rating ? 1 : 0;
+//        String countBlockingsByRating = "SELECT * FROM " + TABLE_BLOCKING
+//                + " WHERE " + BLOCKED_KEY_T_B + "='" + nr_blocked
+//                + "' AND " + RATING_T_B + "=" + sqlRating + ";";
+//        SQLiteDatabase db = this.getWritableDatabase();
+//        Cursor cursor = db.rawQuery(countBlockingsByRating, null);
+//        int count = cursor.getCount();
+//        cursor.close();
+        DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
+        Query query = mDatabase.child("blockings").orderByChild("nrBlocked").equalTo(nr_blocked);
+        final int[] count = {0};
 
-        return count;
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                Log.e("COS", String.valueOf(dataSnapshot.getChildrenCount()));
+                count[0] = (int) dataSnapshot.getChildrenCount();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+//        mDatabase.child("blockings").push().setValue(newBlock);
+        Log.e("COS!!", "DUPA!!!!!" + count[0]);
+        return count[0];
     }
 
     /**

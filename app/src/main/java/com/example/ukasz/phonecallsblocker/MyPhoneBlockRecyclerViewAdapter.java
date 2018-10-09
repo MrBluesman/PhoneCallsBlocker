@@ -16,6 +16,9 @@ import android.widget.TextView;
 
 import com.example.ukasz.androidsqlite.Block;
 import com.example.ukasz.phonecallsblocker.list_helper.FlipAnimator;
+import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.firebase.ui.database.FirebaseRecyclerOptions;
+import com.google.firebase.database.DatabaseReference;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,11 +26,11 @@ import java.util.List;
 /**
  * {@link RecyclerView.Adapter} that can display a {@link Block} and makes a call to the
  */
-public class MyPhoneBlockRecyclerViewAdapter extends RecyclerView.Adapter<MyPhoneBlockRecyclerViewAdapter.ViewHolder>
+public class MyPhoneBlockRecyclerViewAdapter extends FirebaseRecyclerAdapter<Block, MyPhoneBlockRecyclerViewAdapter.ViewHolder>
 {
 
     //List values
-    private final List<Block> mBlockings;
+//    private final List<Block> mBlockings;
     //Listener
 //    private final OnListFragmentInteractionListener mListener;
     private final BlockAdapterListener mListener;
@@ -105,14 +108,16 @@ public class MyPhoneBlockRecyclerViewAdapter extends RecyclerView.Adapter<MyPhon
      * Constructor for creating a {@link MyPhoneBlockRecyclerViewAdapter} instance.
      *
      * @param context context of the application
-     * @param blockings list of blockings (blocked numbers)
+//     * @param blockings list of blockings (blocked numbers)
      * @param listener {@link BlockAdapterListener listener} for catching events
      */
-    MyPhoneBlockRecyclerViewAdapter(Context context, List<Block> blockings, BlockAdapterListener listener)
+    MyPhoneBlockRecyclerViewAdapter(FirebaseRecyclerOptions<Block> options, Context context, BlockAdapterListener listener)
     {
+        super(options);
+        Log.e("PUPA", "PUPA");
 //        Log.e("blockings", blockings.toString());
         mContext = context;
-        mBlockings = blockings;
+//        mBlockings = blockings;
         mListener = listener;
         selectedItems = new SparseBooleanArray();
         animationItemsIndex = new SparseBooleanArray();
@@ -134,32 +139,53 @@ public class MyPhoneBlockRecyclerViewAdapter extends RecyclerView.Adapter<MyPhon
         return new ViewHolder(view);
     }
 
-    /**
-     * Allows an actions after bind a {@link ViewHolder}.
-     *
-     * @param holder {@link ViewHolder} instance.
-     * @param position position of element on the list (One of Blocks).
-     */
-    @Override
-    public void onBindViewHolder(@NonNull final ViewHolder holder, int position)
-    {
-        Block block = mBlockings.get(position);
+//    /**
+//     * Allows an actions after bind a {@link ViewHolder}.
+//     *
+//     * @param holder {@link ViewHolder} instance.
+//     * @param position position of element on the list (One of Blocks).
+//     */
+//    @Override
+//    public void onBindViewHolder(@NonNull final ViewHolder holder, int position, Block model)
+//    {
+////        Block block = mBlockings.get(position);
+////
+////        //displaying text content of blockings
+////        holder.mNrBlocked.setText(mBlockings.get(position).getNrBlocked());
+//
+//        //change the row state to activated
+//        holder.itemView.setActivated(selectedItems.get(position, false));
+//
+////        //display block image
+////        applyBlockPicture(holder, block);
+////
+////        //handle icon animation
+////        applyIconAnimation(holder, position, block);
+//
+//        //apply click events
+//        applyClickEvents(holder, position);
+//
+//    }
 
-        //displaying text content of blockings
-        holder.mNrBlocked.setText(mBlockings.get(position).getNrBlocked());
+    @Override
+    protected void onBindViewHolder(@NonNull ViewHolder holder, int position, @NonNull Block model)
+    {
+//                Block block = mBlockings.get(position);
+//
+//        //displaying text content of blockings
+        holder.mNrBlocked.setText(model.getNrBlocked());
 
         //change the row state to activated
         holder.itemView.setActivated(selectedItems.get(position, false));
 
         //display block image
-        applyBlockPicture(holder, block);
+        applyBlockPicture(holder, model);
 
         //handle icon animation
-        applyIconAnimation(holder, position, block);
+        applyIconAnimation(holder, position, model);
 
         //apply click events
         applyClickEvents(holder, position);
-
     }
 
     /**
@@ -290,16 +316,16 @@ public class MyPhoneBlockRecyclerViewAdapter extends RecyclerView.Adapter<MyPhon
         currentSelectedIndex = -1;
     }
 
-    /**
-     * Size of {@link Block} list getter.
-     *
-     * @return size of {@link Block} list
-     */
-    @Override
-    public int getItemCount()
-    {
-        return mBlockings.size();
-    }
+//    /**
+//     * Size of {@link Block} list getter.
+//     *
+//     * @return size of {@link Block} list
+//     */
+//    @Override
+//    public int getItemCount()
+//    {
+//        return mBlockings.size();
+//    }
 
     /**
      * Toggles blocking at the pos.
@@ -379,16 +405,16 @@ public class MyPhoneBlockRecyclerViewAdapter extends RecyclerView.Adapter<MyPhon
         return selectedItems.size();
     }
 
-    /**
-     * Removes blocking at the position from adapter blockings.
-     *
-     * @param position position of blocking do remove
-     */
-    public void removeData(int position)
-    {
-        mBlockings.remove(position);
-        resetCurrentIndex();
-    }
+//    /**
+//     * Removes blocking at the position from adapter blockings.
+//     *
+//     * @param position position of blocking do remove
+//     */
+//    public void removeData(int position)
+//    {
+//        mBlockings.remove(position);
+//        resetCurrentIndex();
+//    }
 
     /**
      * Interface for BlockAdapterListener.

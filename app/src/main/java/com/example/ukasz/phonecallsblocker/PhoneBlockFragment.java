@@ -28,6 +28,9 @@ import android.widget.Toast;
 import com.example.ukasz.androidsqlite.Block;
 import com.example.ukasz.androidsqlite.DatabaseHandler;
 import com.example.ukasz.phonecallsblocker.list_helper.DividerItemDecoration;
+import com.firebase.ui.database.FirebaseRecyclerOptions;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,6 +48,8 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
     private int mColumnCount = 1;
     private MyPhoneBlockRecyclerViewAdapter adapter;
     private RecyclerView recyclerView;
+    private DatabaseReference mDatabaseRef;
+    private DatabaseReference childRef;
     public static List<Block> blockings = new ArrayList<>(); //adapter data
     DatabaseHandler db;
     IntentFilter intentFilter;
@@ -81,12 +86,28 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
      * Runs on resume application.
      * Notify data set changed.
      */
+    @Override
     public void onResume()
     {
-        // TODO Auto-generated method stub
         super.onResume();
         adapter.notifyDataSetChanged();
         Log.e("PhoneBlockFragment", "onResume()");
+    }
+
+    @Override
+    public void onStart()
+    {
+        super.onStart();
+        adapter.startListening();
+        Log.e("PhoneBlockFragment", "onStart()");
+    }
+
+    @Override
+    public void onStop()
+    {
+        super.onStop();
+        adapter.stopListening();
+        Log.e("PhoneBlockFragment", "onStop()");
     }
 
     /**
@@ -136,6 +157,10 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
         swipeRefreshLayout = rootView.findViewById(R.id.swipe_refresh_layout);
         swipeRefreshLayout.setOnRefreshListener(this);
 
+        //Firebase realtime database references
+        mDatabaseRef = FirebaseDatabase.getInstance().getReference();
+        childRef = mDatabaseRef.child("blockings");
+
         //Set the adapter
         if (view instanceof RecyclerView)
         {
@@ -150,8 +175,11 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
 
-            adapter = new MyPhoneBlockRecyclerViewAdapter(context, blockings, this);
-            adapter.notifyDataSetChanged();
+            FirebaseRecyclerOptions<Block> options = new FirebaseRecyclerOptions.Builder<Block>()
+                    .setQuery(childRef, Block.class)
+                    .build();
+            adapter = new MyPhoneBlockRecyclerViewAdapter(options, context, this);
+//            adapter.notifyDataSetChanged();
             recyclerView.setItemAnimator(new DefaultItemAnimator());
             recyclerView.addItemDecoration(new DividerItemDecoration(context, LinearLayoutManager.VERTICAL));
             recyclerView.setAdapter(adapter);
@@ -544,7 +572,7 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
             int positionToDelete = selectedItemPositions.get(i);
             Block b = blockings.get(positionToDelete);
             db.deleteBlocking(b);
-            adapter.removeData(positionToDelete);
+//            adapter.removeData(positionToDelete);
         }
         adapter.notifyDataSetChanged();
     }
