@@ -780,7 +780,8 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
             db.addBlocking(newBlock);
             //ADD to blocking list to make notify data changed possible for adapter
             Toast.makeText(StartActivity.this, "Numer dodany", Toast.LENGTH_SHORT).show();
-            PhoneBlockFragment.blockings.add(newBlock);
+            //TODO: add phone block to adapter
+//            PhoneBlockFragment.blockings.add(newBlock);
         }
         else
         {

@@ -2,7 +2,6 @@ package com.example.ukasz.phonecallsblocker;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -23,7 +22,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.example.ukasz.androidsqlite.Block;
 import com.example.ukasz.androidsqlite.DatabaseHandler;
@@ -38,7 +36,6 @@ import java.util.Objects;
 
 /**
  * A fragment representing a list of Blocks.
- * <p/>
  */
 public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener,
         MyPhoneBlockRecyclerViewAdapter.BlockAdapterListener
@@ -48,11 +45,10 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
     private int mColumnCount = 1;
     private MyPhoneBlockRecyclerViewAdapter adapter;
     private RecyclerView recyclerView;
-    private DatabaseReference mDatabaseRef;
+    private DatabaseReference databaseRef;
     private DatabaseReference childRef;
-    public static List<Block> blockings = new ArrayList<>(); //adapter data
+    FirebaseRecyclerOptions<Block> phoneBlockRecyclerOptions;
     DatabaseHandler db;
-    IntentFilter intentFilter;
 
     private SwipeRefreshLayout swipeRefreshLayout;
     private ActionModeCallback actionModeCallback;
@@ -64,13 +60,14 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
      */
     public PhoneBlockFragment()
     {
+
     }
 
     /**
      * Instance of PhoneBlockFragment initiator.
-     * @param columnCount amount of columns which will be show on the list view.
      *
-     * @return new instance of this Fragment
+     * @param columnCount amount of columns which will be show on the list view
+     * @return new instance of this {@link PhoneBlockFragment}
      */
     @SuppressWarnings("unused")
     public static PhoneBlockFragment newInstance(int columnCount)
@@ -90,10 +87,13 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
     public void onResume()
     {
         super.onResume();
-        adapter.notifyDataSetChanged();
         Log.e("PhoneBlockFragment", "onResume()");
     }
 
+    /**
+     * Runs on start of {@link PhoneBlockFragment}.
+     * Starts listening the adapter.
+     */
     @Override
     public void onStart()
     {
@@ -102,6 +102,10 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
         Log.e("PhoneBlockFragment", "onStart()");
     }
 
+    /**
+     * Runs on stop of {@link PhoneBlockFragment}.
+     * Stops listening the adapter.
+     */
     @Override
     public void onStop()
     {
@@ -113,16 +117,13 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
     /**
      * Runs on creating a this Fragment.
      *
-     * @param savedInstanceState saved instance state of this Fragment
+     * @param savedInstanceState saved instance state of this {@link PhoneBlockFragment}
      */
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null)
-        {
-            mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
-        }
+        if (getArguments() != null) mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
 
         //set up the DatabaseHandler
         db = new DatabaseHandler(getActivity());
@@ -140,7 +141,7 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
      *
      * @param inflater {@link LayoutInflater} which will be used to inflate a {@link View}
      * @param container {@link ViewGroup} container
-     * @param savedInstanceState saved state of instance this Fragment
+     * @param savedInstanceState saved state of instance this {@link PhoneBlockFragment}
      * @return created {@link View}
      */
     @Override
@@ -158,8 +159,8 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
         swipeRefreshLayout.setOnRefreshListener(this);
 
         //Firebase realtime database references
-        mDatabaseRef = FirebaseDatabase.getInstance().getReference();
-        childRef = mDatabaseRef.child("blockings");
+        databaseRef = FirebaseDatabase.getInstance().getReference();
+        childRef = databaseRef.child("blockings");
 
         //Set the adapter
         if (view instanceof RecyclerView)
@@ -175,16 +176,16 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
 
-            FirebaseRecyclerOptions<Block> options = new FirebaseRecyclerOptions.Builder<Block>()
+            phoneBlockRecyclerOptions = new FirebaseRecyclerOptions.Builder<Block>()
                     .setQuery(childRef, Block.class)
                     .build();
-            adapter = new MyPhoneBlockRecyclerViewAdapter(options, context, this);
-//            adapter.notifyDataSetChanged();
+            adapter = new MyPhoneBlockRecyclerViewAdapter(phoneBlockRecyclerOptions, context, this);
+
             recyclerView.setItemAnimator(new DefaultItemAnimator());
             recyclerView.addItemDecoration(new DividerItemDecoration(context, LinearLayoutManager.VERTICAL));
             recyclerView.setAdapter(adapter);
 
-            //Show loader and fetch blockings
+            //Show loading spinner and fetch blockings
             swipeRefreshLayout.post(
                     new Runnable()
                     {
@@ -203,7 +204,7 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
     /**
      * Runs when this Fragment is attaching to the Activity.
      *
-     * @param context App context.
+     * @param context context of the application
      */
     @Override
     public void onAttach(Context context)
@@ -220,8 +221,9 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
         swipeRefreshLayout.setRefreshing(true);
         List<Block> blockingsToAddFromDb = db.getAllBlockings();
 
-        blockings.clear();
-        blockings.addAll(blockingsToAddFromDb);
+        //TODO: Loading blockings
+//        blockings.clear();
+//        blockings.addAll(blockingsToAddFromDb);
 
         adapter.notifyDataSetChanged();
         swipeRefreshLayout.setRefreshing(false);
@@ -246,7 +248,8 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
     {
-        // Inflate the menu; this adds items to the action bar if it is present.
+        // Inflate the menu;
+        // this adds items to the action bar if it is present.
         menu.clear();
         inflater.inflate(R.menu.menu_phoneblock, menu);
         super.onCreateOptionsMenu(menu, inflater);
@@ -322,7 +325,6 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
         }
     }
 
-
     /**
      * Action after short click (tap) a row of position.
      * Action depends on whether adapter has selected item to delete or for now is selected to
@@ -343,8 +345,9 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
         else
         {
             // read the block which removes bold from the row
-            Block block = blockings.get(position);
-            startDetailsActivityForBlocking(block.getNrBlocked());
+            //TODO: get block at position from Firebase and start details activity
+//            Block block = blockings.get(position);
+//            startDetailsActivityForBlocking(block.getNrBlocked());
         }
     }
 
@@ -376,7 +379,7 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
     /**
      * Toggle selected position to another state (to delete or not).
      *
-     * @param position position of the Block to toggle
+     * @param position position of the {@link Block} to toggle
      */
     private void toggleSelection(int position)
     {
@@ -415,7 +418,7 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
     /**
      * Sets other fragments enabled or disabled to swipe and click.
      *
-     * @param enabled disable or enable access to fragments.
+     * @param enabled disable or enable access to fragments
      */
     private void setOtherFragmentsEnabled(boolean enabled)
     {
@@ -424,7 +427,6 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
         ((ViewGroup) ((StartActivity)getActivity()).getTabLayout().getChildAt(0)).getChildAt(0).setEnabled(enabled);
         if(enabled) ((StartActivity)getActivity()).getFab().showMenu(true);
         else ((StartActivity)getActivity()).getFab().hideMenu(true);
-
     }
 
     /**
@@ -433,13 +435,12 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
     private class ActionModeCallback implements ActionMode.Callback
     {
         private int statusBarColor;
-        private int toolbarColor;
 
         /**
          * Action on creating a action mode.
          *
-         * @param mode {@link ActionMode mode}.
-         * @param menu {@link Menu menu}.
+         * @param mode {@link ActionMode mode}
+         * @param menu {@link Menu menu}
          *
          * @return true
          */
@@ -460,8 +461,8 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
         /**
          * Preparing the action mode.
          *
-         * @param mode {@link ActionMode mode}.
-         * @param menu {@link Menu menu}.
+         * @param mode {@link ActionMode mode}
+         * @param menu {@link Menu menu}
          *
          * @return false
          */
@@ -474,9 +475,9 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
         /**
          * Catch the action of the toolbar (action bar).
          *
-         * @param mode {@link ActionMode mode}.
+         * @param mode {@link ActionMode mode}
          * @param item {@link MenuItem item}
-         * @return True if delete has clicked, false if hasn't.
+         * @return True if delete has clicked, false if hasn't
          */
         @Override
         public boolean onActionItemClicked(ActionMode mode, MenuItem item)
@@ -494,15 +495,17 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
                 case R.id.menu_action_details:
                     //go to the number details
                     itemPosition = adapter.getSelectedItem();
-                    b = blockings.get(itemPosition);
-                    startDetailsActivityForBlocking(b.getNrBlocked());
+                    //TODO: get block at selected position and start details activity
+//                    b = blockings.get(itemPosition);
+//                    startDetailsActivityForBlocking(b.getNrBlocked());
                     mode.finish();
                     return true;
                 case R.id.menu_action_edit:
                     //go to the number details
                     itemPosition = adapter.getSelectedItem();
-                    b = blockings.get(itemPosition);
-                    startEditActivityForBlocking(b.getNrBlocked());
+                    //TODO: get block at selected position and start edit activity
+//                    b = blockings.get(itemPosition);
+//                    startEditActivityForBlocking(b.getNrBlocked());
                     mode.finish();
                     return true;
                 case R.id.menu_action_set_as_negative:
@@ -517,6 +520,7 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
                     return true;
                 case R.id.menu_action_select_all:
                     //select all blockings
+                    //TODO: select all items in adapter
 //                    adapter.selectAllItems();
                     toggleAll();
                     return true;
@@ -526,12 +530,11 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
             }
         }
 
-
         /**
          * Action after destroy action mode - deleting.
          * Resets adapter animation and clear previous selected items.
          *
-         * @param mode {@link ActionMode mode}.
+         * @param mode {@link ActionMode mode}
          */
         @Override
         public void onDestroyActionMode(ActionMode mode)
@@ -550,7 +553,6 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
                 public void run()
                 {
                     adapter.resetAnimationIndex();
-                    // mAdapter.notifyDataSetChanged();
                 }
             });
 
@@ -570,9 +572,10 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
         for (int i = selectedItemPositions.size() - 1; i >= 0; i--)
         {
             int positionToDelete = selectedItemPositions.get(i);
-            Block b = blockings.get(positionToDelete);
-            db.deleteBlocking(b);
-//            adapter.removeData(positionToDelete);
+            //TODO: get Block at position and delete from Firebase
+//            Block b = blockings.get(positionToDelete);
+//            db.deleteBlocking(b);
+////            adapter.removeData(positionToDelete);
         }
         adapter.notifyDataSetChanged();
     }
@@ -590,9 +593,10 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
         for (int i = selectedItemPositions.size() - 1; i >= 0; i--)
         {
             int positionToChange = selectedItemPositions.get(i);
-            Block b = blockings.get(positionToChange);
-            b.setNrRating(rating);
-            db.updateBlocking(b);
+            //TODO: get Block at position and update on Firebase
+//            Block b = blockings.get(positionToChange);
+//            b.setNrRating(rating);
+//            db.updateBlocking(b);
         }
         adapter.notifyDataSetChanged();
     }

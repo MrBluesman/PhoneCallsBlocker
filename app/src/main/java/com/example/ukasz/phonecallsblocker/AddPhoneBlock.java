@@ -100,8 +100,8 @@ public class AddPhoneBlock extends AppCompatActivity implements AdapterView.OnIt
                     if(!db.existBlock(newBlock))
                     {
                         db.addBlocking(newBlock);
-                        //ADD to bloicking list to make notify data changed possible for adapter
-                        PhoneBlockFragment.blockings.add(newBlock);
+                        //TODO: ADD to bloicking list to make notify data changed possible for adapter
+//                        PhoneBlockFragment.blockings.add(newBlock);
                     }
                     else
                     {

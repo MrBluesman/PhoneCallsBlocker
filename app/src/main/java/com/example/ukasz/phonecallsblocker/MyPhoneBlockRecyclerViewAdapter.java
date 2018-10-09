@@ -3,7 +3,6 @@ package com.example.ukasz.phonecallsblocker;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.HapticFeedbackConstants;
 import android.view.LayoutInflater;
@@ -18,7 +17,6 @@ import com.example.ukasz.androidsqlite.Block;
 import com.example.ukasz.phonecallsblocker.list_helper.FlipAnimator;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
-import com.google.firebase.database.DatabaseReference;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,13 +24,8 @@ import java.util.List;
 /**
  * {@link RecyclerView.Adapter} that can display a {@link Block} and makes a call to the
  */
-public class MyPhoneBlockRecyclerViewAdapter extends FirebaseRecyclerAdapter<Block, MyPhoneBlockRecyclerViewAdapter.ViewHolder>
+public class MyPhoneBlockRecyclerViewAdapter extends FirebaseRecyclerAdapter<Block, MyPhoneBlockRecyclerViewAdapter.PhoneBlockHolder>
 {
-
-    //List values
-//    private final List<Block> mBlockings;
-    //Listener
-//    private final OnListFragmentInteractionListener mListener;
     private final BlockAdapterListener mListener;
     //Context
     private final Context mContext;
@@ -49,7 +42,7 @@ public class MyPhoneBlockRecyclerViewAdapter extends FirebaseRecyclerAdapter<Blo
     /**
      * ViewHolder class for single Block view.
      */
-    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnLongClickListener
+    public class PhoneBlockHolder extends RecyclerView.ViewHolder implements View.OnLongClickListener
     {
 
         final View mViewContainer;
@@ -58,13 +51,12 @@ public class MyPhoneBlockRecyclerViewAdapter extends FirebaseRecyclerAdapter<Blo
         private LinearLayout mPhoneblockContainer;
         private RelativeLayout mIconContainer, mIconBack, mIconFront;
 
-
         /**
-         * ViewHolder constructor.
+         * PhoneBlockHolder constructor.
          *
          * @param view single Block view
          */
-        ViewHolder(View view)
+        PhoneBlockHolder(View view)
         {
             super(view);
             mViewContainer = view;
@@ -77,11 +69,10 @@ public class MyPhoneBlockRecyclerViewAdapter extends FirebaseRecyclerAdapter<Blo
             view.setOnLongClickListener(this);
         }
 
-
         /**
          * Converts to {@link String text}.
          *
-         * @return Stringified Block number
+         * @return String toString Block number
          */
         @Override
         public String toString()
@@ -92,14 +83,14 @@ public class MyPhoneBlockRecyclerViewAdapter extends FirebaseRecyclerAdapter<Blo
         /**
          * Action after long click on single Block view.
          *
-         * @param v single Block view
+         * @param view single Block view
          * @return true
          */
         @Override
-        public boolean onLongClick(View v)
+        public boolean onLongClick(View view)
         {
             mListener.onRowLongClicked(getAdapterPosition());
-            v.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
+            view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
             return true;
         }
     }
@@ -107,82 +98,58 @@ public class MyPhoneBlockRecyclerViewAdapter extends FirebaseRecyclerAdapter<Blo
     /**
      * Constructor for creating a {@link MyPhoneBlockRecyclerViewAdapter} instance.
      *
+     * @param options options for {@link FirebaseRecyclerAdapter} including query for selected values
      * @param context context of the application
-//     * @param blockings list of blockings (blocked numbers)
      * @param listener {@link BlockAdapterListener listener} for catching events
      */
     MyPhoneBlockRecyclerViewAdapter(FirebaseRecyclerOptions<Block> options, Context context, BlockAdapterListener listener)
     {
         super(options);
-        Log.e("PUPA", "PUPA");
-//        Log.e("blockings", blockings.toString());
         mContext = context;
-//        mBlockings = blockings;
         mListener = listener;
         selectedItems = new SparseBooleanArray();
         animationItemsIndex = new SparseBooleanArray();
     }
 
     /**
-     * Inflates a {@link View} and attaches it to a {@link ViewHolder}
+     * Inflates a {@link View} and attaches it to a {@link PhoneBlockHolder}
      * for single {@link Block} instance.
-     * @param parent a parent {@link ViewGroup} for get a context.
-     * @param viewType type of {@link View}.
-     * @return new {@link ViewHolder} for single {@link Block} instance {@link View}.
+     *
+     * @param parent a parent {@link ViewGroup} for get a context
+     * @param viewType type of {@link View}
+     * @return new {@link PhoneBlockHolder} for single {@link Block} instance {@link View}
      */
     @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType)
+    public PhoneBlockHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType)
     {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.phoneblock_list_row, parent, false);
-        return new ViewHolder(view);
+        return new PhoneBlockHolder(view);
     }
 
-//    /**
-//     * Allows an actions after bind a {@link ViewHolder}.
-//     *
-//     * @param holder {@link ViewHolder} instance.
-//     * @param position position of element on the list (One of Blocks).
-//     */
-//    @Override
-//    public void onBindViewHolder(@NonNull final ViewHolder holder, int position, Block model)
-//    {
-////        Block block = mBlockings.get(position);
-////
-////        //displaying text content of blockings
-////        holder.mNrBlocked.setText(mBlockings.get(position).getNrBlocked());
-//
-//        //change the row state to activated
-//        holder.itemView.setActivated(selectedItems.get(position, false));
-//
-////        //display block image
-////        applyBlockPicture(holder, block);
-////
-////        //handle icon animation
-////        applyIconAnimation(holder, position, block);
-//
-//        //apply click events
-//        applyClickEvents(holder, position);
-//
-//    }
-
+    /**
+     * Binds a single {@link} Block to {@link PhoneBlockHolder}.
+     * Allows an actions after bind a {@link PhoneBlockHolder}.
+     *
+     * @param holder {@link PhoneBlockHolder} instance
+     * @param position position of element on the list (One of {@link Block})
+     * @param block {@link Block} instance
+     */
     @Override
-    protected void onBindViewHolder(@NonNull ViewHolder holder, int position, @NonNull Block model)
+    protected void onBindViewHolder(@NonNull PhoneBlockHolder holder, int position, @NonNull Block block)
     {
-//                Block block = mBlockings.get(position);
-//
-//        //displaying text content of blockings
-        holder.mNrBlocked.setText(model.getNrBlocked());
+        //displaying text content of blockings
+        holder.mNrBlocked.setText(block.getNrBlocked());
 
         //change the row state to activated
         holder.itemView.setActivated(selectedItems.get(position, false));
 
         //display block image
-        applyBlockPicture(holder, model);
+        applyBlockPicture(holder, block);
 
         //handle icon animation
-        applyIconAnimation(holder, position, model);
+        applyIconAnimation(holder, position, block);
 
         //apply click events
         applyClickEvents(holder, position);
@@ -192,10 +159,10 @@ public class MyPhoneBlockRecyclerViewAdapter extends FirebaseRecyclerAdapter<Blo
      * Applier for click events.
      * Sets up the listeners to catch click events.
      *
-     * @param holder {@link ViewHolder holder} for Block at position
-     * @param position position of single Block
+     * @param holder {@link PhoneBlockHolder holder} for Block at position
+     * @param position position of single {@link Block}
      */
-    private void applyClickEvents(ViewHolder holder, final int position)
+    private void applyClickEvents(PhoneBlockHolder holder, final int position)
     {
         holder.mIconContainer.setOnClickListener(new View.OnClickListener()
         {
@@ -229,13 +196,12 @@ public class MyPhoneBlockRecyclerViewAdapter extends FirebaseRecyclerAdapter<Blo
     }
 
     /**
-     * TODO: Different icons depends on blocked or allowed number (or category?)
      * Sets up the default block picture for selecting blockings to destroy.
      *
-     * @param holder {@link ViewHolder holder} for Block at position
+     * @param holder {@link PhoneBlockHolder holder} for Block at position
      * @param block {@link Block block} which picture will be applied
      */
-    private void applyBlockPicture(ViewHolder holder, Block block)
+    private void applyBlockPicture(PhoneBlockHolder holder, Block block)
     {
         //Select img block depends on block type (positive or negative)
         if(block.getNrRating()) holder.mImgBlock.setImageResource(R.drawable.bg_circle_negative);
@@ -245,11 +211,11 @@ public class MyPhoneBlockRecyclerViewAdapter extends FirebaseRecyclerAdapter<Blo
     /**
      * Animates toggle blocking using static methods from {@link FlipAnimator}.
      *
-     * @param holder {@link ViewHolder holder} for Block at position
-     * @param position position of single Block
+     * @param holder {@link PhoneBlockHolder holder} for Block at position
+     * @param position position of single {@link Block}
      * @param block {@link Block block} which picture icon will be animated
      */
-    private void applyIconAnimation(ViewHolder holder, int position, Block block)
+    private void applyIconAnimation(PhoneBlockHolder holder, int position, Block block)
     {
         if (selectedItems.get(position, false))
         {
@@ -258,6 +224,7 @@ public class MyPhoneBlockRecyclerViewAdapter extends FirebaseRecyclerAdapter<Blo
             resetIconYAxis(holder.mIconBack);
             holder.mIconBack.setVisibility(View.VISIBLE);
             holder.mIconBack.setAlpha(1);
+
             if (currentSelectedIndex == position)
             {
                 FlipAnimator.flipView(mContext, holder.mIconBack, holder.mIconFront, true);
@@ -274,6 +241,7 @@ public class MyPhoneBlockRecyclerViewAdapter extends FirebaseRecyclerAdapter<Blo
             resetIconYAxis(holder.mIconFront);
             holder.mIconFront.setVisibility(View.VISIBLE);
             holder.mIconFront.setAlpha(1);
+
             if ((reverseAllAnimations && animationItemsIndex.get(position, false)) || currentSelectedIndex == position)
             {
                 FlipAnimator.flipView(mContext, holder.mIconBack, holder.mIconFront, false);
@@ -283,7 +251,7 @@ public class MyPhoneBlockRecyclerViewAdapter extends FirebaseRecyclerAdapter<Blo
     }
 
     /**
-     * Reset icon for Y axis.
+     * Resets icon for Y axis.
      * As the views will be reused, sometimes the icon appears as
      * flipped because older view is reused. Reset the Y-axis to 0.
      *
@@ -301,7 +269,7 @@ public class MyPhoneBlockRecyclerViewAdapter extends FirebaseRecyclerAdapter<Blo
      * Resets the animation index.
      * Also setting reversing all animations to false.
      */
-    public void resetAnimationIndex()
+    void resetAnimationIndex()
     {
         reverseAllAnimations = false;
         animationItemsIndex.clear();
@@ -316,43 +284,32 @@ public class MyPhoneBlockRecyclerViewAdapter extends FirebaseRecyclerAdapter<Blo
         currentSelectedIndex = -1;
     }
 
-//    /**
-//     * Size of {@link Block} list getter.
-//     *
-//     * @return size of {@link Block} list
-//     */
-//    @Override
-//    public int getItemCount()
-//    {
-//        return mBlockings.size();
-//    }
-
     /**
      * Toggles blocking at the pos.
      * Notifies item changes.
      *
-     * @param pos item position
+     * @param position item position
      */
-    public void toggleSelection(int pos)
+    void toggleSelection(int position)
     {
-        currentSelectedIndex = pos;
-        if (selectedItems.get(pos, false))
+        currentSelectedIndex = position;
+        if (selectedItems.get(position, false))
         {
-            selectedItems.delete(pos);
-            animationItemsIndex.delete(pos);
+            selectedItems.delete(position);
+            animationItemsIndex.delete(position);
         }
         else
         {
-            selectedItems.put(pos, true);
-            animationItemsIndex.put(pos, true);
+            selectedItems.put(position, true);
+            animationItemsIndex.put(position, true);
         }
-        notifyItemChanged(pos);
+        notifyItemChanged(position);
     }
 
     /**
      * Clear all selected blockings.
      */
-    public void clearSelections()
+    void clearSelections()
     {
         reverseAllAnimations = true;
         selectedItems.clear();
@@ -364,7 +321,7 @@ public class MyPhoneBlockRecyclerViewAdapter extends FirebaseRecyclerAdapter<Blo
      *
      * @return {@link List} of positions of selected blockings
      */
-    public List<Integer> getSelectedItemsAsList()
+    List<Integer> getSelectedItemsAsList()
     {
         List<Integer> items = new ArrayList<>(selectedItems.size());
         for (int i = 0; i < selectedItems.size(); i++)
@@ -379,7 +336,7 @@ public class MyPhoneBlockRecyclerViewAdapter extends FirebaseRecyclerAdapter<Blo
      *
      * @return {@link SparseBooleanArray} of all positions with flag if the position is selected or not
      */
-    public SparseBooleanArray getSelectedItems()
+    SparseBooleanArray getSelectedItems()
     {
         return selectedItems;
     }
@@ -389,7 +346,7 @@ public class MyPhoneBlockRecyclerViewAdapter extends FirebaseRecyclerAdapter<Blo
      *
      * @return position of the first selected item
      */
-    public Integer getSelectedItem()
+    Integer getSelectedItem()
     {
         if(getSelectedItemCount() > 0) return selectedItems.keyAt(0);
         return null;
@@ -400,21 +357,10 @@ public class MyPhoneBlockRecyclerViewAdapter extends FirebaseRecyclerAdapter<Blo
      *
      * @return amount of selected blockings
      */
-    public int getSelectedItemCount()
+    int getSelectedItemCount()
     {
         return selectedItems.size();
     }
-
-//    /**
-//     * Removes blocking at the position from adapter blockings.
-//     *
-//     * @param position position of blocking do remove
-//     */
-//    public void removeData(int position)
-//    {
-//        mBlockings.remove(position);
-//        resetCurrentIndex();
-//    }
 
     /**
      * Interface for BlockAdapterListener.
@@ -427,5 +373,4 @@ public class MyPhoneBlockRecyclerViewAdapter extends FirebaseRecyclerAdapter<Blo
 
         void onRowLongClicked(int position);
     }
-
 }
