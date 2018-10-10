@@ -157,6 +157,7 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
         swipeRefreshLayout.setOnRefreshListener(this);
 
         //Firebase realtime database references
+        //TODO: initialize persistence setting as soon as possible (after app start)
         FirebaseDatabase.getInstance().setPersistenceEnabled(true);
         databaseRef = FirebaseDatabase.getInstance().getReference();
         blockingsRef = databaseRef.child("blockings");

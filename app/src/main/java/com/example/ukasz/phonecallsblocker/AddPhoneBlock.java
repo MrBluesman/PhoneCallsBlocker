@@ -59,7 +59,7 @@ public class AddPhoneBlock extends AppCompatActivity implements AdapterView.OnIt
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_NUMBERS)
                 != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE)
                 != PackageManager.PERMISSION_GRANTED) return;
-        myPhoneNumber = !tm.getLine1Number().equals("") ? tm.getLine1Number() : getSim1IMSI();
+        myPhoneNumber = !tm.getLine1Number().equals("") ? tm.getLine1Number() : tm.getSubscriberId();
         myPhoneNumber = !myPhoneNumber.equals("") ? myPhoneNumber : tm.getSimSerialNumber();
 
         //set toolbar
@@ -137,38 +137,6 @@ public class AddPhoneBlock extends AppCompatActivity implements AdapterView.OnIt
                 }
             }
         });
-    }
-
-    /**
-     * TODO: refactor for access globally (some kind of class helper for getting phone info)
-     * @return Subsciber ID (IMSI) number
-     */
-    public String getSim1IMSI()
-    {
-        String imsi = null;
-        TelephonyManager tm = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP_MR1)
-        {
-            try
-            {
-                Method getSubId = TelephonyManager.class.getMethod("getSubscriberId", int.class);
-                SubscriptionManager sm = null;
-                sm = (SubscriptionManager) getSystemService(TELEPHONY_SUBSCRIPTION_SERVICE);
-                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED)
-                {
-                    return null;
-                }
-                if (sm != null)
-                {
-                    imsi = (String) getSubId.invoke(tm, sm.getActiveSubscriptionInfoForSimSlotIndex(0).getSubscriptionId()); // Sim slot 1 IMSI
-                }
-            }
-            catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e)
-            {
-                e.printStackTrace();
-            }
-        }
-        return imsi;
     }
 
     /**
