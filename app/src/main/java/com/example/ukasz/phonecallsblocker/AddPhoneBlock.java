@@ -1,8 +1,14 @@
 package com.example.ukasz.phonecallsblocker;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.pm.PackageManager;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.telephony.TelephonyManager;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -15,18 +21,21 @@ import android.widget.Toast;
 
 import com.example.ukasz.androidsqlite.Block;
 import com.example.ukasz.androidsqlite.DatabaseHandler;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.List;
 import java.util.Objects;
 
-public class AddPhoneBlock extends AppCompatActivity implements AdapterView.OnItemSelectedListener
-{
+public class AddPhoneBlock extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
     private Toolbar mActionBar;
     private EditText nrBlocked;
     private Switch isPositiveSwitch;
     private Spinner category;
     private EditText description;
     private Button addButton;
+    private String myPhoneNumber;
+    private TelephonyManager tm;
 
     /**
      * Initialize var instances and view for start {@link AddPhoneBlock} activity.
@@ -34,10 +43,18 @@ public class AddPhoneBlock extends AppCompatActivity implements AdapterView.OnIt
      * @param savedInstanceState Instance state.
      */
     @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
+    @SuppressLint("HardwareIds")
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_phone_block);
+
+        //getMyPhoneNumber
+        tm = (TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_SMS)
+                != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_NUMBERS)
+                != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE)
+                != PackageManager.PERMISSION_GRANTED) return;
+        myPhoneNumber = !tm.getLine1Number().equals("") ? tm.getLine1Number() : tm.getSimSerialNumber();
 
         //set toolbar
         mActionBar = findViewById(R.id.add_phone_block_toolbar);
@@ -86,22 +103,22 @@ public class AddPhoneBlock extends AppCompatActivity implements AdapterView.OnIt
                 }
                 else
                 {
-                    //TODO: get phone number ((TelephonyManager)v.getContext().getSystemService(Context.TELEPHONY_SERVICE) is not working anymore)
-//                    Toast.makeText(v.getContext(), String.valueOf(category.getSelectedItemPosition()), Toast.LENGTH_SHORT).show();
                     DatabaseHandler db = new DatabaseHandler(v.getContext());
 
                     //Block data depends on isPositiveSwitch
                     Block newBlock = isPositiveSwitch.isChecked() ? new Block("721315333", nrBlocked.getText().toString(),
                            0 , description.getText().toString(), false)
-                            : new Block("721315333", nrBlocked.getText().toString(),
+                            : new Block(myPhoneNumber, nrBlocked.getText().toString(),
                             category.getSelectedItemPosition(), description.getText().toString(), true);
 
+                    DatabaseReference databaseRef  = FirebaseDatabase.getInstance().getReference();
 
                     if(!db.existBlock(newBlock))
                     {
-                        db.addBlocking(newBlock);
+//                        db.addBlocking(newBlock);
                         //TODO: ADD to bloicking list to make notify data changed possible for adapter
 //                        PhoneBlockFragment.blockings.add(newBlock);
+                        databaseRef.child("blockings").push().setValue(newBlock);
                     }
                     else
                     {
@@ -150,9 +167,9 @@ public class AddPhoneBlock extends AppCompatActivity implements AdapterView.OnIt
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id)
     {
-//        CharSequence elem = (CharSequence) parent.getItemAtPosition(position);
-//        Toast t = Toast.makeText(this, elem, Toast.LENGTH_SHORT);
-//        t.show();
+        CharSequence elem = (CharSequence) parent.getItemAtPosition(position);
+        Toast t = Toast.makeText(this, elem, Toast.LENGTH_SHORT);
+        t.show();
     }
 
     @Override

@@ -5,7 +5,6 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -30,7 +29,6 @@ import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -46,7 +44,7 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
     private MyPhoneBlockRecyclerViewAdapter adapter;
     private RecyclerView recyclerView;
     private DatabaseReference databaseRef;
-    private DatabaseReference childRef;
+    private DatabaseReference blockingsRef;
     FirebaseRecyclerOptions<Block> phoneBlockRecyclerOptions;
     DatabaseHandler db;
 
@@ -160,7 +158,7 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
 
         //Firebase realtime database references
         databaseRef = FirebaseDatabase.getInstance().getReference();
-        childRef = databaseRef.child("blockings");
+        blockingsRef = databaseRef.child("blockings");
 
         //Set the adapter
         if (view instanceof RecyclerView)
@@ -177,7 +175,7 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
             }
 
             phoneBlockRecyclerOptions = new FirebaseRecyclerOptions.Builder<Block>()
-                    .setQuery(childRef, Block.class)
+                    .setQuery(blockingsRef, Block.class)
                     .build();
             adapter = new MyPhoneBlockRecyclerViewAdapter(phoneBlockRecyclerOptions, context, this);
 
@@ -345,9 +343,8 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
         else
         {
             // read the block which removes bold from the row
-            //TODO: get block at position from Firebase and start details activity
-//            Block block = blockings.get(position);
-//            startDetailsActivityForBlocking(block.getNrBlocked());
+            Block block = adapter.getItem(position);
+            startDetailsActivityForBlocking(block.getNrBlocked());
         }
     }
 
@@ -483,7 +480,7 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
         public boolean onActionItemClicked(ActionMode mode, MenuItem item)
         {
             Integer itemPosition;
-            Block b;
+            Block block;
 
             switch (item.getItemId())
             {
@@ -495,9 +492,8 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
                 case R.id.menu_action_details:
                     //go to the number details
                     itemPosition = adapter.getSelectedItem();
-                    //TODO: get block at selected position and start details activity
-//                    b = blockings.get(itemPosition);
-//                    startDetailsActivityForBlocking(b.getNrBlocked());
+                    block = adapter.getItem(itemPosition);
+                    startDetailsActivityForBlocking(block.getNrBlocked());
                     mode.finish();
                     return true;
                 case R.id.menu_action_edit:
