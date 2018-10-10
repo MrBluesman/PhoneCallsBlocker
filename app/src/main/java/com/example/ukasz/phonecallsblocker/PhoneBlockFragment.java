@@ -499,9 +499,8 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
                 case R.id.menu_action_edit:
                     //go to the number details
                     itemPosition = adapter.getSelectedItem();
-                    //TODO: get block at selected position and start edit activity
-//                    b = blockings.get(itemPosition);
-//                    startEditActivityForBlocking(b.getNrBlocked());
+                    block = adapter.getItem(itemPosition);
+                    startEditActivityForBlocking(block.getNrBlocked());
                     mode.finish();
                     return true;
                 case R.id.menu_action_set_as_negative:
