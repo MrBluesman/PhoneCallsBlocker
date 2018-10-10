@@ -561,8 +561,6 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
         for (int i = selectedItemPositions.size() - 1; i >= 0; i--)
         {
             int positionToDelete = selectedItemPositions.get(i);
-            //TODO: get Block at position and delete from Firebase
-            Block block = adapter.getItem(positionToDelete);
             adapter.getRef(positionToDelete).removeValue();
         }
     }
@@ -580,10 +578,9 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
         for (int i = selectedItemPositions.size() - 1; i >= 0; i--)
         {
             int positionToChange = selectedItemPositions.get(i);
-            //TODO: get Block at position and update on Firebase
-//            Block b = blockings.get(positionToChange);
-//            b.setNrRating(rating);
-//            db.updateBlocking(b);
+            Block block = adapter.getItem(positionToChange);
+            block.setNrRating(rating);
+            adapter.getRef(positionToChange).setValue(block);
         }
         adapter.notifyDataSetChanged();
     }
