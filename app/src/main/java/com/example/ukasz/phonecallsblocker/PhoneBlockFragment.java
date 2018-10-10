@@ -157,6 +157,7 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
         swipeRefreshLayout.setOnRefreshListener(this);
 
         //Firebase realtime database references
+        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
         databaseRef = FirebaseDatabase.getInstance().getReference();
         blockingsRef = databaseRef.child("blockings");
 
@@ -217,13 +218,8 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
     private void loadBlockings()
     {
         swipeRefreshLayout.setRefreshing(true);
-        List<Block> blockingsToAddFromDb = db.getAllBlockings();
-
-        //TODO: Loading blockings
-//        blockings.clear();
-//        blockings.addAll(blockingsToAddFromDb);
-
-        adapter.notifyDataSetChanged();
+        adapter.stopListening();
+        adapter.startListening();
         swipeRefreshLayout.setRefreshing(false);
     }
 
@@ -582,7 +578,6 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
             block.setNrRating(rating);
             adapter.getRef(positionToChange).setValue(block);
         }
-        adapter.notifyDataSetChanged();
     }
 
     /**
