@@ -8,7 +8,9 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.telephony.SubscriptionManager;
 import android.telephony.TelephonyManager;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -24,10 +26,13 @@ import com.example.ukasz.androidsqlite.DatabaseHandler;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Objects;
 
-public class AddPhoneBlock extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
+public class AddPhoneBlock extends AppCompatActivity implements AdapterView.OnItemSelectedListener
+{
     private Toolbar mActionBar;
     private EditText nrBlocked;
     private Switch isPositiveSwitch;
@@ -44,17 +49,18 @@ public class AddPhoneBlock extends AppCompatActivity implements AdapterView.OnIt
      */
     @Override
     @SuppressLint("HardwareIds")
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_phone_block);
 
         //getMyPhoneNumber
         tm = (TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE);
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_SMS)
-                != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_NUMBERS)
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_NUMBERS)
                 != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE)
                 != PackageManager.PERMISSION_GRANTED) return;
-        myPhoneNumber = !tm.getLine1Number().equals("") ? tm.getLine1Number() : tm.getSimSerialNumber();
+        myPhoneNumber = !tm.getLine1Number().equals("") ? tm.getLine1Number() : getSim1IMSI();
+        myPhoneNumber = !myPhoneNumber.equals("") ? myPhoneNumber : tm.getSimSerialNumber();
 
         //set toolbar
         mActionBar = findViewById(R.id.add_phone_block_toolbar);
@@ -73,10 +79,12 @@ public class AddPhoneBlock extends AppCompatActivity implements AdapterView.OnIt
         category.setOnItemSelectedListener(this);
 
         //Switch view depends on blocking type (positive or negative)
-        isPositiveSwitch.setOnClickListener(new View.OnClickListener() {
+        isPositiveSwitch.setOnClickListener(new View.OnClickListener()
+        {
             @Override
-            public void onClick(View v) {
-                if(isPositiveSwitch.isChecked())
+            public void onClick(View v)
+            {
+                if (isPositiveSwitch.isChecked())
                 {
 //                    description.setVisibility(View.GONE);
                     category.setVisibility(View.GONE);
@@ -96,7 +104,7 @@ public class AddPhoneBlock extends AppCompatActivity implements AdapterView.OnIt
             public void onClick(View v)
             {
 
-                if(nrBlocked.getText().toString().length() == 0)
+                if (nrBlocked.getText().toString().length() == 0)
                 {
                     nrBlocked.setError("Podaj numer telefonu");
                     Toast.makeText(v.getContext(), "Podaj numer telefonu", Toast.LENGTH_SHORT).show();
@@ -107,13 +115,13 @@ public class AddPhoneBlock extends AppCompatActivity implements AdapterView.OnIt
 
                     //Block data depends on isPositiveSwitch
                     Block newBlock = isPositiveSwitch.isChecked() ? new Block("721315333", nrBlocked.getText().toString(),
-                           0 , description.getText().toString(), false)
+                            0, description.getText().toString(), false)
                             : new Block(myPhoneNumber, nrBlocked.getText().toString(),
                             category.getSelectedItemPosition(), description.getText().toString(), true);
 
-                    DatabaseReference databaseRef  = FirebaseDatabase.getInstance().getReference();
+                    DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference();
 
-                    if(!db.existBlock(newBlock))
+                    if (!db.existBlock(newBlock))
                     {
 //                        db.addBlocking(newBlock);
                         //TODO: ADD to bloicking list to make notify data changed possible for adapter
@@ -129,6 +137,38 @@ public class AddPhoneBlock extends AppCompatActivity implements AdapterView.OnIt
                 }
             }
         });
+    }
+
+    /**
+     * TODO: refactor for access globally (some kind of class helper for getting phone info)
+     * @return Subsciber ID (IMSI) number
+     */
+    public String getSim1IMSI()
+    {
+        String imsi = null;
+        TelephonyManager tm = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP_MR1)
+        {
+            try
+            {
+                Method getSubId = TelephonyManager.class.getMethod("getSubscriberId", int.class);
+                SubscriptionManager sm = null;
+                sm = (SubscriptionManager) getSystemService(TELEPHONY_SUBSCRIPTION_SERVICE);
+                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED)
+                {
+                    return null;
+                }
+                if (sm != null)
+                {
+                    imsi = (String) getSubId.invoke(tm, sm.getActiveSubscriptionInfoForSimSlotIndex(0).getSubscriptionId()); // Sim slot 1 IMSI
+                }
+            }
+            catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e)
+            {
+                e.printStackTrace();
+            }
+        }
+        return imsi;
     }
 
     /**
