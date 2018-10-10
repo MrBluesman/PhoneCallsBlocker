@@ -267,11 +267,7 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         //noinspection SimplifiableIfStatement
-        if(id == R.id.menu_action_select_all)
-        {
-            toggleAll();
-            return true;
-        }
+        if(id == R.id.menu_action_select_all) toggleAll();
         return true;
     }
 
@@ -515,8 +511,6 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
                     return true;
                 case R.id.menu_action_select_all:
                     //select all blockings
-                    //TODO: select all items in adapter
-//                    adapter.selectAllItems();
                     toggleAll();
                     return true;
                 default:
@@ -568,11 +562,9 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
         {
             int positionToDelete = selectedItemPositions.get(i);
             //TODO: get Block at position and delete from Firebase
-//            Block b = blockings.get(positionToDelete);
-//            db.deleteBlocking(b);
-////            adapter.removeData(positionToDelete);
+            Block block = adapter.getItem(positionToDelete);
+            adapter.getRef(positionToDelete).removeValue();
         }
-        adapter.notifyDataSetChanged();
     }
 
     /**
