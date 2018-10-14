@@ -8,6 +8,7 @@ public class Block
 {
     private String nr_declarant;
     private String nr_blocked;
+    private String nr_declarant_blocked;
     private int reason_category;
     private String reason_description;
     private boolean nr_rating;
@@ -23,16 +24,17 @@ public class Block
     /**
      * Instance of Block Constructor.
      *
-     * @param nr_dec    Declarant number, number which blocking.
-     * @param nr_bloc   Blocking number.
-     * @param r_cat     Category number.
-     * @param r_desc    Description (optional).
-     * @param nr_rat    Rating of blocked number, positive or negative blocking.
+     * @param nr_dec    Declarant number, number which blocking
+     * @param nr_bloc   Blocking number
+     * @param r_cat     Category number
+     * @param r_desc    Description (optional)
+     * @param nr_rat    Rating of blocked number, positive or negative blocking
      */
     public Block(String nr_dec, String nr_bloc, int r_cat, String r_desc, boolean nr_rat)
     {
         this.nr_declarant = nr_dec;
         this.nr_blocked = nr_bloc;
+        this.nr_declarant_blocked = nr_dec + "_" + nr_bloc;
         this.reason_category = r_cat;
         this.reason_description = r_desc;
         this.nr_rating = nr_rat;
@@ -41,15 +43,16 @@ public class Block
     /**
      * Instance of Block Constructor.
      *
-     * @param nr_dec    Declarant number, number which blocking.
-     * @param nr_bloc   Blocking number.
-     * @param r_cat     Category number.
-     * @param nr_rat    Rating of blocked number, positive or negative blocking.
+     * @param nr_dec    Declarant number, number which blocking
+     * @param nr_bloc   Blocking number
+     * @param r_cat     Category number
+     * @param nr_rat    Rating of blocked number, positive or negative blocking
      */
     public Block(String nr_dec, String nr_bloc, int r_cat, boolean nr_rat)
     {
         this.nr_declarant = nr_dec;
         this.nr_blocked = nr_bloc;
+        this.nr_declarant_blocked = nr_dec + "_" + nr_bloc;
         this.reason_category = r_cat;
         this.reason_description = "";
         this.nr_rating = nr_rat;
@@ -58,7 +61,7 @@ public class Block
     /**
      * nr_declarant setter.
      *
-     * @param nr_dec new nr_declatant.
+     * @param nr_dec new nr_declatant
      */
     public void setNrDeclarant(String nr_dec)
     {
@@ -68,7 +71,7 @@ public class Block
     /**
      * nr_blocked setter.
      *
-     * @param nr_bloc new nr_blocked.
+     * @param nr_bloc new nr_blocked
      */
     public void setNrBlocked(String nr_bloc)
     {
@@ -76,9 +79,19 @@ public class Block
     }
 
     /**
+     * nr_declarant_blocked setter.
+     *
+     * @param nr_dec_bloc new nr_declarant_blocked
+     */
+    public void setNrDeclarantBlocked(String nr_dec_bloc)
+    {
+        this.nr_declarant_blocked = nr_dec_bloc;
+    }
+
+    /**
      * reason_category setter.
      *
-     * @param r_cat new reason_category.
+     * @param r_cat new reason_category
      */
     public void setReasonCategory(int r_cat)
     {
@@ -88,7 +101,7 @@ public class Block
     /**
      * reason_description setter.
      *
-     * @param r_desc new reason_description.
+     * @param r_desc new reason_description
      */
     public void setReasonDescription(String r_desc)
     {
@@ -98,7 +111,7 @@ public class Block
     /**
      * nr_rating setter.
      *
-     * @param nr_rat new nr_rating.
+     * @param nr_rat new nr_rating
      */
     public void setNrRating(boolean nr_rat)
     {
@@ -108,7 +121,7 @@ public class Block
     /**
      * nr_declarant getter.
      *
-     * @return nr_declarant of instance.
+     * @return nr_declarant of instance
      */
     public String getNrDeclarant()
     {
@@ -118,7 +131,7 @@ public class Block
     /**
      * nr_blocked getter.
      *
-     * @return nr_blocked of instance.
+     * @return nr_blocked of instance
      */
     public String getNrBlocked()
     {
@@ -126,9 +139,19 @@ public class Block
     }
 
     /**
+     * nr_declarant_blocked getter.
+     *
+     * @return nr_declarant_blocked of instance
+     */
+    public String getNrDeclarantBlocked()
+    {
+        return this.nr_declarant_blocked;
+    }
+
+    /**
      * reason_category getter.
      *
-     * @return reason_category of instance.
+     * @return reason_category of instance
      */
     public int getReasonCategory()
     {
@@ -138,7 +161,7 @@ public class Block
     /**
      * reason_description getter.
      *
-     * @return reason_description of instance.
+     * @return reason_description of instance
      */
     public String getReasonDescription()
     {
@@ -148,7 +171,7 @@ public class Block
     /**
      * nr_rating getter.
      *
-     * @return nr_rating of instance.
+     * @return nr_rating of instance
      */
     public boolean getNrRating()
     {
