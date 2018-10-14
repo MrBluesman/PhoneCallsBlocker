@@ -4,11 +4,11 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.telephony.SubscriptionManager;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.MenuItem;
@@ -23,11 +23,13 @@ import android.widget.Toast;
 
 import com.example.ukasz.androidsqlite.Block;
 import com.example.ukasz.androidsqlite.DatabaseHandler;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Objects;
 
@@ -86,12 +88,10 @@ public class AddPhoneBlock extends AppCompatActivity implements AdapterView.OnIt
             {
                 if (isPositiveSwitch.isChecked())
                 {
-//                    description.setVisibility(View.GONE);
                     category.setVisibility(View.GONE);
                 }
                 else
                 {
-//                    description.setVisibility(View.VISIBLE);
                     category.setVisibility(View.VISIBLE);
                 }
             }
@@ -101,7 +101,7 @@ public class AddPhoneBlock extends AppCompatActivity implements AdapterView.OnIt
         addButton.setOnClickListener(new View.OnClickListener()
         {
             @Override
-            public void onClick(View v)
+            public void onClick(final View v)
             {
 
                 if (nrBlocked.getText().toString().length() == 0)
@@ -111,28 +111,43 @@ public class AddPhoneBlock extends AppCompatActivity implements AdapterView.OnIt
                 }
                 else
                 {
-                    DatabaseHandler db = new DatabaseHandler(v.getContext());
-
                     //Block data depends on isPositiveSwitch
-                    Block newBlock = isPositiveSwitch.isChecked() ? new Block("721315333", nrBlocked.getText().toString(),
+                    final Block newBlock = isPositiveSwitch.isChecked() ? new Block(myPhoneNumber, nrBlocked.getText().toString(),
                             0, description.getText().toString(), false)
                             : new Block(myPhoneNumber, nrBlocked.getText().toString(),
                             category.getSelectedItemPosition(), description.getText().toString(), true);
 
-                    DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference();
+                    final DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference();
+                    Query newBlockingRef = databaseRef
+                            .child("blockings")
+                            .orderByChild("nrDeclarantBlocked")
+                            .equalTo(newBlock.getNrDeclarant() + "_" + newBlock.getNrBlocked())
+                            .limitToFirst(1);
 
-                    if (!db.existBlock(newBlock))
-                    {
-//                        db.addBlocking(newBlock);
-                        //TODO: ADD to bloicking list to make notify data changed possible for adapter
-//                        PhoneBlockFragment.blockings.add(newBlock);
-                        databaseRef.child("blockings").push().setValue(newBlock);
-                    }
-                    else
-                    {
-                        Toast.makeText(v.getContext(), "Numer jest już na liście", Toast.LENGTH_SHORT).show();
-                    }
+                    Log.e("TEST", newBlock.getNrDeclarant() + "_" + newBlock.getNrBlocked());
 
+                    newBlockingRef.addListenerForSingleValueEvent(new ValueEventListener()
+                    {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot)
+                        {
+                            if(!dataSnapshot.exists())
+                            {
+                                Log.e("TEST_ISTNIEJE", "NIE");
+                                databaseRef.child("blockings").push().setValue(newBlock);
+                            }
+                            else
+                            {
+                                Log.e("TEST_ISTNIEJE", "TAK");
+                                Toast.makeText(v.getContext(), "Numer istnieje już na liście", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+                            Toast.makeText(v.getContext(), "Wystąpił błąd", Toast.LENGTH_SHORT).show();
+                        }
+                    });
                     finish();
                 }
             }
