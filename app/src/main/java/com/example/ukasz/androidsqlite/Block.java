@@ -9,6 +9,7 @@ public class Block
     private String nr_declarant;
     private String nr_blocked;
     private String nr_declarant_blocked;
+    private String nr_declarant_blocked_rating;
     private int reason_category;
     private String reason_description;
     private boolean nr_rating;
@@ -35,6 +36,7 @@ public class Block
         this.nr_declarant = nr_dec;
         this.nr_blocked = nr_bloc;
         this.nr_declarant_blocked = nr_dec + "_" + nr_bloc;
+        this.nr_declarant_blocked_rating = nr_dec + "_" + nr_bloc + "_" + nr_rat;
         this.reason_category = r_cat;
         this.reason_description = r_desc;
         this.nr_rating = nr_rat;
@@ -53,6 +55,7 @@ public class Block
         this.nr_declarant = nr_dec;
         this.nr_blocked = nr_bloc;
         this.nr_declarant_blocked = nr_dec + "_" + nr_bloc;
+        this.nr_declarant_blocked_rating = nr_dec + "_" + nr_bloc + "_" + nr_rat;
         this.reason_category = r_cat;
         this.reason_description = "";
         this.nr_rating = nr_rat;
@@ -89,6 +92,16 @@ public class Block
     }
 
     /**
+     * nr_declarant_blocked_rating setter.
+     *
+     * @param nr_dec_bloc_rat new nr_declarant_blocked_rating
+     */
+    public void setNrDeclarantBlockedRating(String nr_dec_bloc_rat)
+    {
+        this.nr_declarant_blocked_rating = nr_dec_bloc_rat;
+    }
+
+    /**
      * reason_category setter.
      *
      * @param r_cat new reason_category
@@ -116,6 +129,7 @@ public class Block
     public void setNrRating(boolean nr_rat)
     {
         this.nr_rating = nr_rat;
+        this.nr_declarant_blocked_rating = this.nr_declarant_blocked + "_" + nr_rat;
     }
 
     /**
@@ -146,6 +160,16 @@ public class Block
     public String getNrDeclarantBlocked()
     {
         return this.nr_declarant_blocked;
+    }
+
+    /**
+     * nr_declarant_blocked_rating getter.
+     *
+     * @return nr_declarant_blocked_rating of instance
+     */
+    public String getNrDeclarantBlockedRating()
+    {
+        return this.nr_declarant_blocked_rating;
     }
 
     /**
