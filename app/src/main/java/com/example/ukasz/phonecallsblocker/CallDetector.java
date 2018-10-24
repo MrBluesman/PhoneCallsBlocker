@@ -69,7 +69,7 @@ public class CallDetector
          */
         @RequiresApi(api = Build.VERSION_CODES.M)
         @Override
-        public void onCallStateChanged(int state, String incomingNumber)
+        public void onCallStateChanged(int state, final String incomingNumber)
         {
             //Settings data
             SharedPreferences data;
@@ -91,7 +91,12 @@ public class CallDetector
                     .child("blockings")
                     .orderByChild("nrDeclarantBlockedRating")
                     .equalTo(myPhoneNumber + "_" + incomingNumberFormatted + "_true");
+            Query falseBlockings = mDatabase
+                    .child("blockings")
+                    .orderByChild("nrDeclarantBlockedRating")
+                    .equalTo(myPhoneNumber + "_" + incomingNumberFormatted + "_false");
             trueBlockings.getRef().keepSynced(true);
+            falseBlockings.getRef().keepSynced(true);
 
             switch (state)
             {
@@ -102,8 +107,8 @@ public class CallDetector
                     //database and settings load
                     final DatabaseHandler db = new DatabaseHandler(ctx);
 
-                    trueBlockings.addListenerForSingleValueEvent(new ValueEventListener() {
-
+                    trueBlockings.addListenerForSingleValueEvent(new ValueEventListener()
+                    {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot)
                         {
@@ -119,38 +124,48 @@ public class CallDetector
                                 declinePhone(ctx);
                                 registerPhoneBlock(db, incomingNumberFormatted, true);
                             }
-//                            else if(!db.existBlock(myPhoneNumber, incomingNumberFormatted, false))
-//                        {
-//
-//                            //Can draw overlays depends on SDK version
-//                            boolean canDrawOverlays = true;
-//                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
-//                            {
-//                                if (!Settings.canDrawOverlays(ctx)) canDrawOverlays = false;
-//                            }
-//
-//                            if (canDrawOverlays)
-//                            {
-//                                AlertDialog alertDialog;
-//                                //If number is private show dialog box with limited options - only block and allow
-//                                if (incomingNumber == null)
-//                                    alertDialog = createIncomingCallDialogPrivateNumber(incomingNumberFormatted, db);
-//                                else
-//                                {
-//                                    //If number is blocked by user show dialog box with possibility to change to positive number
-//                                    alertDialog = db.existBlock(myPhoneNumber, incomingNumberFormatted, true)
-//                                            ? createIncomingCallDialogBlockedNumber(incomingNumberFormatted, db)
-//                                            : createIncomingCallDialogNewNumber(incomingNumberFormatted, db);
-//                                }
-//
-//                                alertDialog.getWindow().setType(getDialogLayoutFlag());
-//                                alertDialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
-//                                        | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
-//                                        | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
-//                                        | WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
-//                                alertDialog.show();
-//                            }
-//                        }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) { }
+                    });
+
+                    falseBlockings.addListenerForSingleValueEvent(new ValueEventListener()
+                    {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot)
+                        {
+                            if(dataSnapshot.getChildrenCount() == 0)
+                            {
+                                //Can draw overlays depends on SDK version
+                                boolean canDrawOverlays = true;
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+                                {
+                                    if (!Settings.canDrawOverlays(ctx)) canDrawOverlays = false;
+                                }
+
+                                if (canDrawOverlays)
+                                {
+                                    AlertDialog alertDialog;
+                                    //If number is private show dialog box with limited options - only block and allow
+                                    if (incomingNumber == null)
+                                        alertDialog = createIncomingCallDialogPrivateNumber(incomingNumberFormatted, db);
+                                    else
+                                    {
+                                        //If number is blocked by user show dialog box with possibility to change to positive number
+                                        alertDialog = db.existBlock(myPhoneNumber, incomingNumberFormatted, true)
+                                                ? createIncomingCallDialogBlockedNumber(incomingNumberFormatted, db)
+                                                : createIncomingCallDialogNewNumber(incomingNumberFormatted, db);
+                                    }
+
+                                    alertDialog.getWindow().setType(getDialogLayoutFlag());
+                                    alertDialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
+                                            | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
+                                            | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
+                                            | WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
+                                    alertDialog.show();
+                                }
+                            }
                         }
 
                         @Override
