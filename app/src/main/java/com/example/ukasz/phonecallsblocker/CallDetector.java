@@ -18,6 +18,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.provider.Settings;
+import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NotificationCompat;
@@ -32,6 +33,12 @@ import com.example.ukasz.androidsqlite.Block;
 import com.example.ukasz.androidsqlite.DatabaseHandler;
 import com.example.ukasz.androidsqlite.RegistryBlock;
 import com.example.ukasz.phonecallsblocker.notification_helper.NotificationID;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.google.i18n.phonenumbers.NumberParseException;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.Phonenumber;
@@ -67,17 +74,24 @@ public class CallDetector
             //Settings data
             SharedPreferences data;
             data = ctx.getSharedPreferences("data", Context.MODE_PRIVATE);
-            boolean autoBlockEnabled = data.getBoolean("autoBlockEnabled", false);
+            final boolean autoBlockEnabled = data.getBoolean("autoBlockEnabled", false);
             boolean foreignBlockEnabled = data.getBoolean("foreignBlockEnabled", false);
             boolean privateBlockEnabled = data.getBoolean("privateBlockEnabled", false);
             boolean unknownBlockEnabled = data.getBoolean("unknownBlockEnabled", false);
 
-            boolean notificationBlockEnabled = data.getBoolean("notificationBlockEnabled", false);
-            boolean notificationAllowEnabled = data.getBoolean("notificationAllowEnabled", false);
+            final boolean notificationBlockEnabled = data.getBoolean("notificationBlockEnabled", false);
+            final boolean notificationAllowEnabled = data.getBoolean("notificationAllowEnabled", false);
 
             final String incomingNumberFormatted = incomingNumber != null ? incomingNumber : "Numer prywatny";
             String incomingContactName = null;
             if(unknownBlockEnabled) incomingContactName = !incomingNumberFormatted.isEmpty()? getContactName(ctx, incomingNumberFormatted) : null;
+
+            //Firebase blockings data
+            Query trueBlockings = mDatabase
+                    .child("blockings")
+                    .orderByChild("nrDeclarantBlockedRating")
+                    .equalTo(myPhoneNumber + "_" + incomingNumberFormatted + "_true");
+            trueBlockings.getRef().keepSynced(true);
 
             switch (state)
             {
@@ -88,9 +102,64 @@ public class CallDetector
                     //database and settings load
                     final DatabaseHandler db = new DatabaseHandler(ctx);
 
+                    trueBlockings.addListenerForSingleValueEvent(new ValueEventListener() {
+
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot)
+                        {
+                            Log.e("COS", String.valueOf(dataSnapshot.getChildrenCount()));
+                            if (autoBlockEnabled && dataSnapshot.getChildrenCount() > 0) //Phone number is blocked and autoBlock is enabled
+                            {
+                                //if notification block is enabled - show a notification
+                                if(notificationBlockEnabled) notificationManager.notify(
+                                        NotificationID.getID(),
+                                        createNotification(incomingNumberFormatted, NOTIFICATION_BLOCKED).build()
+                                );
+                                //decline and register
+                                declinePhone(ctx);
+                                registerPhoneBlock(db, incomingNumberFormatted, true);
+                            }
+//                            else if(!db.existBlock(myPhoneNumber, incomingNumberFormatted, false))
+//                        {
+//
+//                            //Can draw overlays depends on SDK version
+//                            boolean canDrawOverlays = true;
+//                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+//                            {
+//                                if (!Settings.canDrawOverlays(ctx)) canDrawOverlays = false;
+//                            }
+//
+//                            if (canDrawOverlays)
+//                            {
+//                                AlertDialog alertDialog;
+//                                //If number is private show dialog box with limited options - only block and allow
+//                                if (incomingNumber == null)
+//                                    alertDialog = createIncomingCallDialogPrivateNumber(incomingNumberFormatted, db);
+//                                else
+//                                {
+//                                    //If number is blocked by user show dialog box with possibility to change to positive number
+//                                    alertDialog = db.existBlock(myPhoneNumber, incomingNumberFormatted, true)
+//                                            ? createIncomingCallDialogBlockedNumber(incomingNumberFormatted, db)
+//                                            : createIncomingCallDialogNewNumber(incomingNumberFormatted, db);
+//                                }
+//
+//                                alertDialog.getWindow().setType(getDialogLayoutFlag());
+//                                alertDialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
+//                                        | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
+//                                        | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
+//                                        | WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
+//                                alertDialog.show();
+//                            }
+//                        }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) { }
+                    });
+
+                    //Condition not relevant to database checks
                     //Check if we should autoblocked (only for negative phone numbers)
-                    if((autoBlockEnabled && db.getNumberBlockingsCount(incomingNumberFormatted, true) > 0) //Phone number is blocked and autoBlock is enabled
-                            || (foreignBlockEnabled && isForeignIncomingCall(incomingNumberFormatted)) //OR phone number is foreign and foreignBlock is enabled
+                    if((foreignBlockEnabled && isForeignIncomingCall(incomingNumberFormatted)) //OR phone number is foreign and foreignBlock is enabled
                             || (privateBlockEnabled && incomingNumber == null) //OR phone number is private and privateBlock is enabled
                             || (unknownBlockEnabled && incomingContactName == null)) //OR phone number is unknown and uknownBlock is enabled
 
@@ -103,38 +172,6 @@ public class CallDetector
                         //decline and register
                         declinePhone(ctx);
                         registerPhoneBlock(db, incomingNumberFormatted, true);
-                    }
-                    else if(!db.existBlock(myPhoneNumber, incomingNumberFormatted, false))
-                    {
-
-                        //Can draw overlays depends on SDK version
-                        boolean canDrawOverlays = true;
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
-                        {
-                            if (!Settings.canDrawOverlays(ctx)) canDrawOverlays = false;
-                        }
-
-                        if (canDrawOverlays)
-                        {
-                            AlertDialog alertDialog;
-                            //If number is private show dialog box with limited options - only block and allow
-                            if (incomingNumber == null)
-                                alertDialog = createIncomingCallDialogPrivateNumber(incomingNumberFormatted, db);
-                            else
-                            {
-                                //If number is blocked by user show dialog box with possibility to change to positive number
-                                alertDialog = db.existBlock(myPhoneNumber, incomingNumberFormatted, true)
-                                        ? createIncomingCallDialogBlockedNumber(incomingNumberFormatted, db)
-                                        : createIncomingCallDialogNewNumber(incomingNumberFormatted, db);
-                            }
-
-                            alertDialog.getWindow().setType(getDialogLayoutFlag());
-                            alertDialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
-                                    | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
-                                    | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
-                                    | WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
-                            alertDialog.show();
-                        }
                     }
                     else //Phone call allowed
                     {
@@ -525,6 +562,7 @@ public class CallDetector
     //final static fields for notification type
     private final static int NOTIFICATION_BLOCKED = 0;
     private final static int NOTIFICATION_ALLOWED = 1;
+    private DatabaseReference mDatabase;
 
     /**
      * Constructor.
@@ -539,6 +577,11 @@ public class CallDetector
         ctx = _ctx;
         callStateListener = new CallStateListener();
         notificationManager = NotificationManagerCompat.from(ctx);
+
+        /* TODO: refactor to keep all references in one place */
+        //Database reference
+        mDatabase = FirebaseDatabase.getInstance().getReference();
+        //Notification channel
         createNotificationChannel();
     }
 
@@ -553,7 +596,6 @@ public class CallDetector
         Log.e("CallDetector", "start() method");
         tm = (TelephonyManager) ctx.getSystemService(Context.TELEPHONY_SERVICE);
         tm.listen(callStateListener, PhoneStateListener.LISTEN_CALL_STATE);
-
 
         //Save the user phone number (declarant)
         //getMyPhoneNumber
