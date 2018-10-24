@@ -556,16 +556,12 @@ public class CallDetector
 
 
         //Save the user phone number (declarant)
-        if (ActivityCompat.checkSelfPermission(ctx, Manifest.permission.READ_SMS)
-                != PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(ctx, Manifest.permission.READ_PHONE_NUMBERS)
-                != PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(ctx, Manifest.permission.READ_PHONE_STATE)
-                != PackageManager.PERMISSION_GRANTED) {
-            return;
-        }
-
-        myPhoneNumber = !tm.getLine1Number().equals("") ? tm.getLine1Number() : tm.getSimSerialNumber();
+        //getMyPhoneNumber
+        if (ActivityCompat.checkSelfPermission(ctx, Manifest.permission.READ_PHONE_NUMBERS)
+                != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(ctx, Manifest.permission.READ_PHONE_STATE)
+                != PackageManager.PERMISSION_GRANTED) return;
+        myPhoneNumber = !tm.getLine1Number().equals("") ? tm.getLine1Number() : tm.getSubscriberId();
+        myPhoneNumber = !myPhoneNumber.equals("") ? myPhoneNumber : tm.getSimSerialNumber();
         myCountryDialCode = PhoneNumberUtil.getInstance().getCountryCodeForRegion(tm.getSimCountryIso().toUpperCase());
         Log.e("PHONE_NUMBER", String.valueOf(myCountryDialCode));
     }

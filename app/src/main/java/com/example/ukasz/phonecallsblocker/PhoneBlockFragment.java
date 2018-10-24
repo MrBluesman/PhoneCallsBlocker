@@ -1,14 +1,18 @@
 package com.example.ukasz.phonecallsblocker;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.telephony.TelephonyManager;
 import android.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
@@ -28,6 +32,7 @@ import com.example.ukasz.phonecallsblocker.list_helper.DividerItemDecoration;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 
 import java.util.List;
 import java.util.Objects;
@@ -36,17 +41,19 @@ import java.util.Objects;
  * A fragment representing a list of Blocks.
  */
 public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener,
-        MyPhoneBlockRecyclerViewAdapter.BlockAdapterListener
-{
+        MyPhoneBlockRecyclerViewAdapter.BlockAdapterListener {
 
     private static final String ARG_COLUMN_COUNT = "column-count";
     private int mColumnCount = 1;
     private MyPhoneBlockRecyclerViewAdapter adapter;
     private RecyclerView recyclerView;
     private DatabaseReference databaseRef;
-    private DatabaseReference blockingsRef;
+    private Query blockingsRef;
     FirebaseRecyclerOptions<Block> phoneBlockRecyclerOptions;
     DatabaseHandler db;
+    /* TODO: Refactor!!! One place for tm and user phone info data */
+    private String myPhoneNumber;
+    private TelephonyManager tm;
 
     private SwipeRefreshLayout swipeRefreshLayout;
     private ActionModeCallback actionModeCallback;
@@ -56,8 +63,7 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
      */
-    public PhoneBlockFragment()
-    {
+    public PhoneBlockFragment() {
 
     }
 
@@ -68,8 +74,7 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
      * @return new instance of this {@link PhoneBlockFragment}
      */
     @SuppressWarnings("unused")
-    public static PhoneBlockFragment newInstance(int columnCount)
-    {
+    public static PhoneBlockFragment newInstance(int columnCount) {
         PhoneBlockFragment fragment = new PhoneBlockFragment();
         Bundle args = new Bundle();
         args.putInt(ARG_COLUMN_COUNT, columnCount);
@@ -82,8 +87,7 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
      * Notify data set changed.
      */
     @Override
-    public void onResume()
-    {
+    public void onResume() {
         super.onResume();
         Log.e("PhoneBlockFragment", "onResume()");
     }
@@ -93,8 +97,7 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
      * Starts listening the adapter.
      */
     @Override
-    public void onStart()
-    {
+    public void onStart() {
         super.onStart();
         adapter.startListening();
         Log.e("PhoneBlockFragment", "onStart()");
@@ -105,8 +108,7 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
      * Stops listening the adapter.
      */
     @Override
-    public void onStop()
-    {
+    public void onStop() {
         super.onStop();
         adapter.stopListening();
         Log.e("PhoneBlockFragment", "onStop()");
@@ -117,9 +119,9 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
      *
      * @param savedInstanceState saved instance state of this {@link PhoneBlockFragment}
      */
+    @SuppressLint("HardwareIds")
     @Override
-    public void onCreate(Bundle savedInstanceState)
-    {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
 
@@ -131,6 +133,16 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
 
         //create a action mode callback
         actionModeCallback = new ActionModeCallback();
+
+        /* TODO: Refactor!!! One place for tm and user phone info data */
+        //getMyPhoneNumber
+        tm = (TelephonyManager) Objects.requireNonNull(getContext()).getSystemService(Context.TELEPHONY_SERVICE);
+        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.READ_PHONE_NUMBERS)
+                != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.READ_PHONE_STATE)
+                != PackageManager.PERMISSION_GRANTED) return;
+        myPhoneNumber = !tm.getLine1Number().equals("") ? tm.getLine1Number() : tm.getSubscriberId();
+        myPhoneNumber = !myPhoneNumber.equals("") ? myPhoneNumber : tm.getSimSerialNumber();
+        Log.e("My number: ", myPhoneNumber);
     }
 
     /**
@@ -159,8 +171,8 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
         //Firebase realtime database references
         //TODO: initialize keep Synced when is really needed and remember to unSync it
         databaseRef = FirebaseDatabase.getInstance().getReference();
-        blockingsRef = databaseRef.child("blockings");
-        blockingsRef.keepSynced(true);
+        blockingsRef = databaseRef.child("blockings").orderByChild("nrDeclarant").equalTo(myPhoneNumber);
+        blockingsRef.getRef().keepSynced(true);
 
         //Set the adapter
         if (view instanceof RecyclerView)
