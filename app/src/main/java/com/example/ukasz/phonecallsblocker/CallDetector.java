@@ -168,7 +168,7 @@ public class CallDetector
                                                     //If number is blocked by user show dialog box with possibility to change to positive number
                                                     alertDialog = db.existBlock(myPhoneNumber, incomingNumberFormatted, true)
                                                             ? createIncomingCallDialogBlockedNumber(incomingNumberFormatted, db)
-                                                            : createIncomingCallDialogNewNumber(incomingNumberFormatted, db);
+                                                            : createIncomingCallDialogNewNumber(incomingNumberFormatted, db, dataSnapshot.getChildrenCount());
                                                 }
 
                                                 alertDialog.getWindow().setType(getDialogLayoutFlag());
@@ -216,12 +216,13 @@ public class CallDetector
          *
          * @param incomingNumber contains the number of incoming call
          * @param db database for receive number of blockings and allow save to local list
+         * @param blockingsCount blockings count to display in {@link android.support.v7.app.AlertDialog}
          * @return created {@link AlertDialog} with options for incoming call dialog for new number
          */
-        private AlertDialog createIncomingCallDialogNewNumber(final String incomingNumber, final DatabaseHandler db)
+        private AlertDialog createIncomingCallDialogNewNumber(final String incomingNumber, final DatabaseHandler db, final long blockingsCount)
         {
             AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
-            builder.setTitle(incomingNumber + " \n liczba zablokowań: " + db.getNumberBlockingsCount(incomingNumber));
+            builder.setTitle(incomingNumber + " \n liczba zablokowań: " + blockingsCount);
             builder.setItems(R.array.incoming_number_options,
                     new DialogInterface.OnClickListener()
                     {
@@ -499,6 +500,7 @@ public class CallDetector
      * @param category category of added phone number
      * @param rating rating of added phone number, positive or negative
      */
+    /* TODO: Consider refactor, adding phone number in one place! */
     @SuppressLint("HardwareIds")
     private void addPhoneBlock(DatabaseHandler db, String phoneNumber, int category, boolean rating)
     {
@@ -507,11 +509,39 @@ public class CallDetector
                 != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(ctx, Manifest.permission.READ_PHONE_STATE)
                 != PackageManager.PERMISSION_GRANTED) return;
 
-        if(db.existBlock(new Block(myPhoneNumber, phoneNumber, category, "", rating)))
+        final Block newBlock = new Block(myPhoneNumber, phoneNumber, category, "", rating);
+
+        final DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference();
+        Query newBlockingRef = databaseRef
+                .child("blockings")
+                .orderByChild("nrDeclarantBlocked")
+                .equalTo(newBlock.getNrDeclarant() + "_" + newBlock.getNrBlocked())
+                .limitToFirst(1);
+
+        Log.e("ADD ALERT TEST: ", newBlock.getNrDeclarant() + "_" + newBlock.getNrBlocked());
+
+        newBlockingRef.addListenerForSingleValueEvent(new ValueEventListener()
         {
-            Toast.makeText(ctx, R.string.call_detector_already_blocked, Toast.LENGTH_SHORT).show();
-        }
-        else db.addBlocking(new Block(myPhoneNumber, phoneNumber, category, "", rating));
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot)
+            {
+                if(!dataSnapshot.exists())
+                {
+                    Log.e("TEST_ISTNIEJE", "NIE");
+                    databaseRef.child("blockings").push().setValue(newBlock);
+                }
+                else
+                {
+                    Log.e("TEST_ISTNIEJE", "TAK");
+                    Toast.makeText(ctx,  R.string.call_detector_already_blocked, Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Toast.makeText(ctx, "Wystąpił błąd", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     /**
