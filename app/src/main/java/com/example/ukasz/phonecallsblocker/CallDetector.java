@@ -45,6 +45,7 @@ import com.google.i18n.phonenumbers.Phonenumber;
 
 import java.lang.reflect.Method;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
@@ -567,11 +568,30 @@ public class CallDetector
      * @param phoneNumber phone number which rating will be updated
      * @param rating new blocking rating
      */
-    private void updatePhoneBlock(DatabaseHandler db, String phoneNumber, boolean rating)
+    private void updatePhoneBlock(DatabaseHandler db, final String phoneNumber, final boolean rating)
     {
-        Block updatedBlock = db.getBlocking(myPhoneNumber, phoneNumber);
-        updatedBlock.setNrRating(rating);
-        db.updateBlocking(updatedBlock);
+        final Query blockings = mDatabase
+                .child("blockings")
+                .orderByChild("nrDeclarantBlocked")
+                .equalTo(myPhoneNumber + "_" + phoneNumber);
+
+        blockings.addListenerForSingleValueEvent(new ValueEventListener()
+        {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot)
+            {
+                if(dataSnapshot.exists())
+                {
+                    HashMap<String, Object> updateData = new HashMap<>();
+                    updateData.put("nrRating", rating);
+                    updateData.put("nrDeclarantBlockedRating", myPhoneNumber+"_"+phoneNumber+"_"+rating);
+                    dataSnapshot.getChildren().iterator().next().getRef().updateChildren(updateData);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) { }
+        });
     }
 
     /**
