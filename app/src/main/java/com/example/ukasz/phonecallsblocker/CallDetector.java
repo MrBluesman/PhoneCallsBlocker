@@ -113,8 +113,10 @@ public class CallDetector
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot)
                         {
+                            final boolean isBlockedByMy = dataSnapshot.getChildrenCount() > 0;
+
                             Log.e("COS", String.valueOf(dataSnapshot.getChildrenCount()));
-                            if (autoBlockEnabled && dataSnapshot.getChildrenCount() > 0) //Phone number is blocked and autoBlock is enabled
+                            if (autoBlockEnabled && isBlockedByMy) //Phone number is blocked and autoBlock is enabled
                             {
                                 //if notification block is enabled - show a notification
                                 if(notificationBlockEnabled) notificationManager.notify(
@@ -166,7 +168,7 @@ public class CallDetector
                                                 else
                                                 {
                                                     //If number is blocked by user show dialog box with possibility to change to positive number
-                                                    alertDialog = db.existBlock(myPhoneNumber, incomingNumberFormatted, true)
+                                                    alertDialog = isBlockedByMy
                                                             ? createIncomingCallDialogBlockedNumber(incomingNumberFormatted, db)
                                                             : createIncomingCallDialogNewNumber(incomingNumberFormatted, db, dataSnapshot.getChildrenCount());
                                                 }
