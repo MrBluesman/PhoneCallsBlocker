@@ -75,23 +75,24 @@ public class CallDetector
             SharedPreferences data;
             data = ctx.getSharedPreferences("data", Context.MODE_PRIVATE);
             final boolean autoBlockEnabled = data.getBoolean("autoBlockEnabled", false);
-            boolean foreignBlockEnabled = data.getBoolean("foreignBlockEnabled", false);
-            boolean privateBlockEnabled = data.getBoolean("privateBlockEnabled", false);
-            boolean unknownBlockEnabled = data.getBoolean("unknownBlockEnabled", false);
+            final boolean foreignBlockEnabled = data.getBoolean("foreignBlockEnabled", false);
+            final boolean privateBlockEnabled = data.getBoolean("privateBlockEnabled", false);
+            final boolean unknownBlockEnabled = data.getBoolean("unknownBlockEnabled", false);
 
             final boolean notificationBlockEnabled = data.getBoolean("notificationBlockEnabled", false);
             final boolean notificationAllowEnabled = data.getBoolean("notificationAllowEnabled", false);
 
             final String incomingNumberFormatted = incomingNumber != null ? incomingNumber : "Numer prywatny";
-            String incomingContactName = null;
-            if(unknownBlockEnabled) incomingContactName = !incomingNumberFormatted.isEmpty()? getContactName(ctx, incomingNumberFormatted) : null;
+            final String incomingContactName = (unknownBlockEnabled && !incomingNumberFormatted.isEmpty())
+                    ? getContactName(ctx, incomingNumberFormatted)
+                    : null;
 
             //Firebase blockings data
             Query trueBlockings = mDatabase
                     .child("blockings")
                     .orderByChild("nrDeclarantBlockedRating")
                     .equalTo(myPhoneNumber + "_" + incomingNumberFormatted + "_true");
-            Query falseBlockings = mDatabase
+            final Query falseBlockings = mDatabase
                     .child("blockings")
                     .orderByChild("nrDeclarantBlockedRating")
                     .equalTo(myPhoneNumber + "_" + incomingNumberFormatted + "_false");
@@ -124,47 +125,74 @@ public class CallDetector
                                 declinePhone(ctx);
                                 registerPhoneBlock(db, incomingNumberFormatted, true);
                             }
-                        }
+                            //Condition not relevant to database checks
+                            //Check if we should autoblocked (only for negative phone numbers)
+                            else if((foreignBlockEnabled && isForeignIncomingCall(incomingNumberFormatted)) //OR phone number is foreign and foreignBlock is enabled
+                                    || (privateBlockEnabled && incomingNumber == null) //OR phone number is private and privateBlock is enabled
+                                    || (unknownBlockEnabled && incomingContactName == null)) //OR phone number is unknown and uknownBlock is enabled
 
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError databaseError) { }
-                    });
-
-                    falseBlockings.addListenerForSingleValueEvent(new ValueEventListener()
-                    {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot dataSnapshot)
-                        {
-                            if(dataSnapshot.getChildrenCount() == 0)
                             {
-                                //Can draw overlays depends on SDK version
-                                boolean canDrawOverlays = true;
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+                                //if notification block is enabled - show a notification
+                                if(notificationBlockEnabled) notificationManager.notify(
+                                        NotificationID.getID(),
+                                        createNotification(incomingNumberFormatted, NOTIFICATION_BLOCKED).build()
+                                );
+                                //decline and register
+                                declinePhone(ctx);
+                                registerPhoneBlock(db, incomingNumberFormatted, true);
+                            }
+                            else
+                            {
+                                falseBlockings.addListenerForSingleValueEvent(new ValueEventListener()
                                 {
-                                    if (!Settings.canDrawOverlays(ctx)) canDrawOverlays = false;
-                                }
-
-                                if (canDrawOverlays)
-                                {
-                                    AlertDialog alertDialog;
-                                    //If number is private show dialog box with limited options - only block and allow
-                                    if (incomingNumber == null)
-                                        alertDialog = createIncomingCallDialogPrivateNumber(incomingNumberFormatted, db);
-                                    else
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot)
                                     {
-                                        //If number is blocked by user show dialog box with possibility to change to positive number
-                                        alertDialog = db.existBlock(myPhoneNumber, incomingNumberFormatted, true)
-                                                ? createIncomingCallDialogBlockedNumber(incomingNumberFormatted, db)
-                                                : createIncomingCallDialogNewNumber(incomingNumberFormatted, db);
+                                        if(dataSnapshot.getChildrenCount() == 0)
+                                        {
+                                            //Can draw overlays depends on SDK version
+                                            boolean canDrawOverlays = true;
+                                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+                                            {
+                                                if (!Settings.canDrawOverlays(ctx)) canDrawOverlays = false;
+                                            }
+
+                                            if (canDrawOverlays)
+                                            {
+                                                AlertDialog alertDialog;
+                                                //If number is private show dialog box with limited options - only block and allow
+                                                if (incomingNumber == null)
+                                                    alertDialog = createIncomingCallDialogPrivateNumber(incomingNumberFormatted, db);
+                                                else
+                                                {
+                                                    //If number is blocked by user show dialog box with possibility to change to positive number
+                                                    alertDialog = db.existBlock(myPhoneNumber, incomingNumberFormatted, true)
+                                                            ? createIncomingCallDialogBlockedNumber(incomingNumberFormatted, db)
+                                                            : createIncomingCallDialogNewNumber(incomingNumberFormatted, db);
+                                                }
+
+                                                alertDialog.getWindow().setType(getDialogLayoutFlag());
+                                                alertDialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
+                                                        | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
+                                                        | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
+                                                        | WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
+                                                alertDialog.show();
+                                            }
+                                        }
+                                        else //Phone call allowed
+                                        {
+                                            //if notification allow is enabled - show a notification
+                                            if(notificationAllowEnabled) notificationManager.notify(
+                                                    NotificationID.getID(),
+                                                    createNotification(incomingNumberFormatted, NOTIFICATION_ALLOWED).build()
+                                            );
+                                            registerPhoneBlock(db, incomingNumberFormatted, false);
+                                        }
                                     }
 
-                                    alertDialog.getWindow().setType(getDialogLayoutFlag());
-                                    alertDialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
-                                            | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
-                                            | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
-                                            | WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
-                                    alertDialog.show();
-                                }
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError databaseError) { }
+                                });
                             }
                         }
 
@@ -172,31 +200,6 @@ public class CallDetector
                         public void onCancelled(@NonNull DatabaseError databaseError) { }
                     });
 
-                    //Condition not relevant to database checks
-                    //Check if we should autoblocked (only for negative phone numbers)
-                    if((foreignBlockEnabled && isForeignIncomingCall(incomingNumberFormatted)) //OR phone number is foreign and foreignBlock is enabled
-                            || (privateBlockEnabled && incomingNumber == null) //OR phone number is private and privateBlock is enabled
-                            || (unknownBlockEnabled && incomingContactName == null)) //OR phone number is unknown and uknownBlock is enabled
-
-                    {
-                        //if notification block is enabled - show a notification
-                        if(notificationBlockEnabled) notificationManager.notify(
-                                NotificationID.getID(),
-                                createNotification(incomingNumberFormatted, NOTIFICATION_BLOCKED).build()
-                        );
-                        //decline and register
-                        declinePhone(ctx);
-                        registerPhoneBlock(db, incomingNumberFormatted, true);
-                    }
-                    else //Phone call allowed
-                    {
-                        //if notification allow is enabled - show a notification
-                        if(notificationAllowEnabled) notificationManager.notify(
-                                NotificationID.getID(),
-                                createNotification(incomingNumberFormatted, NOTIFICATION_ALLOWED).build()
-                        );
-                        registerPhoneBlock(db, incomingNumberFormatted, false);
-                    }
                     break;
                 }
                 case TelephonyManager.CALL_STATE_OFFHOOK:
