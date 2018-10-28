@@ -145,7 +145,7 @@ public class AddPhoneBlock extends AppCompatActivity implements AdapterView.OnIt
 
                         @Override
                         public void onCancelled(@NonNull DatabaseError databaseError) {
-                            Toast.makeText(v.getContext(), "Wystąpił błąd", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(v.getContext(), R.string.error, Toast.LENGTH_SHORT).show();
                         }
                     });
                     finish();

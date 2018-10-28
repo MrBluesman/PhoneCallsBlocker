@@ -134,7 +134,7 @@ public class CallDetector
                                     else falseAmount++;
                                 }
 
-                                //GLOBAL BLOCK CONDITION - TO CONSIDER
+                                //GLOBAL BLOCK CONDITION - TODO: CONSIDER CONDITION!
                                 if(trueAmount > falseAmount) {
                                     declinePhone(ctx);
                                     registerPhoneBlock(db, incomingNumberFormatted, true);
@@ -144,7 +144,7 @@ public class CallDetector
                             @Override
                             public void onCancelled(@NonNull DatabaseError databaseError)
                             {
-
+                                Toast.makeText(ctx, R.string.error, Toast.LENGTH_SHORT).show();
                             }
                         });
                     }

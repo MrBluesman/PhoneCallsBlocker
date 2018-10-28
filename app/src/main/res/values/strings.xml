@@ -6,6 +6,7 @@
     <string name="title_activity_permissions_startup">Uprawnienia</string>
     <string name="ok">OK</string>
     <string name="cancel">Anuluj</string>
+    <string name="error">Wystąpił błąd</string>
 
     <!-- Strings related to PermissionsStartupActivity -->
     <string name="permissions_startup_activity_header">
