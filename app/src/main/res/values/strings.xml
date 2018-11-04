@@ -89,10 +89,12 @@
     <!-- Strings related to AddPhoneBlock -->
     <string name="add_phone_block_title">Nowy numer</string>
     <string name="add_phone_block_nr_blocked_hint">Wpisz numer telefonu</string>
+    <string name="add_phone_block_nr_blocked_error">Podaj numer telefonu</string>
     <string name="add_phone_block_category_header">Kategoria</string>
     <string name="add_phone_block_description_hint">Opisz powód blokowania</string>
     <string name="add_phone_block_button_add">Dodaj numer do listy</string>
     <string name="add_phone_block_is_positive_switch">Dodaj jako pozytywny (tolerowany)</string>
+    <string name="add_phone_block_already_exist">Numer już istnieje na liście</string>
 
     <!-- Strings related to DetailsPhoneBlock -->
     <string name="details_phone_block_title">Szczegóły numeru</string>

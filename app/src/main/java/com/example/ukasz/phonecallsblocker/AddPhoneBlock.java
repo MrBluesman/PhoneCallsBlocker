@@ -45,9 +45,9 @@ public class AddPhoneBlock extends AppCompatActivity implements AdapterView.OnIt
     private TelephonyManager tm;
 
     /**
-     * Initialize var instances and view for start {@link AddPhoneBlock} activity.
+     * Initializes var instances and view for start {@link AddPhoneBlock} activity.
      *
-     * @param savedInstanceState Instance state.
+     * @param savedInstanceState Instance state
      */
     @Override
     @SuppressLint("HardwareIds")
@@ -56,6 +56,7 @@ public class AddPhoneBlock extends AppCompatActivity implements AdapterView.OnIt
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_phone_block);
 
+        // TODO: Refactor: Consider keeping myPhoneNumber in external common place
         //getMyPhoneNumber
         tm = (TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE);
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_NUMBERS)
@@ -106,8 +107,8 @@ public class AddPhoneBlock extends AppCompatActivity implements AdapterView.OnIt
 
                 if (nrBlocked.getText().toString().length() == 0)
                 {
-                    nrBlocked.setError("Podaj numer telefonu");
-                    Toast.makeText(v.getContext(), "Podaj numer telefonu", Toast.LENGTH_SHORT).show();
+                    nrBlocked.setError(v.getContext().getString(R.string.add_phone_block_nr_blocked_error));
+                    Toast.makeText(v.getContext(), R.string.add_phone_block_nr_blocked_error, Toast.LENGTH_SHORT).show();
                 }
                 else
                 {
@@ -117,37 +118,54 @@ public class AddPhoneBlock extends AppCompatActivity implements AdapterView.OnIt
                             : new Block(myPhoneNumber, nrBlocked.getText().toString(),
                             category.getSelectedItemPosition(), description.getText().toString(), true);
 
-                    final DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference();
-                    Query newBlockingRef = databaseRef
-                            .child("blockings")
-                            .orderByChild("nrDeclarantBlocked")
-                            .equalTo(newBlock.getNrDeclarant() + "_" + newBlock.getNrBlocked())
-                            .limitToFirst(1);
-
-                    Log.e("TEST", newBlock.getNrDeclarant() + "_" + newBlock.getNrBlocked());
-
-                    newBlockingRef.addListenerForSingleValueEvent(new ValueEventListener()
+                    //LOCAL SECTION! add to local blockings
+                    DatabaseHandler db = new DatabaseHandler(v.getContext());
+                    if(!db.existBlock(newBlock))
                     {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot dataSnapshot)
-                        {
-                            if(!dataSnapshot.exists())
-                            {
-                                Log.e("TEST_ISTNIEJE", "NIE");
-                                databaseRef.child("blockings").push().setValue(newBlock);
-                            }
-                            else
-                            {
-                                Log.e("TEST_ISTNIEJE", "TAK");
-                                Toast.makeText(v.getContext(), "Numer istnieje już na liście", Toast.LENGTH_SHORT).show();
-                            }
-                        }
+                        db.addBlocking(newBlock);
+                        //ADD to blockings list to make notify data changed possible for adapter
+                        PhoneBlockFragment.blockings.add(newBlock);
+                    }
+                    else
+                    {
+                        Toast.makeText(v.getContext(), R.string.add_phone_block_already_exist, Toast.LENGTH_SHORT).show();
+                    }
 
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError databaseError) {
-                            Toast.makeText(v.getContext(), R.string.error, Toast.LENGTH_SHORT).show();
-                        }
-                    });
+                    //GLOBAL SECTION! add to global blockings if sync is enabled
+                    boolean syncEnabled =  getSharedPreferences("data", Context.MODE_PRIVATE)
+                            .getBoolean("syncEnabled", false);
+
+                    if(syncEnabled)
+                    {
+                        final DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference();
+                        Query newBlockingRef = databaseRef
+                                .child("blockings")
+                                .orderByChild("nrDeclarantBlocked")
+                                .equalTo(newBlock.getNrDeclarant() + "_" + newBlock.getNrBlocked())
+                                .limitToFirst(1);
+
+                        Log.e("TEST", newBlock.getNrDeclarant() + "_" + newBlock.getNrBlocked());
+
+                        newBlockingRef.addListenerForSingleValueEvent(new ValueEventListener()
+                        {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot)
+                            {
+                                if(!dataSnapshot.exists())
+                                {
+                                    Log.e("TEST_ISTNIEJE", "NIE");
+                                    databaseRef.child("blockings").push().setValue(newBlock);
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError)
+                            {
+                                Toast.makeText(v.getContext(), R.string.error, Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+
                     finish();
                 }
             }
@@ -157,7 +175,7 @@ public class AddPhoneBlock extends AppCompatActivity implements AdapterView.OnIt
     /**
      * Loads categories from database to spinner.
      *
-     * @param spinner spinner which will have a set adapter with loaded categories.
+     * @param spinner spinner which will have a set adapter with loaded categories
      */
     public void loadCategoriesToSpinner(Spinner spinner)
     {
@@ -169,10 +187,10 @@ public class AddPhoneBlock extends AppCompatActivity implements AdapterView.OnIt
     }
 
     /**
-     * Catch the selected category as one of {@link MenuItem} item.
+     * Catches the selected category as one of {@link MenuItem} item.
      *
-     * @param item {@link MenuItem} item - selected category.
-     * @return This method applied to superclass with this item.
+     * @param item {@link MenuItem} item - selected category
+     * @return This method applied to superclass with this item
      */
     @Override
     public boolean onOptionsItemSelected(MenuItem item)
