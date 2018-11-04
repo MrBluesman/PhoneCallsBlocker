@@ -30,8 +30,6 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.os.Bundle;
 import android.telephony.TelephonyManager;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 
 import android.widget.Toast;
@@ -39,8 +37,6 @@ import android.widget.Toast;
 import com.example.ukasz.androidsqlite.Block;
 import com.example.ukasz.androidsqlite.DatabaseHandler;
 import com.example.ukasz.phonecallsblocker.tab_layout_helper.CustomViewPager;
-
-import java.text.ParseException;
 
 public class StartActivity extends AppCompatActivity implements SettingsFragment.OnFragmentInteractionListener
 {
@@ -71,6 +67,9 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
     private boolean foreignBlockEnabled;
     private boolean privateBlockEnabled;
     private boolean unknownBlockEnabled;
+
+    //SYnc options
+    private boolean syncEnabled;
 
     //Notifications options
     private boolean notificationBlockEnabled;
@@ -182,7 +181,7 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
             }
         });
 
-        //Add from registyr listener
+        //Add from registry listener
         com.github.clans.fab.FloatingActionButton fab_add_calls_registry = findViewById(R.id.start_activity_add_calls_registry);
         fab_add_calls_registry.setOnClickListener(new View.OnClickListener()
         {
@@ -234,6 +233,9 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
         foreignBlockEnabled = data.getBoolean("foreignBlockEnabled", false);
         privateBlockEnabled = data.getBoolean("privateBlockEnabled", false);
         unknownBlockEnabled = data.getBoolean("unknownBlockEnabled", false);
+
+        //sync settings
+        syncEnabled = data.getBoolean("syncEnabled", false);
 
         //notification settings
         notificationBlockEnabled = data.getBoolean("notificationBlockEnabled", false);
@@ -419,6 +421,15 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
         return unknownBlockEnabled;
     }
 
+    /**
+     * syncEnabled getter.
+     *
+     * @return value of syncEnabled;
+     */
+    public boolean getSyncEnabled()
+    {
+        return syncEnabled;
+    }
     /**
      * notificationBlockEnabled getter.
      *

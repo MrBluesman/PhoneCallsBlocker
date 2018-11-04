@@ -36,6 +36,9 @@ public class SettingsFragment extends Fragment
     private Switch privateBlockSwitch;
     private Switch unknownBlockSwitch;
 
+    //Sync settings switches
+    private Switch syncSwitch;
+
     //Notifications settings switches
     private Switch notificationBlockSwitch;
     private Switch notificationAllowSwitch;
@@ -107,6 +110,9 @@ public class SettingsFragment extends Fragment
         foreignBlockSwitch = getView().findViewById(R.id.settings_fragment_switch3_foreign_block);
         privateBlockSwitch = getView().findViewById(R.id.settings_fragment_switch4_private_block);
         unknownBlockSwitch = getView().findViewById(R.id.settings_fragment_switch5_unknown_block);
+
+        //Switches to enable/disable sync local and global blockings lists
+        syncSwitch = getView().findViewById(R.id.settings_fragment_switch6_allow_sync);
 
         //Switches to enable/disable notifications options
         notificationBlockSwitch = getView().findViewById(R.id.settings_fragment_switch7_notification_block);
@@ -219,6 +225,24 @@ public class SettingsFragment extends Fragment
             }
         });
 
+        //Click listener for enable or disable sync blockings lists
+        syncSwitch.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                //get syncEnabled from data SharedPreferences
+                boolean syncEnabled = !data.getBoolean("syncEnabled", true);
+
+                syncSwitch.setChecked(syncEnabled);
+
+                //Save settings in SharedPreferences
+                SharedPreferences.Editor editDataSettings = data.edit();
+                editDataSettings.putBoolean("syncEnabled", syncEnabled);
+                editDataSettings.apply(); //commit
+            }
+        });
+
         //Click listener for enable or disable block notification
         notificationBlockSwitch.setOnClickListener(new View.OnClickListener()
         {
@@ -267,6 +291,7 @@ public class SettingsFragment extends Fragment
         boolean foreignBlockEnabled = data.getBoolean("foreignBlockEnabled", false);
         boolean privateBlockEnabled = data.getBoolean("privateBlockEnabled", false);
         boolean unknownBlockEnabled = data.getBoolean("unknownBlockEnabled", false);
+        boolean syncEnabled = data.getBoolean("syncEnabled", false);
         boolean notificationBlockEnabled = data.getBoolean("notificationBlockEnabled", false);
         boolean notificationAllowEnabled = data.getBoolean("notificationAllowEnabled", false);
 
@@ -275,6 +300,9 @@ public class SettingsFragment extends Fragment
         autoBlockSwitch.setChecked(autoBlockEnabled);
         foreignBlockSwitch.setChecked(foreignBlockEnabled);
         privateBlockSwitch.setChecked(privateBlockEnabled);
+
+        //sync settings
+        syncSwitch.setChecked(syncEnabled);
 
         //notification settings
         notificationBlockSwitch.setChecked(notificationBlockEnabled);
