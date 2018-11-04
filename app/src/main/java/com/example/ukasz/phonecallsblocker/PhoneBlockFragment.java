@@ -21,10 +21,17 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.example.ukasz.androidsqlite.Block;
 import com.example.ukasz.androidsqlite.DatabaseHandler;
 import com.example.ukasz.phonecallsblocker.list_helper.DividerItemDecoration;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -518,13 +525,46 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
         adapter.resetAnimationIndex();
         List<Integer> selectedItemPositions =
                 adapter.getSelectedItemsAsList();
+
+        final DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference();
+
         for (int i = selectedItemPositions.size() - 1; i >= 0; i--)
         {
+            //Local deleting
             int positionToDelete = selectedItemPositions.get(i);
             Block b = blockings.get(positionToDelete);
             db.deleteBlocking(b);
             adapter.removeData(positionToDelete);
+
+            //GLOBAL DELETING - if sync is enabled
+            boolean syncEnabled =  recyclerView.getContext().getSharedPreferences("data", Context.MODE_PRIVATE)
+                    .getBoolean("syncEnabled", false);
+
+            if(syncEnabled)
+            {
+                Query blockingToDeleteRef = databaseRef
+                        .child("blockings")
+                        .orderByChild("nrDeclarantBlocked")
+                        .equalTo(b.getNrDeclarant() + "_" + b.getNrBlocked())
+                        .limitToFirst(1);
+
+                blockingToDeleteRef.addListenerForSingleValueEvent(new ValueEventListener()
+                {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot)
+                    {
+                        dataSnapshot.getChildren().iterator().next().getRef().removeValue();
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError)
+                    {
+                        Toast.makeText(getContext(), R.string.error, Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
         }
+
         adapter.notifyDataSetChanged();
     }
 
