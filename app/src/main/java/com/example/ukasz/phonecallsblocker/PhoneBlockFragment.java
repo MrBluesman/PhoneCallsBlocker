@@ -1,18 +1,14 @@
 package com.example.ukasz.phonecallsblocker;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.telephony.TelephonyManager;
 import android.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
@@ -29,11 +25,8 @@ import android.view.ViewGroup;
 import com.example.ukasz.androidsqlite.Block;
 import com.example.ukasz.androidsqlite.DatabaseHandler;
 import com.example.ukasz.phonecallsblocker.list_helper.DividerItemDecoration;
-import com.firebase.ui.database.FirebaseRecyclerOptions;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -41,19 +34,15 @@ import java.util.Objects;
  * A fragment representing a list of Blocks.
  */
 public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener,
-        MyPhoneBlockRecyclerViewAdapter.BlockAdapterListener {
+        MyPhoneBlockRecyclerViewAdapter.BlockAdapterListener
+{
 
     private static final String ARG_COLUMN_COUNT = "column-count";
     private int mColumnCount = 1;
     private MyPhoneBlockRecyclerViewAdapter adapter;
     private RecyclerView recyclerView;
-    private DatabaseReference databaseRef;
-    private Query blockingsRef;
-    FirebaseRecyclerOptions<Block> phoneBlockRecyclerOptions;
+    public static List<Block> blockings = new ArrayList<>(); //adapter data
     DatabaseHandler db;
-    /* TODO: Refactor!!! One place for tm and user phone info data */
-    private String myPhoneNumber;
-    private TelephonyManager tm;
 
     private SwipeRefreshLayout swipeRefreshLayout;
     private ActionModeCallback actionModeCallback;
@@ -63,8 +52,8 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
      */
-    public PhoneBlockFragment() {
-
+    public PhoneBlockFragment()
+    {
     }
 
     /**
@@ -74,7 +63,8 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
      * @return new instance of this {@link PhoneBlockFragment}
      */
     @SuppressWarnings("unused")
-    public static PhoneBlockFragment newInstance(int columnCount) {
+    public static PhoneBlockFragment newInstance(int columnCount)
+    {
         PhoneBlockFragment fragment = new PhoneBlockFragment();
         Bundle args = new Bundle();
         args.putInt(ARG_COLUMN_COUNT, columnCount);
@@ -86,32 +76,11 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
      * Runs on resume application.
      * Notify data set changed.
      */
-    @Override
-    public void onResume() {
+    public void onResume()
+    {
         super.onResume();
+        adapter.notifyDataSetChanged();
         Log.e("PhoneBlockFragment", "onResume()");
-    }
-
-    /**
-     * Runs on start of {@link PhoneBlockFragment}.
-     * Starts listening the adapter.
-     */
-    @Override
-    public void onStart() {
-        super.onStart();
-        adapter.startListening();
-        Log.e("PhoneBlockFragment", "onStart()");
-    }
-
-    /**
-     * Runs on stop of {@link PhoneBlockFragment}.
-     * Stops listening the adapter.
-     */
-    @Override
-    public void onStop() {
-        super.onStop();
-        adapter.stopListening();
-        Log.e("PhoneBlockFragment", "onStop()");
     }
 
     /**
@@ -121,7 +90,8 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
      */
     @SuppressLint("HardwareIds")
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
 
@@ -133,16 +103,6 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
 
         //create a action mode callback
         actionModeCallback = new ActionModeCallback();
-
-        /* TODO: Refactor!!! One place for tm and user phone info data */
-        //getMyPhoneNumber
-        tm = (TelephonyManager) Objects.requireNonNull(getContext()).getSystemService(Context.TELEPHONY_SERVICE);
-        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.READ_PHONE_NUMBERS)
-                != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.READ_PHONE_STATE)
-                != PackageManager.PERMISSION_GRANTED) return;
-        myPhoneNumber = !tm.getLine1Number().equals("") ? tm.getLine1Number() : tm.getSubscriberId();
-        myPhoneNumber = !myPhoneNumber.equals("") ? myPhoneNumber : tm.getSimSerialNumber();
-        Log.e("My number: ", myPhoneNumber);
     }
 
     /**
@@ -168,12 +128,6 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
         swipeRefreshLayout = rootView.findViewById(R.id.swipe_refresh_layout);
         swipeRefreshLayout.setOnRefreshListener(this);
 
-        //Firebase realtime database references
-        //TODO: initialize keep Synced when is really needed and remember to unSync it
-        databaseRef = FirebaseDatabase.getInstance().getReference();
-        blockingsRef = databaseRef.child("blockings").orderByChild("nrDeclarant").equalTo(myPhoneNumber);
-        blockingsRef.getRef().keepSynced(true);
-
         //Set the adapter
         if (view instanceof RecyclerView)
         {
@@ -188,11 +142,8 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
 
-            phoneBlockRecyclerOptions = new FirebaseRecyclerOptions.Builder<Block>()
-                    .setQuery(blockingsRef, Block.class)
-                    .build();
-            adapter = new MyPhoneBlockRecyclerViewAdapter(phoneBlockRecyclerOptions, context, this);
-
+            adapter = new MyPhoneBlockRecyclerViewAdapter(context, blockings, this);
+            adapter.notifyDataSetChanged();
             recyclerView.setItemAnimator(new DefaultItemAnimator());
             recyclerView.addItemDecoration(new DividerItemDecoration(context, LinearLayoutManager.VERTICAL));
             recyclerView.setAdapter(adapter);
@@ -231,8 +182,12 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
     private void loadBlockings()
     {
         swipeRefreshLayout.setRefreshing(true);
-        adapter.stopListening();
-        adapter.startListening();
+        List<Block> blockingsToAddFromDb = db.getAllBlockings();
+
+        blockings.clear();
+        blockings.addAll(blockingsToAddFromDb);
+
+        adapter.notifyDataSetChanged();
         swipeRefreshLayout.setRefreshing(false);
     }
 
@@ -348,7 +303,7 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
         else
         {
             // read the block which removes bold from the row
-            Block block = adapter.getItem(position);
+            Block block = blockings.get(position);
             startDetailsActivityForBlocking(block.getNrBlocked());
         }
     }
@@ -497,14 +452,14 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
                 case R.id.menu_action_details:
                     //go to the number details
                     itemPosition = adapter.getSelectedItem();
-                    block = adapter.getItem(itemPosition);
+                    block = blockings.get(itemPosition);
                     startDetailsActivityForBlocking(block.getNrBlocked());
                     mode.finish();
                     return true;
                 case R.id.menu_action_edit:
                     //go to the number details
                     itemPosition = adapter.getSelectedItem();
-                    block = adapter.getItem(itemPosition);
+                    block = blockings.get(itemPosition);
                     startEditActivityForBlocking(block.getNrBlocked());
                     mode.finish();
                     return true;
@@ -520,6 +475,7 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
                     return true;
                 case R.id.menu_action_select_all:
                     //select all blockings
+//                    adapter.selectAllItems();
                     toggleAll();
                     return true;
                 default:
@@ -551,6 +507,7 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
                 public void run()
                 {
                     adapter.resetAnimationIndex();
+                    // mAdapter.notifyDataSetChanged();
                 }
             });
 
@@ -570,8 +527,11 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
         for (int i = selectedItemPositions.size() - 1; i >= 0; i--)
         {
             int positionToDelete = selectedItemPositions.get(i);
-            adapter.getRef(positionToDelete).removeValue();
+            Block b = blockings.get(positionToDelete);
+            db.deleteBlocking(b);
+            adapter.removeData(positionToDelete);
         }
+        adapter.notifyDataSetChanged();
     }
 
     /**
@@ -587,10 +547,11 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
         for (int i = selectedItemPositions.size() - 1; i >= 0; i--)
         {
             int positionToChange = selectedItemPositions.get(i);
-            Block block = adapter.getItem(positionToChange);
-            block.setNrRating(rating);
-            adapter.getRef(positionToChange).setValue(block);
+            Block b = blockings.get(positionToChange);
+            b.setNrRating(rating);
+            db.updateBlocking(b);
         }
+        adapter.notifyDataSetChanged();
     }
 
     /**
