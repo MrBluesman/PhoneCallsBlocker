@@ -133,14 +133,8 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
         {
             Context context = view.getContext();
             recyclerView = (RecyclerView) view;
-            if (mColumnCount <= 1)
-            {
-                recyclerView.setLayoutManager(new LinearLayoutManager(context));
-            }
-            else
-            {
-                recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
-            }
+            if (mColumnCount <= 1) recyclerView.setLayoutManager(new LinearLayoutManager(context));
+            else recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
 
             adapter = new MyPhoneBlockRecyclerViewAdapter(context, blockings, this);
             adapter.notifyDataSetChanged();

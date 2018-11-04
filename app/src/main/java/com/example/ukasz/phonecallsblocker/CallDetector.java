@@ -593,37 +593,53 @@ public class CallDetector
 
         final Block newBlock = new Block(myPhoneNumber, phoneNumber, category, "", rating);
 
-        final DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference();
-        Query newBlockingRef = databaseRef
-                .child("blockings")
-                .orderByChild("nrDeclarantBlocked")
-                .equalTo(newBlock.getNrDeclarant() + "_" + newBlock.getNrBlocked())
-                .limitToFirst(1);
-
-        Log.e("ADD ALERT TEST: ", newBlock.getNrDeclarant() + "_" + newBlock.getNrBlocked());
-
-        newBlockingRef.addListenerForSingleValueEvent(new ValueEventListener()
+        //LOCAL SECTION! add to local blockings
+        if(!db.existBlock(newBlock))
         {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot)
-            {
-                if(!dataSnapshot.exists())
-                {
-                    Log.e("TEST_ISTNIEJE", "NIE");
-                    databaseRef.child("blockings").push().setValue(newBlock);
-                }
-                else
-                {
-                    Log.e("TEST_ISTNIEJE", "TAK");
-                    Toast.makeText(ctx,  R.string.call_detector_already_blocked, Toast.LENGTH_SHORT).show();
-                }
-            }
+            db.addBlocking(newBlock);
+            //ADD to blocking list to make notify data changed possible for adapter
+            Toast.makeText(ctx, R.string.add_phone_block_added, Toast.LENGTH_SHORT).show();
+            //TODO: Refresh adapter after add
+            PhoneBlockFragment.blockings.add(newBlock);
+        }
+        else
+        {
+            Toast.makeText(ctx, R.string.add_phone_block_already_exist, Toast.LENGTH_SHORT).show();
+        }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                Toast.makeText(ctx, "Wystąpił błąd", Toast.LENGTH_SHORT).show();
-            }
-        });
+        //GLOBAL SECTION! add to global blockings if sync is enabled
+        boolean syncEnabled =  ctx.getSharedPreferences("data", Context.MODE_PRIVATE)
+                .getBoolean("syncEnabled", false);
+
+        if(syncEnabled)
+        {
+            final DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference();
+            Query newBlockingRef = databaseRef
+                    .child("blockings")
+                    .orderByChild("nrDeclarantBlocked")
+                    .equalTo(newBlock.getNrDeclarant() + "_" + newBlock.getNrBlocked())
+                    .limitToFirst(1);
+
+
+            newBlockingRef.addListenerForSingleValueEvent(new ValueEventListener()
+            {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot)
+                {
+                    if(!dataSnapshot.exists())
+                    {
+                        Log.e("TEST_ISTNIEJE", "NIE");
+                        databaseRef.child("blockings").push().setValue(newBlock);
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError)
+                {
+                    Toast.makeText(ctx, R.string.error, Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
     }
 
     /**
