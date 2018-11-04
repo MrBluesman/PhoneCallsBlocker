@@ -37,6 +37,12 @@ import android.widget.Toast;
 import com.example.ukasz.androidsqlite.Block;
 import com.example.ukasz.androidsqlite.DatabaseHandler;
 import com.example.ukasz.phonecallsblocker.tab_layout_helper.CustomViewPager;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
 public class StartActivity extends AppCompatActivity implements SettingsFragment.OnFragmentInteractionListener
 {
@@ -60,6 +66,9 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
 
     //The {@link TelephonyManager} for fetch user phone number
     private TelephonyManager tm;
+
+    //phone owner number
+    private String myPhoneNumber;
 
     //Blocking options
     private boolean detectEnabled;
@@ -91,6 +100,7 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
      *
      * @param savedInstanceState saved instance of Activity state
      */
+    @SuppressLint("HardwareIds")
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -106,6 +116,15 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
         //Create the adapter that will return a fragment for each of the three
         //primary sections of the activity.
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+
+        // TODO: Refactor: Consider keeping myPhoneNumber in external common place
+        //getMyPhoneNumber
+        tm = (TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_NUMBERS)
+                != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE)
+                != PackageManager.PERMISSION_GRANTED) return;
+        myPhoneNumber = !tm.getLine1Number().equals("") ? tm.getLine1Number() : tm.getSubscriberId();
+        myPhoneNumber = !myPhoneNumber.equals("") ? myPhoneNumber : tm.getSimSerialNumber();
 
         //Set up the ViewPager with the sections adapter.
         mViewPager = findViewById(R.id.start_activity_container);
@@ -762,11 +781,11 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
                     }
                 });
 
-
         return builder.create();
     }
 
     /**
+     * TODO: Refactor! If possible keep adding phone number method in one common place
      * Adds nrBlocked to the blocking list.
      *
      * @param nrBlocked phone number to add to blocking list
@@ -776,27 +795,54 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
     {
         DatabaseHandler db = new DatabaseHandler(StartActivity.this);
 
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_SMS)
-                != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_NUMBERS)
-                != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE)
-                != PackageManager.PERMISSION_GRANTED) return;
-
-        @SuppressLint("HardwareIds")
-        Block newBlock = new Block(tm.getLine1Number(), nrBlocked,
+        final Block newBlock = new Block(myPhoneNumber, nrBlocked,
                 1, "", rating);
 
-
+        //LOCAL SECTION! add to local blockings
         if(!db.existBlock(newBlock))
         {
             db.addBlocking(newBlock);
             //ADD to blocking list to make notify data changed possible for adapter
-            Toast.makeText(StartActivity.this, "Numer dodany", Toast.LENGTH_SHORT).show();
-            //TODO: add phone block to adapter
-//            PhoneBlockFragment.blockings.add(newBlock);
+            Toast.makeText(StartActivity.this, R.string.add_phone_block_added, Toast.LENGTH_SHORT).show();
+            //TODO: Refresh adapter after add
+            PhoneBlockFragment.blockings.add(newBlock);
         }
         else
         {
-            Toast.makeText(StartActivity.this, "Numer jest już na liście", Toast.LENGTH_SHORT).show();
+            Toast.makeText(StartActivity.this, R.string.add_phone_block_already_exist, Toast.LENGTH_SHORT).show();
+        }
+
+        //GLOBAL SECTION! add to global blockings if sync is enabled
+        boolean syncEnabled =  getSharedPreferences("data", Context.MODE_PRIVATE)
+                .getBoolean("syncEnabled", false);
+
+        if(syncEnabled)
+        {
+            final DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference();
+            Query newBlockingRef = databaseRef
+                    .child("blockings")
+                    .orderByChild("nrDeclarantBlocked")
+                    .equalTo(newBlock.getNrDeclarant() + "_" + newBlock.getNrBlocked())
+                    .limitToFirst(1);
+
+            newBlockingRef.addListenerForSingleValueEvent(new ValueEventListener()
+            {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot)
+                {
+                    if(!dataSnapshot.exists())
+                    {
+                        Log.e("TEST_ISTNIEJE", "NIE");
+                        databaseRef.child("blockings").push().setValue(newBlock);
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError)
+                {
+                    Toast.makeText(StartActivity.this, R.string.error, Toast.LENGTH_SHORT).show();
+                }
+            });
         }
     }
 }

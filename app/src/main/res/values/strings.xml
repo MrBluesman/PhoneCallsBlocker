@@ -94,6 +94,7 @@
     <string name="add_phone_block_description_hint">Opisz powód blokowania</string>
     <string name="add_phone_block_button_add">Dodaj numer do listy</string>
     <string name="add_phone_block_is_positive_switch">Dodaj jako pozytywny (tolerowany)</string>
+    <string name="add_phone_block_added">Numer dodany</string>
     <string name="add_phone_block_already_exist">Numer już istnieje na liście</string>
 
     <!-- Strings related to DetailsPhoneBlock -->

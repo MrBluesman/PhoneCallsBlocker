@@ -112,6 +112,7 @@ public class AddPhoneBlock extends AppCompatActivity implements AdapterView.OnIt
                 }
                 else
                 {
+                    // TODO: Refactor! If possible keep adding phone number method in one common place
                     //Block data depends on isPositiveSwitch
                     final Block newBlock = isPositiveSwitch.isChecked() ? new Block(myPhoneNumber, nrBlocked.getText().toString(),
                             0, description.getText().toString(), false)
@@ -124,6 +125,7 @@ public class AddPhoneBlock extends AppCompatActivity implements AdapterView.OnIt
                     {
                         db.addBlocking(newBlock);
                         //ADD to blockings list to make notify data changed possible for adapter
+                        Toast.makeText(v.getContext(), R.string.add_phone_block_added, Toast.LENGTH_SHORT).show();
                         PhoneBlockFragment.blockings.add(newBlock);
                     }
                     else
@@ -143,8 +145,6 @@ public class AddPhoneBlock extends AppCompatActivity implements AdapterView.OnIt
                                 .orderByChild("nrDeclarantBlocked")
                                 .equalTo(newBlock.getNrDeclarant() + "_" + newBlock.getNrBlocked())
                                 .limitToFirst(1);
-
-                        Log.e("TEST", newBlock.getNrDeclarant() + "_" + newBlock.getNrBlocked());
 
                         newBlockingRef.addListenerForSingleValueEvent(new ValueEventListener()
                         {
