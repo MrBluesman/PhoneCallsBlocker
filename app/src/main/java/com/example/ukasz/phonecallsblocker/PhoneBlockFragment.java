@@ -34,6 +34,7 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
@@ -573,17 +574,52 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
      * @param rating rating which will be set up for all selected blockings
      *               true if block, false if allow
      */
-    private void setBlockingsRating(boolean rating)
+    private void setBlockingsRating(final boolean rating)
     {
+
         adapter.resetAnimationIndex();
         List<Integer> selectedItemPositions =
                 adapter.getSelectedItemsAsList();
+
+        final DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference();
+
         for (int i = selectedItemPositions.size() - 1; i >= 0; i--)
         {
+            //LOCAL UPDATING
             int positionToChange = selectedItemPositions.get(i);
             Block b = blockings.get(positionToChange);
             b.setNrRating(rating);
             db.updateBlocking(b);
+
+            //GLOBAL UPDATING - if sync is enabled
+            boolean syncEnabled =  recyclerView.getContext().getSharedPreferences("data", Context.MODE_PRIVATE)
+                    .getBoolean("syncEnabled", false);
+
+            if(syncEnabled)
+            {
+                Query blockingToUpdateRef = databaseRef
+                        .child("blockings")
+                        .orderByChild("nrDeclarantBlocked")
+                        .equalTo(b.getNrDeclarant() + "_" + b.getNrBlocked())
+                        .limitToFirst(1);
+
+                blockingToUpdateRef.addListenerForSingleValueEvent(new ValueEventListener()
+                {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot)
+                    {
+                        HashMap<String, Object> updateData = new HashMap<>();
+                        updateData.put("nrRating", rating);
+                        dataSnapshot.getChildren().iterator().next().getRef().updateChildren(updateData);
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError)
+                    {
+                        Toast.makeText(getContext(), R.string.error, Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
         }
         adapter.notifyDataSetChanged();
     }

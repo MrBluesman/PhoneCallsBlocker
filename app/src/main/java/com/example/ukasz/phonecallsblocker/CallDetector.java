@@ -679,7 +679,6 @@ public class CallDetector
                 {
                     HashMap<String, Object> updateData = new HashMap<>();
                     updateData.put("nrRating", rating);
-                    updateData.put("nrDeclarantBlockedRating", myPhoneNumber+"_"+phoneNumber+"_"+rating);
                     dataSnapshot.getChildren().iterator().next().getRef().updateChildren(updateData);
                 }
             }
