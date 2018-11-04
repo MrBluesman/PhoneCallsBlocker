@@ -109,8 +109,8 @@ public class SettingsFragment extends Fragment
         unknownBlockSwitch = getView().findViewById(R.id.settings_fragment_switch5_unknown_block);
 
         //Switches to enable/disable notifications options
-        notificationBlockSwitch = getView().findViewById(R.id.settings_fragment_switch6_notification_block);
-        notificationAllowSwitch = getView().findViewById(R.id.settings_fragment_switch7_notification_allow);
+        notificationBlockSwitch = getView().findViewById(R.id.settings_fragment_switch7_notification_block);
+        notificationAllowSwitch = getView().findViewById(R.id.settings_fragment_switch8_notification_allow);
 
         loadSettingsState();
 

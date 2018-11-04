@@ -62,6 +62,8 @@
     <string name="settings_fragment_foreign_block_switch">Blokowanie numerów zagranicznych</string>
     <string name="settings_fragment_private_block_switch">Blokowanie numerów zastrzeżonych</string>
     <string name="settings_fragment_unknown_block_switch">Blokowanie nieznanych numerów</string>
+    <string name="settings_fragment_global_list_section_title">Opinie o numerach</string>
+    <string name="settings_fragment_global_list_allow_sync_switch">Pozwól na wykorzystanie Twoich opinii do ulepszenia skuteczności blokowań (zalecane)</string>
     <string name="settings_fragment_notification_section_title">Powiadomienia</string>
     <string name="settings_fragment_notification_block_switch">Powiadomienia o blokowaniach</string>
     <string name="settings_fragment_notification_allow_switch">Powiadamiaj również o przepuszczonych połączeniach</string>

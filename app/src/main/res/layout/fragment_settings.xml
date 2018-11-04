@@ -81,6 +81,30 @@
             app:layout_constraintTop_toBottomOf="@+id/settings_fragment_switch4_private_block" />
 
         <TextView
+            android:id="@+id/settings_fragment_global_list_section_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/settings_fragment_global_list_section_title"
+            android:textAlignment="viewStart"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:typeface="normal"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/settings_fragment_switch5_unknown_block" />
+
+        <Switch
+            android:id="@+id/settings_fragment_switch6_allow_sync"
+            android:layout_width="match_parent"
+            android:layout_height="20pt"
+            android:layout_marginTop="8dp"
+            android:text="@string/settings_fragment_global_list_allow_sync_switch"
+            android:visibility="visible"
+
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/settings_fragment_global_list_section_title" />
+
+        <TextView
             android:id="@+id/settings_fragment_notification_section_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -91,10 +115,10 @@
             android:textStyle="bold"
             android:typeface="normal"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/settings_fragment_switch5_unknown_block" />
+            app:layout_constraintTop_toBottomOf="@+id/settings_fragment_switch6_allow_sync" />
 
         <Switch
-            android:id="@+id/settings_fragment_switch6_notification_block"
+            android:id="@+id/settings_fragment_switch7_notification_block"
             android:layout_width="match_parent"
             android:layout_height="20pt"
             android:layout_marginTop="8dp"
@@ -105,7 +129,7 @@
             app:layout_constraintTop_toBottomOf="@+id/settings_fragment_notification_section_title" />
 
         <Switch
-            android:id="@+id/settings_fragment_switch7_notification_allow"
+            android:id="@+id/settings_fragment_switch8_notification_allow"
             android:layout_width="match_parent"
             android:layout_height="20pt"
             android:layout_marginTop="8dp"
@@ -113,7 +137,7 @@
 
             android:visibility="visible"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/settings_fragment_switch6_notification_block" />
+            app:layout_constraintTop_toBottomOf="@+id/settings_fragment_switch7_notification_block" />
 
         <View
             android:layout_width="match_parent"
