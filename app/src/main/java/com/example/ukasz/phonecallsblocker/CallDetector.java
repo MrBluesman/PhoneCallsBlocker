@@ -658,6 +658,7 @@ public class CallDetector
 
     /**
      * Updates the phone block with new rating value.
+     * TODO: Almost the same like in PhoneBlockFragment - set blockings rating - consider keep it in one place
      *
      * @param db {@link DatabaseHandler} to make a update phoneNumber exists
      * @param phoneNumber phone number which rating will be updated
@@ -665,27 +666,44 @@ public class CallDetector
      */
     private void updatePhoneBlock(DatabaseHandler db, final String phoneNumber, final boolean rating)
     {
-        final Query blockings = mDatabase
-                .child("blockings")
-                .orderByChild("nrDeclarantBlocked")
-                .equalTo(myPhoneNumber + "_" + phoneNumber);
+        //LOCAL UPDATING
+        Block updatedBlock = db.getBlocking(myPhoneNumber, phoneNumber);
+        updatedBlock.setNrRating(rating);
+        db.updateBlocking(updatedBlock);
 
-        blockings.addListenerForSingleValueEvent(new ValueEventListener()
+        //TODO: Odświeżanie adaptera po zmianie
+
+        //GLOBAL UPDATING - if sync is enabled
+        boolean syncEnabled =  ctx.getSharedPreferences("data", Context.MODE_PRIVATE)
+                .getBoolean("syncEnabled", false);
+
+        if(syncEnabled)
         {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot)
-            {
-                if(dataSnapshot.exists())
-                {
-                    HashMap<String, Object> updateData = new HashMap<>();
-                    updateData.put("nrRating", rating);
-                    dataSnapshot.getChildren().iterator().next().getRef().updateChildren(updateData);
-                }
-            }
+            final Query blockings = mDatabase
+                    .child("blockings")
+                    .orderByChild("nrDeclarantBlocked")
+                    .equalTo(myPhoneNumber + "_" + phoneNumber);
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) { }
-        });
+            blockings.addListenerForSingleValueEvent(new ValueEventListener()
+            {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot)
+                {
+                    if(dataSnapshot.exists())
+                    {
+                        HashMap<String, Object> updateData = new HashMap<>();
+                        updateData.put("nrRating", rating);
+                        dataSnapshot.getChildren().iterator().next().getRef().updateChildren(updateData);
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError)
+                {
+                    Toast.makeText(ctx, R.string.error, Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
     }
 
     /**
