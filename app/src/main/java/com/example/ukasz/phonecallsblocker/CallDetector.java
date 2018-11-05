@@ -386,7 +386,7 @@ public class CallDetector
         private AlertDialog createIncomingCallDialogBlockedNumber(final String incomingNumber, final DatabaseHandler db)
         {
             final AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
-            builder.setTitle(incomingNumber + " \n Ten numer jest przez Ciebie blokowany.");
+            builder.setTitle(incomingNumber + "\n" + ctx.getString(R.string.call_detector_is_blocked_by_you)+".");
 
             builder.setItems(R.array.incoming_blocked_number_options,
                     new DialogInterface.OnClickListener()
