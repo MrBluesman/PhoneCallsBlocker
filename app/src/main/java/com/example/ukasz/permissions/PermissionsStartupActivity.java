@@ -2,10 +2,13 @@ package com.example.ukasz.permissions;
 
 import android.Manifest;
 import android.annotation.TargetApi;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
+import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
@@ -57,13 +60,35 @@ public class PermissionsStartupActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
-
         //View.VISIBLE || View.GONE
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_permissions_startup);
 
+        //First run actions
+        SharedPreferences sharedPreferences = this.getSharedPreferences("data", Context.MODE_PRIVATE);
+        // Check if we need perform first run actions
+        if (!sharedPreferences.getBoolean("firstRun", false))
+        {
+            Log.e("PIERWSZY RAZ!", "PIERWSZY RAZ!");
+
+            SharedPreferences.Editor sharedPreferencesEditor = sharedPreferences.edit();
+
+            //Default settings
+            sharedPreferencesEditor.putBoolean("detectEnabled", true);
+            sharedPreferencesEditor.putBoolean("autoBlockEnabled", true);
+            sharedPreferencesEditor.putBoolean("syncEnabled", true);
+            sharedPreferencesEditor.putBoolean("notificationBlockEnabled", true);
+
+            //Disable first run flag
+            sharedPreferencesEditor.putBoolean("firstRun", true);
+
+            sharedPreferencesEditor.apply();
+        }
+
+        //Permissions -----------------------------------
         phoneStateCheckBoxPerm = findViewById(R.id.permissions_startup_activity_phone_checkbox);
         allowWindowsCheckBoxPerm = findViewById(R.id.permissions_startup_activity_windows_checkbox);
+
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M)
         {
