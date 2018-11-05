@@ -554,7 +554,10 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot)
                     {
-                        dataSnapshot.getChildren().iterator().next().getRef().removeValue();
+                        if(dataSnapshot.getChildren().iterator().hasNext())
+                        {
+                            dataSnapshot.getChildren().iterator().next().getRef().removeValue();
+                        }
                     }
 
                     @Override
@@ -608,9 +611,12 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot)
                     {
-                        HashMap<String, Object> updateData = new HashMap<>();
-                        updateData.put("nrRating", rating);
-                        dataSnapshot.getChildren().iterator().next().getRef().updateChildren(updateData);
+                        if(dataSnapshot.getChildren().iterator().hasNext())
+                        {
+                            HashMap<String, Object> updateData = new HashMap<>();
+                            updateData.put("nrRating", rating);
+                            dataSnapshot.getChildren().iterator().next().getRef().updateChildren(updateData);
+                        }
                     }
 
                     @Override

@@ -146,17 +146,21 @@ public class CallDetector
                                     | WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
                             alertDialog.show();
                         }
-                        else {
+                        else
+                        {
                             //GLOBAL BLOCKING only if auto block (global) is enabled
                             if (autoBlockEnabled) {
-                                blockings.addListenerForSingleValueEvent(new ValueEventListener() {
+                                blockings.addListenerForSingleValueEvent(new ValueEventListener()
+                                {
                                     @Override
-                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot)
+                                    {
                                         Log.e("BLOK! LICZBA! ", String.valueOf(dataSnapshot.getChildrenCount()));
                                         //Counter for count blocking category to decite whether block or not
                                         int trueAmount = 0;
                                         int falseAmount = 0;
-                                        for (DataSnapshot blockSnapshot : dataSnapshot.getChildren()) {
+                                        for (DataSnapshot blockSnapshot : dataSnapshot.getChildren())
+                                        {
                                             Block block = blockSnapshot.getValue(Block.class);
                                             assert block != null;
                                             if (block.getNrRating()) trueAmount++;
@@ -164,7 +168,8 @@ public class CallDetector
                                         }
 
                                         //GLOBAL BLOCK CONDITION - TODO: CONSIDER CONDITION!
-                                        if (trueAmount > falseAmount) {
+                                        if (trueAmount > falseAmount)
+                                        {
                                             Log.e("NIESPODZIENKA", "tu jestem :)");
                                             declinePhone(ctx);
                                             registerPhoneBlock(db, incomingNumberFormatted, true);
@@ -172,7 +177,8 @@ public class CallDetector
                                     }
 
                                     @Override
-                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                                    public void onCancelled(@NonNull DatabaseError databaseError)
+                                    {
                                         Toast.makeText(ctx, R.string.error, Toast.LENGTH_SHORT).show();
                                     }
                                 });
@@ -606,9 +612,12 @@ public class CallDetector
                 {
                     if(dataSnapshot.exists())
                     {
-                        HashMap<String, Object> updateData = new HashMap<>();
-                        updateData.put("nrRating", rating);
-                        dataSnapshot.getChildren().iterator().next().getRef().updateChildren(updateData);
+                        if(dataSnapshot.getChildren().iterator().hasNext())
+                        {
+                            HashMap<String, Object> updateData = new HashMap<>();
+                            updateData.put("nrRating", rating);
+                            dataSnapshot.getChildren().iterator().next().getRef().updateChildren(updateData);
+                        }
                     }
                 }
 
