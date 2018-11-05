@@ -232,7 +232,7 @@ public class SettingsFragment extends Fragment
             public void onClick(View v)
             {
                 //get syncEnabled from data SharedPreferences
-                boolean syncEnabled = !data.getBoolean("syncEnabled", true);
+                boolean syncEnabled = !data.getBoolean("syncEnabled", false);
 
                 syncSwitch.setChecked(syncEnabled);
 
