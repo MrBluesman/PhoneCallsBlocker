@@ -208,9 +208,7 @@ public class AddPhoneBlock extends AppCompatActivity implements AdapterView.OnIt
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id)
     {
-        CharSequence elem = (CharSequence) parent.getItemAtPosition(position);
-        Toast t = Toast.makeText(this, elem, Toast.LENGTH_SHORT);
-        t.show();
+//        CharSequence elem = (CharSequence) parent.getItemAtPosition(position);
     }
 
     @Override
