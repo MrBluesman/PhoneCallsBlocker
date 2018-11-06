@@ -230,6 +230,7 @@ public class DatabaseHandler extends SQLiteOpenHelper
                 Block block = new Block();
                 block.setNrDeclarant(cursor.getString(0));
                 block.setNrBlocked(cursor.getString(1));
+                block.setNrDeclarantBlocked(block.getNrDeclarant() + "_" + block.getNrBlocked());
                 block.setReasonCategory(Integer.parseInt(cursor.getString(2)));
                 block.setReasonDescription(cursor.getString(3));
                 block.setNrRating("1".equals(cursor.getString(4)));
