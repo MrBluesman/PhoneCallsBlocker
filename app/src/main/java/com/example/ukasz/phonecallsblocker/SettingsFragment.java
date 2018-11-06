@@ -16,6 +16,17 @@ import android.view.ViewGroup;
 import android.widget.Switch;
 import android.widget.Toast;
 
+import com.example.ukasz.androidsqlite.Block;
+import com.example.ukasz.androidsqlite.DatabaseHandler;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.HashMap;
+import java.util.List;
 import java.util.Objects;
 
 
@@ -234,6 +245,9 @@ public class SettingsFragment extends Fragment
                 //get syncEnabled from data SharedPreferences
                 boolean syncEnabled = !data.getBoolean("syncEnabled", false);
 
+                //Sync after turn off synchronization
+                if(syncEnabled) syncFirebase();
+
                 syncSwitch.setChecked(syncEnabled);
 
                 //Save settings in SharedPreferences
@@ -322,7 +336,55 @@ public class SettingsFragment extends Fragment
             SharedPreferences.Editor editDataSettings = data.edit();
             editDataSettings.putBoolean("unknownBlockEnabled", false);
             editDataSettings.apply(); //commit
-        } else unknownBlockSwitch.setChecked(unknownBlockEnabled);
+        }
+        else unknownBlockSwitch.setChecked(unknownBlockEnabled);
+    }
+
+    /**
+     * Synchronizes firebase blockings with actual local blockings.
+     */
+    private void syncFirebase()
+    {
+        DatabaseHandler db = new DatabaseHandler(getActivity());
+        List<Block> myBlockings = db.getAllBlockings();
+
+        final DatabaseReference databaseRef = FirebaseDatabase
+            .getInstance()
+            .getReference();
+
+        for (final Block block: myBlockings)
+        {
+            //Update firebase
+            Query blockingToUpdateRef = databaseRef
+                    .child("blockings")
+                    .orderByChild("nrDeclarantBlocked")
+                    .equalTo(block.getNrDeclarant() + "_" + block.getNrBlocked())
+                    .limitToFirst(1);
+
+            blockingToUpdateRef.addListenerForSingleValueEvent(new ValueEventListener()
+            {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot)
+                {
+                    if(dataSnapshot.getChildren().iterator().hasNext())
+                    {
+                        HashMap<String, Object> updateData = new HashMap<>();
+                        updateData.put("nrRating", block.getNrRating());
+                        dataSnapshot.getChildren().iterator().next().getRef().updateChildren(updateData);
+                    }
+                    else
+                    {
+                        databaseRef.child("blockings").push().setValue(block);
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError)
+                {
+                    Toast.makeText(getContext(), R.string.error, Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
     }
 
     /**
