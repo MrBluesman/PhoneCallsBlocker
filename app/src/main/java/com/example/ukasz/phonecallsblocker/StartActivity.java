@@ -46,7 +46,6 @@ import com.google.firebase.database.ValueEventListener;
 
 public class StartActivity extends AppCompatActivity implements SettingsFragment.OnFragmentInteractionListener
 {
-
     /*
     The {@link android.support.v4.view.PagerAdapter} that will provide
     fragments for each of the sections. We use a
@@ -107,9 +106,6 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start);
 
-        //load data settings (saved in shared preferences)
-        loadSettingsState();
-
         Toolbar toolbar = findViewById(R.id.start_activity_toolbar);
         setSupportActionBar(toolbar);
 
@@ -125,6 +121,12 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
                 != PackageManager.PERMISSION_GRANTED) return;
         myPhoneNumber = !tm.getLine1Number().equals("") ? tm.getLine1Number() : tm.getSubscriberId();
         myPhoneNumber = !myPhoneNumber.equals("") ? myPhoneNumber : tm.getSimSerialNumber();
+
+        //Apply first run actions
+        applyFirstRunActions();
+
+        //load data settings (saved in shared preferences)
+        loadSettingsState();
 
         //Set up the ViewPager with the sections adapter.
         mViewPager = findViewById(R.id.start_activity_container);
@@ -844,5 +846,79 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
                 }
             });
         }
+    }
+
+    /**
+     * Runs actions only after first run of the application.
+     */
+    private void applyFirstRunActions()
+    {
+        //First run actions
+        SharedPreferences sharedPreferences = this.getSharedPreferences("data", Context.MODE_PRIVATE);
+        // Check if we need perform first run actions
+        if (!sharedPreferences.getBoolean("firstRun", false))
+        {
+            loadDefaultSettings();
+            loadBlockingsFromFirebase();
+
+            SharedPreferences.Editor sharedPreferencesEditor = sharedPreferences.edit();
+            //Disable first run flag
+            sharedPreferencesEditor.putBoolean("firstRun", true);
+            sharedPreferencesEditor.apply();
+        }
+    }
+
+    /**
+     * Loads default settings state.
+     */
+    private void loadDefaultSettings()
+    {
+        SharedPreferences sharedPreferences = this.getSharedPreferences("data", Context.MODE_PRIVATE);
+        SharedPreferences.Editor sharedPreferencesEditor = sharedPreferences.edit();
+
+        //Default settings
+        sharedPreferencesEditor.putBoolean("detectEnabled", true);
+        sharedPreferencesEditor.putBoolean("autoBlockEnabled", true);
+        sharedPreferencesEditor.putBoolean("syncEnabled", true);
+        sharedPreferencesEditor.putBoolean("notificationBlockEnabled", true);
+
+        sharedPreferencesEditor.apply();
+    }
+
+    /**
+     * Loads blockings from {@link FirebaseDatabase} to local database.
+     */
+    private void loadBlockingsFromFirebase()
+    {
+        //Fetch blockings from firebase
+        Query myBlockings = FirebaseDatabase.getInstance().getReference()
+                .child("blockings")
+                .orderByChild("nrDeclarant")
+                .equalTo(myPhoneNumber);
+
+        myBlockings.addListenerForSingleValueEvent(new ValueEventListener()
+        {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot)
+            {
+                for (DataSnapshot blockSnapshot : dataSnapshot.getChildren())
+                {
+                    Block newBlock = blockSnapshot.getValue(Block.class);
+                    DatabaseHandler db = new DatabaseHandler(getApplicationContext());
+                    if(newBlock != null && !db.existBlock(newBlock))
+                    {
+                        db.addBlocking(newBlock);
+                        //ADD to blockings list to make notify data changed possible for adapter
+                        PhoneBlockFragment.blockings.add(newBlock);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError)
+            {
+                Toast.makeText(getApplicationContext(), R.string.error, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }

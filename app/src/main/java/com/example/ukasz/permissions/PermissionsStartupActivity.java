@@ -1,6 +1,7 @@
 package com.example.ukasz.permissions;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
@@ -16,15 +17,26 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.telephony.PhoneStateListener;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.example.ukasz.androidsqlite.Block;
+import com.example.ukasz.androidsqlite.DatabaseHandler;
+import com.example.ukasz.phonecallsblocker.PhoneBlockFragment;
 import com.example.ukasz.phonecallsblocker.R;
 import com.example.ukasz.phonecallsblocker.StartActivity;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
 /**
  * Class for grant permissions for the first run of app or when
@@ -42,6 +54,9 @@ public class PermissionsStartupActivity extends AppCompatActivity {
     private ImageView phoneStateWarningImage;
     private TextView allowWindowsWarningText;
     private ImageView allowWindowsWarningImage;
+
+    //my phone number
+    private String myPhoneNumber;
 
     //const Permissions Codes
     final private static int ACTION_MANAGE_OVERLAY_PERMISSION_REQUEST_CODE = 5555;
@@ -63,27 +78,6 @@ public class PermissionsStartupActivity extends AppCompatActivity {
         //View.VISIBLE || View.GONE
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_permissions_startup);
-
-        //First run actions
-        SharedPreferences sharedPreferences = this.getSharedPreferences("data", Context.MODE_PRIVATE);
-        // Check if we need perform first run actions
-        if (!sharedPreferences.getBoolean("firstRun", false))
-        {
-            Log.e("PIERWSZY RAZ!", "PIERWSZY RAZ!");
-
-            SharedPreferences.Editor sharedPreferencesEditor = sharedPreferences.edit();
-
-            //Default settings
-            sharedPreferencesEditor.putBoolean("detectEnabled", true);
-            sharedPreferencesEditor.putBoolean("autoBlockEnabled", true);
-            sharedPreferencesEditor.putBoolean("syncEnabled", true);
-            sharedPreferencesEditor.putBoolean("notificationBlockEnabled", true);
-
-            //Disable first run flag
-            sharedPreferencesEditor.putBoolean("firstRun", true);
-
-            sharedPreferencesEditor.apply();
-        }
 
         //Permissions -----------------------------------
         phoneStateCheckBoxPerm = findViewById(R.id.permissions_startup_activity_phone_checkbox);
