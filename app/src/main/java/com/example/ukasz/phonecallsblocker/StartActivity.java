@@ -2,6 +2,7 @@ package com.example.ukasz.phonecallsblocker;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.job.JobInfo;
@@ -14,9 +15,11 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.provider.CallLog;
 import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -36,6 +39,7 @@ import android.widget.Toast;
 
 import com.example.ukasz.androidsqlite.Block;
 import com.example.ukasz.androidsqlite.DatabaseHandler;
+import com.example.ukasz.permissions.PermissionsStartupActivity;
 import com.example.ukasz.phonecallsblocker.tab_layout_helper.CustomViewPager;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -225,19 +229,64 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
     protected void onResume()
     {
         super.onResume();
-        if (fab.isOpened()) fab.toggle(true);
+        if (fab != null)
+        {
+            if(fab.isOpened()) fab.toggle(true);
+        }
         Log.e("StartActivity", "onResume() method");
     }
 
     /**
      * Method which runs on activity restart.
      */
+    @TargetApi(Build.VERSION_CODES.M)
     @Override
     protected void onRestart()
     {
         super.onRestart();
-        if (fab.isOpened()) fab.toggle(true);
+
+        //Check if app has permissions to run
+        checkPermissions();
+
+        if(fab != null)
+        {
+            if (fab.isOpened()) fab.toggle(true);
+        }
         Log.e("StartActivity", "onRestart() method");
+    }
+
+    /**
+     * Checks if this {@link StartActivity} has permissions to work.
+     * If hasn't - run {@link PermissionsStartupActivity} to manage missing permissions.
+     */
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    private void checkPermissions()
+    {
+        PermissionsStartupActivity startupActivity = new PermissionsStartupActivity();
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M)
+        {
+            if (!startupActivity.hasGrantedPermissions())
+            {
+                openPermissionsActivity();
+            }
+        }
+        else //Android SDK >= M
+        {
+            if (!startupActivity.hasGrantedPermissions() || !startupActivity.hasGrantedManageOverlayPermission())
+            {
+                openPermissionsActivity();
+            }
+        }
+    }
+
+    /**
+     * Opens a {@link PermissionsStartupActivity}.
+     */
+    private void openPermissionsActivity()
+    {
+        Intent i = new Intent(new Intent(getApplicationContext(), PermissionsStartupActivity.class));
+        startActivity(i);
+        finish();
     }
 
     /**

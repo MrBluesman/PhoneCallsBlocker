@@ -55,9 +55,6 @@ public class PermissionsStartupActivity extends AppCompatActivity {
     private TextView allowWindowsWarningText;
     private ImageView allowWindowsWarningImage;
 
-    //my phone number
-    private String myPhoneNumber;
-
     //const Permissions Codes
     final private static int ACTION_MANAGE_OVERLAY_PERMISSION_REQUEST_CODE = 5555;
     final private static int READ_PHONE_STATE_PERMISSION_REQUEST_CODE = 5556;
