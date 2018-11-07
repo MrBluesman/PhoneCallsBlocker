@@ -90,7 +90,7 @@ public class PermissionsStartupActivity extends AppCompatActivity {
             findViewById(R.id.permissions_startup_activity_windows_checkbox_description).setVisibility(View.GONE);
 
             //If we have granted permissions we can open a Main Activity
-            if(hasGrantedPermissions())
+            if(hasGrantedPermissions(getApplicationContext()))
             {
                 openStartActivity();
             }
@@ -120,7 +120,7 @@ public class PermissionsStartupActivity extends AppCompatActivity {
         else //Android SDK >= M
         {
             //If we have granted permissions we can open a Main Activity
-            if (hasGrantedPermissions() && hasGrantedManageOverlayPermission())
+            if (hasGrantedPermissions(getApplicationContext()) && hasGrantedManageOverlayPermission(getApplicationContext()))
             {
                 openStartActivity();
             }
@@ -139,8 +139,8 @@ public class PermissionsStartupActivity extends AppCompatActivity {
                     {
                         if (phoneStateCheckBoxPerm.isChecked() && allowWindowsCheckBoxPerm.isChecked())
                         {
-                            if (!hasGrantedManageOverlayPermission()) requestManageOverlayPermission();
-                            if (!hasGrantedPermissions())
+                            if (!hasGrantedManageOverlayPermission(getApplicationContext())) requestManageOverlayPermission();
+                            if (!hasGrantedPermissions(getApplicationContext()))
                             {
                                 requestReadPhoneStatePermission();
                             }
@@ -222,11 +222,11 @@ public class PermissionsStartupActivity extends AppCompatActivity {
      *
      * @return true if it is granted, false if it's are not
      */
-    public boolean hasGrantedPermissions()
+    public boolean hasGrantedPermissions(Context context)
     {
-        return ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.READ_PHONE_STATE)
+        return ContextCompat.checkSelfPermission(context, Manifest.permission.READ_PHONE_STATE)
                 == PackageManager.PERMISSION_GRANTED &&
-                ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.CALL_PHONE)
+                ContextCompat.checkSelfPermission(context, Manifest.permission.CALL_PHONE)
                         == PackageManager.PERMISSION_GRANTED;
     }
 
@@ -237,9 +237,9 @@ public class PermissionsStartupActivity extends AppCompatActivity {
      * @return True if it's granted
      */
     @RequiresApi(api = Build.VERSION_CODES.M)
-    public boolean hasGrantedManageOverlayPermission()
+    public boolean hasGrantedManageOverlayPermission(Context context)
     {
-        return Settings.canDrawOverlays(this);
+        return Settings.canDrawOverlays(context);
     }
 
     /**
@@ -277,7 +277,7 @@ public class PermissionsStartupActivity extends AppCompatActivity {
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED)
                 {
                     // permission was granted, we can open a Main Activity
-                    if(hasGrantedManageOverlayPermission())
+                    if(hasGrantedManageOverlayPermission(getApplicationContext()))
                     {
                         requestCallPhonePermission();
                         //openStartActivity();
@@ -299,7 +299,7 @@ public class PermissionsStartupActivity extends AppCompatActivity {
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED)
                 {
                     // permission was granted, we can open a Main Activity
-                    if(hasGrantedManageOverlayPermission() && hasGrantedPermissions())
+                    if(hasGrantedManageOverlayPermission(getApplicationContext()) && hasGrantedPermissions(getApplicationContext()))
                     {
                         openStartActivity();
                     }
@@ -352,7 +352,7 @@ public class PermissionsStartupActivity extends AppCompatActivity {
                 allowWindowsWarningText.setTextKeepState(getResources().getString(R.string.permissions_startup_activity_windows_checkbox_warning));
                 setOptionsVisible(allowWindowsWarningText, allowWindowsWarningImage);
             }
-            else if(hasGrantedPermissions()) openStartActivity();
+            else if(hasGrantedPermissions(getApplicationContext())) openStartActivity();
             else setOptionsUnVisible(allowWindowsWarningText, allowWindowsWarningImage );
         }
     }

@@ -225,10 +225,15 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
     /**
      * Method which runs on resume activity.
      */
+    @TargetApi(Build.VERSION_CODES.M)
     @Override
     protected void onResume()
     {
         super.onResume();
+
+        //Check if app has permissions to run
+        checkPermissions();
+
         if (fab != null)
         {
             if(fab.isOpened()) fab.toggle(true);
@@ -265,14 +270,14 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
         PermissionsStartupActivity startupActivity = new PermissionsStartupActivity();
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M)
         {
-            if (!startupActivity.hasGrantedPermissions())
+            if (!startupActivity.hasGrantedPermissions(this))
             {
                 openPermissionsActivity();
             }
         }
         else //Android SDK >= M
         {
-            if (!startupActivity.hasGrantedPermissions() || !startupActivity.hasGrantedManageOverlayPermission())
+            if (!startupActivity.hasGrantedPermissions(this) || !startupActivity.hasGrantedManageOverlayPermission(this))
             {
                 openPermissionsActivity();
             }
