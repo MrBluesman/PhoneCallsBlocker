@@ -5,13 +5,6 @@
         <item>Negatywny</item>
     </string-array>
 
-    <string-array name="incoming_number_options">
-        <item>Zapisz i zablokuj</item>
-        <item>Zablokuj</item>
-        <item>Zapisz i toleruj</item>
-        <item>Przepuść</item>
-    </string-array>
-
     <string-array name="incoming_blocked_number_options">
         <item>Zmień na tolerowany</item>
         <item>Zablokuj</item>
