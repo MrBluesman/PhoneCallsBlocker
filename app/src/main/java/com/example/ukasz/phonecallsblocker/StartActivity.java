@@ -825,7 +825,7 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
     private Dialog createRatingDialog(final String nrBlocked)
     {
         final AlertDialog.Builder builder = new AlertDialog.Builder(StartActivity.this);
-        builder.setTitle(R.string.start_activity_dialog_rating_title)
+        builder.setTitle(nrBlocked)
                 .setItems(R.array.blocking_rating_options, new DialogInterface.OnClickListener()
                 {
                     @Override
