@@ -180,64 +180,64 @@ public class CallDetector
                             });
                         }
                     }
-//                    else //manual blocking
-//                    {
-//                        //Can draw overlays depends on SDK version
-//                        boolean canDrawOverlays = true;
-//                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
-//                        {
-//                            if (!Settings.canDrawOverlays(ctx)) canDrawOverlays = false;
-//                        }
-//
-//                        if(canDrawOverlays)
-//                        {
-//                            AlertDialog alertDialog;
-//
-//                            //check for LOCAL BLOCKING
-//                            if (db.existBlock(myPhoneNumber, incomingNumberFormatted, true)) //Phone number is blocked locally
-//                            {
-//                                alertDialog = createIncomingCallDialogBlockedNumber(incomingNumberFormatted, db);
-//
-//                                alertDialog.getWindow().setType(getDialogLayoutFlag());
-//                                alertDialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
-//                                        | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
-//                                        | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
-//                                        | WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
-//                                alertDialog.show();
-//                            }
-//                            else if((foreignBlockEnabled && isForeignIncomingCall(incomingNumberFormatted)) //phone number is foreign and foreignBlock is enabled
-//                                    || (privateBlockEnabled && incomingNumber == null) //phone number is private and privateBlock is enabled
-//                                    || (unknownBlockEnabled && incomingContactName == null)) //phone number is unknown and uknownBlock is enabled
-//                            {
-//                                String reason;
-//                                if(foreignBlockEnabled && isForeignIncomingCall(incomingNumberFormatted)) reason = "Zagraniczny";
-//                                else if (privateBlockEnabled && incomingNumber == null) reason = "Prywatny";
-//                                else reason = "Nieznany";
-//
-//                                alertDialog = createIncomingCallDialogSpecialNumber(reason, incomingNumberFormatted, db);
-//
-//                                alertDialog.getWindow().setType(getDialogLayoutFlag());
-//                                alertDialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
-//                                        | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
-//                                        | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
-//                                        | WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
-//                                alertDialog.show();
-//                            }
-//                            else //check for GLOBAL BLOCKING
-//                            {
-//
-//                            }
-//                        }
-//                        else //allow
-//                        {
-//                            //if notification allow is enabled - show a notification
-//                            if (notificationAllowEnabled) notificationManager.notify(
-//                                    NotificationID.getID(),
-//                                    createNotification(incomingNumberFormatted, NOTIFICATION_ALLOWED).build()
-//                            );
-//                            registerPhoneBlock(db, incomingNumberFormatted, false);
-//                        }
-//                    }
+                    else //manual blocking
+                    {
+                        //Can draw overlays depends on SDK version
+                        boolean canDrawOverlays = true;
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+                        {
+                            if (!Settings.canDrawOverlays(ctx)) canDrawOverlays = false;
+                        }
+
+                        if(canDrawOverlays)
+                        {
+                            AlertDialog alertDialog;
+
+                            //check for LOCAL BLOCKING
+                            if (db.existBlock(myPhoneNumber, incomingNumberFormatted, true)) //Phone number is blocked locally
+                            {
+                                alertDialog = createIncomingCallDialogBlockedNumber(incomingNumberFormatted, db);
+
+                                alertDialog.getWindow().setType(getDialogLayoutFlag());
+                                alertDialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
+                                        | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
+                                        | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
+                                        | WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
+                                alertDialog.show();
+                            }
+                            else if((foreignBlockEnabled && isForeignIncomingCall(incomingNumberFormatted)) //phone number is foreign and foreignBlock is enabled
+                                    || (privateBlockEnabled && incomingNumber == null) //phone number is private and privateBlock is enabled
+                                    || (unknownBlockEnabled)) //phone number is unknown and uknownBlock is enabled
+                            {
+                                String reason;
+                                if(foreignBlockEnabled && isForeignIncomingCall(incomingNumberFormatted)) reason = "Zagraniczny";
+                                else if (privateBlockEnabled && incomingNumber == null) reason = "Prywatny";
+                                else reason = "Nieznany";
+
+                                alertDialog = createIncomingCallDialogSpecialNumber(reason, incomingNumberFormatted, db);
+
+                                alertDialog.getWindow().setType(getDialogLayoutFlag());
+                                alertDialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
+                                        | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
+                                        | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
+                                        | WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
+                                alertDialog.show();
+                            }
+                            else //check for GLOBAL BLOCKING
+                            {
+
+                            }
+                        }
+                        else //allow
+                        {
+                            //if notification allow is enabled - show a notification
+                            if (notificationAllowEnabled) notificationManager.notify(
+                                    NotificationID.getID(),
+                                    createNotification(incomingNumberFormatted, NOTIFICATION_ALLOWED).build()
+                            );
+                            registerPhoneBlock(db, incomingNumberFormatted, false);
+                        }
+                    }
 
                     break;
                 }
