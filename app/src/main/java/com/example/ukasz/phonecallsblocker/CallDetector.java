@@ -210,9 +210,9 @@ public class CallDetector
                                     || (unknownBlockEnabled)) //phone number is unknown and uknownBlock is enabled
                             {
                                 String reason;
-                                if(foreignBlockEnabled && isForeignIncomingCall(incomingNumberFormatted)) reason = "Zagraniczny";
-                                else if (privateBlockEnabled && incomingNumber == null) reason = "Prywatny";
-                                else reason = "Nieznany";
+                                if(foreignBlockEnabled && isForeignIncomingCall(incomingNumberFormatted)) reason = incomingNumberFormatted;
+                                else if (privateBlockEnabled && incomingNumber == null) reason = ctx.getString(R.string.call_detector_private_number);
+                                else reason = ctx.getString(R.string.call_detector_unknown_number);
 
                                 alertDialog = createIncomingCallDialogSpecialNumber(reason, incomingNumberFormatted, db);
 

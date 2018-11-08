@@ -107,6 +107,8 @@
     <string name="call_detector_choose_category_title">Wybierz kategorię</string>
     <string name="call_detector_has_blocked">Zablokowano</string>
     <string name="call_detector_has_allowed">Przepuszczono</string>
+    <string name="call_detector_unknown_number">Numer nieznany</string>
+    <string name="call_detector_private_number">Numer prywatny</string>
     <string name="call_detector_has_saved_positive">Zapisano jako tolerowany</string>
     <string name="call_detector_changed_to_positive">Zmieniono na tolerowany</string>
     <string name="call_detector_already_blocked">Numer jest już zablokowany!</string>
