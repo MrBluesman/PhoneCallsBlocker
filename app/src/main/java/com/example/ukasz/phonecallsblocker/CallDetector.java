@@ -104,7 +104,8 @@ public class CallDetector
                     //database and settings load
                     final DatabaseHandler db = new DatabaseHandler(ctx);
 
-                    if(db.existBlock(myPhoneNumber, incomingNumberFormatted, false)) //tolerated locally - allow!
+                    //tolerated locally or exist in contacts - always allow!
+                    if(db.existBlock(myPhoneNumber, incomingNumberFormatted, false) || !isForeignIncomingCall(incomingNumber))
                     {
                         //if notification allow is enabled - show a notification
                         if (notificationAllowEnabled) notificationManager.notify(
