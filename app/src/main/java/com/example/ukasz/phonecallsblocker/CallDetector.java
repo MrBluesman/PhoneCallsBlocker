@@ -104,97 +104,7 @@ public class CallDetector
                     //database and settings load
                     final DatabaseHandler db = new DatabaseHandler(ctx);
 
-                    //LOCAL BLOCKING
-                    //Try global only if local blocking list doesn't contain the number
-                    //Check if we should autoblocked (only for negative phone numbers)
-                    if((autoBlockEnabled && db.getNumberBlockingsCount(incomingNumberFormatted, true) > 0) //Phone number is blocked and autoBlock is enabled
-                            || (foreignBlockEnabled && isForeignIncomingCall(incomingNumberFormatted)) //OR phone number is foreign and foreignBlock is enabled
-                            || (privateBlockEnabled && incomingNumber == null) //OR phone number is private and privateBlock is enabled
-                            || (unknownBlockEnabled && incomingContactName == null)) //OR phone number is unknown and uknownBlock is enabled
-
-                    {
-                        //if notification block is enabled - show a notification
-                        if(notificationBlockEnabled) notificationManager.notify(
-                                NotificationID.getID(),
-                                createNotification(incomingNumberFormatted, NOTIFICATION_BLOCKED).build()
-                        );
-                        //decline and register
-                        declinePhone(ctx);
-                        registerPhoneBlock(db, incomingNumberFormatted, true);
-                    }
-                    else if(!db.existBlock(myPhoneNumber, incomingNumberFormatted, false))
-                    {
-
-                        //Can draw overlays depends on SDK version
-                        boolean canDrawOverlays = true;
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
-                        {
-                            if (!Settings.canDrawOverlays(ctx)) canDrawOverlays = false;
-                        }
-
-                        if (db.existBlock(myPhoneNumber, incomingNumberFormatted, true) && canDrawOverlays)
-                        {
-                            AlertDialog alertDialog;
-                            alertDialog = incomingNumber == null
-                                    ? createIncomingCallDialogPrivateNumber(incomingNumberFormatted, db)
-                                    : createIncomingCallDialogBlockedNumber(incomingNumberFormatted, db);
-
-                            alertDialog.getWindow().setType(getDialogLayoutFlag());
-                            alertDialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
-                                    | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
-                                    | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
-                                    | WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
-                            alertDialog.show();
-                        }
-                        else
-                        {
-                            //GLOBAL BLOCKING only if auto block (global) is enabled
-                            if (autoBlockEnabled) {
-                                blockings.addListenerForSingleValueEvent(new ValueEventListener()
-                                {
-                                    @Override
-                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot)
-                                    {
-                                        Log.e("BLOK! LICZBA! ", String.valueOf(dataSnapshot.getChildrenCount()));
-                                        //Counter for count blocking category to decite whether block or not
-                                        int trueAmount = 0;
-                                        int falseAmount = 0;
-                                        for (DataSnapshot blockSnapshot : dataSnapshot.getChildren())
-                                        {
-                                            Block block = blockSnapshot.getValue(Block.class);
-                                            assert block != null;
-                                            if (block.getNrRating()) trueAmount++;
-                                            else falseAmount++;
-                                        }
-
-                                        //GLOBAL BLOCK CONDITION - TODO: CONSIDER CONDITION!
-                                        if (trueAmount > falseAmount)
-                                        {
-                                            Log.e("NIESPODZIENKA", "tu jestem :)");
-                                            declinePhone(ctx);
-                                            registerPhoneBlock(db, incomingNumberFormatted, true);
-                                        }
-                                    }
-
-                                    @Override
-                                    public void onCancelled(@NonNull DatabaseError databaseError)
-                                    {
-                                        Toast.makeText(ctx, R.string.error, Toast.LENGTH_SHORT).show();
-                                    }
-                                });
-                            }
-                            else //Phone call allowed
-                            {
-                                //if notification allow is enabled - show a notification
-                                if (notificationAllowEnabled) notificationManager.notify(
-                                        NotificationID.getID(),
-                                        createNotification(incomingNumberFormatted, NOTIFICATION_ALLOWED).build()
-                                );
-                                registerPhoneBlock(db, incomingNumberFormatted, false);
-                            }
-                        }
-                    }
-                    else //Phone call allowed
+                    if(db.existBlock(myPhoneNumber, incomingNumberFormatted, false)) //tolerated locally - allow!
                     {
                         //if notification allow is enabled - show a notification
                         if (notificationAllowEnabled) notificationManager.notify(
@@ -203,6 +113,100 @@ public class CallDetector
                         );
                         registerPhoneBlock(db, incomingNumberFormatted, false);
                     }
+                    else if(autoBlockEnabled) //auto blocking
+                    {
+                        //check for LOCAL BLOCKING
+                        if((db.getNumberBlockingsCount(incomingNumberFormatted, true) > 0) //Phone number is blocked locally
+                                || (foreignBlockEnabled && isForeignIncomingCall(incomingNumberFormatted)) //OR phone number is foreign and foreignBlock is enabled
+                                || (privateBlockEnabled && incomingNumber == null) //OR phone number is private and privateBlock is enabled
+                                || (unknownBlockEnabled && incomingContactName == null)) //OR phone number is unknown and uknownBlock is enabled
+
+                        {
+                            //if notification block is enabled - show a notification
+                            if(notificationBlockEnabled) notificationManager.notify(
+                                    NotificationID.getID(),
+                                    createNotification(incomingNumberFormatted, NOTIFICATION_BLOCKED).build()
+                            );
+                            //decline and register
+                            declinePhone(ctx);
+                            registerPhoneBlock(db, incomingNumberFormatted, true);
+                        }
+                        else //check for GLOBAL BLOCKING
+                        {
+                            blockings.addListenerForSingleValueEvent(new ValueEventListener()
+                            {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot dataSnapshot)
+                                {
+                                    //Counter for count blocking category to decite whether block or not
+                                    int trueAmount = 0;
+                                    int falseAmount = 0;
+                                    for (DataSnapshot blockSnapshot : dataSnapshot.getChildren())
+                                    {
+                                        Block block = blockSnapshot.getValue(Block.class);
+                                        assert block != null;
+                                        if (block.getNrRating()) trueAmount++;
+                                        else falseAmount++;
+                                    }
+
+                                    //GLOBAL BLOCK CONDITION - TODO: CONSIDER CONDITION!
+                                    if (trueAmount > falseAmount)
+                                    {
+                                        declinePhone(ctx);
+                                        registerPhoneBlock(db, incomingNumberFormatted, true);
+                                    }
+                                    else //allow
+                                    {
+                                        //TODO: move allowing to external help method
+                                        //if notification allow is enabled - show a notification
+                                        if (notificationAllowEnabled) notificationManager.notify(
+                                                NotificationID.getID(),
+                                                createNotification(incomingNumberFormatted, NOTIFICATION_ALLOWED).build()
+                                        );
+                                        registerPhoneBlock(db, incomingNumberFormatted, false);
+                                    }
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError databaseError)
+                                {
+                                    Toast.makeText(ctx, R.string.error, Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        }
+                    }
+                    else //manual blocking
+                    {
+
+                    }
+//                    else if(!db.existBlock(myPhoneNumber, incomingNumberFormatted, false))
+//                    {
+//
+//                        //Can draw overlays depends on SDK version
+//                        boolean canDrawOverlays = true;
+//                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+//                        {
+//                            if (!Settings.canDrawOverlays(ctx)) canDrawOverlays = false;
+//                        }
+//
+//                        if (db.existBlock(myPhoneNumber, incomingNumberFormatted, true) && canDrawOverlays)
+//                        {
+//                            AlertDialog alertDialog;
+//                            alertDialog = incomingNumber == null
+//                                    ? createIncomingCallDialogPrivateNumber(incomingNumberFormatted, db)
+//                                    : createIncomingCallDialogBlockedNumber(incomingNumberFormatted, db);
+//
+//                            alertDialog.getWindow().setType(getDialogLayoutFlag());
+//                            alertDialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
+//                                    | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
+//                                    | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
+//                                    | WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
+//                            alertDialog.show();
+//                        }
+//                        else
+//                        {
+//                        }
+//                    }
 
                     break;
                 }
