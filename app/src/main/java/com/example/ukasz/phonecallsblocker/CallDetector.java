@@ -153,12 +153,16 @@ public class CallDetector
                                     //GLOBAL BLOCK CONDITION - TODO: CONSIDER CONDITION!
                                     if (trueAmount > falseAmount)
                                     {
+                                        //if notification block is enabled - show a notification
+                                        if(notificationBlockEnabled) notificationManager.notify(
+                                                NotificationID.getID(),
+                                                createNotification(incomingNumberFormatted, NOTIFICATION_BLOCKED).build()
+                                        );
                                         declinePhone(ctx);
                                         registerPhoneBlock(db, incomingNumberFormatted, true);
                                     }
                                     else //allow
                                     {
-                                        //TODO: move allowing to external help method
                                         //if notification allow is enabled - show a notification
                                         if (notificationAllowEnabled) notificationManager.notify(
                                                 NotificationID.getID(),
