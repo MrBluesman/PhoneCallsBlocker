@@ -195,6 +195,8 @@ public class CallDetector
 
                             //check for LOCAL BLOCKING
                             if (db.existBlock(myPhoneNumber, incomingNumberFormatted, true)) //Phone number is blocked locally
+//                                    ||(foreignBlockEnabled && isForeignIncomingCall(incomingNumberFormatted))
+//                                    || (unknownBlockEnabled)) //phone number is unknown and uknownBlock is enabled
                             {
                                 alertDialog = createIncomingCallDialogBlockedNumber(incomingNumberFormatted, db);
 
@@ -205,14 +207,21 @@ public class CallDetector
                                         | WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
                                 alertDialog.show();
                             }
-                            else if((foreignBlockEnabled && isForeignIncomingCall(incomingNumberFormatted)) //phone number is foreign and foreignBlock is enabled
-                                    || (privateBlockEnabled && incomingNumber == null) //phone number is private and privateBlock is enabled
-                                    || (unknownBlockEnabled)) //phone number is unknown and uknownBlock is enabled
+                            else if(foreignBlockEnabled && isForeignIncomingCall(incomingNumberFormatted) //phone number is foreign and foreignBlock is enabled
+                                        || unknownBlockEnabled)
                             {
-                                String reason = incomingNumberFormatted;
-                                if (privateBlockEnabled && incomingNumber == null) reason = ctx.getString(R.string.call_detector_private_number);
+                                alertDialog = createIncomingCallDialogUnknownOrForeignNumber(incomingNumberFormatted, db);
 
-                                alertDialog = createIncomingCallDialogSpecialNumber(reason, incomingNumberFormatted, db);
+                                alertDialog.getWindow().setType(getDialogLayoutFlag());
+                                alertDialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
+                                        | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
+                                        | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
+                                        | WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
+                                alertDialog.show();
+                            }
+                            else if((privateBlockEnabled && incomingNumber == null)) //phone number is private and privateBlock is enabled
+                            {
+                                alertDialog = createIncomingCallDialogPrivateNumber(ctx.getString(R.string.call_detector_private_number), incomingNumberFormatted, db);
 
                                 alertDialog.getWindow().setType(getDialogLayoutFlag());
                                 alertDialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
@@ -249,7 +258,7 @@ public class CallDetector
 
         /**
          * Creates a {@link AlertDialog} for incoming call with number
-         * which exist in local list.
+         * which exist in local list or is blocked by foreign or unknown (not stored in contacts) number.
          *
          * @param incomingNumber contains the number of incoming call
          * @param db database for receive number of blockings and allow update a local list
@@ -296,14 +305,95 @@ public class CallDetector
         }
 
         /**
-         * Creates a {@link AlertDialog} for incoming call of private|unknown|foreign number.
+         * Creates a {@link AlertDialog} for incoming call with unknown or foreign number.
+         *
+         * @param incomingNumber contains the number of incoming call
+         * @param db database for receive number of blockings and allow save to local list
+         * @return created {@link AlertDialog} with options for incoming call dialog for new number
+         */
+        private AlertDialog createIncomingCallDialogUnknownOrForeignNumber(final String incomingNumber, final DatabaseHandler db)
+        {
+            AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
+            builder.setTitle(incomingNumber);
+            builder.setItems(R.array.incoming_unknown_or_foreign_options,
+                    new DialogInterface.OnClickListener()
+                    {
+                        public void onClick(DialogInterface dialog, int which)
+                        {
+                            switch (which)
+                            {
+                                //Save and block
+                                case 0:
+                                    final List<String> categories = db.getAllCategories();
+                                    AlertDialog.Builder builder2 = new AlertDialog.Builder(ctx);
+                                    builder2.setTitle(R.string.call_detector_choose_category_title);
+                                    CharSequence[] categoriesCharSequence = new CharSequence[categories.size()];
+
+                                    //Build categories list
+                                    int i=0;
+                                    for(String cat:categories)
+                                    {
+                                        categoriesCharSequence[i] = cat;
+                                        i++;
+                                    }
+
+                                    builder2.setItems(categoriesCharSequence,
+                                            new DialogInterface.OnClickListener()
+                                            {
+
+                                                @Override
+                                                public void onClick(DialogInterface dialog, int categoryId)
+                                                {
+                                                    addPhoneBlock(db, incomingNumber, categoryId, true);
+                                                    declinePhone(ctx);
+                                                    registerPhoneBlock(db, incomingNumber, true);
+                                                }
+                                            }
+                                    );
+
+                                    AlertDialog alertDialog2 = builder2.create();
+                                    alertDialog2.getWindow().setType(getDialogLayoutFlag());
+                                    alertDialog2.getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
+                                            | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
+                                            | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
+                                            | WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
+                                    alertDialog2.show();
+
+                                    break;
+                                //Block
+                                case 1:
+                                    declinePhone(ctx);
+                                    registerPhoneBlock(db, incomingNumber, true);
+                                    Toast.makeText(ctx, R.string.call_detector_has_blocked, Toast.LENGTH_SHORT).show();
+                                    break;
+
+                                //Save as positive (white list)
+                                case 2:
+                                    addPhoneBlock(db, incomingNumber, 0, false);
+                                    registerPhoneBlock(db, incomingNumber, false);
+                                    Toast.makeText(ctx, R.string.call_detector_has_saved_positive, Toast.LENGTH_SHORT).show();
+
+                                    //Allow
+                                case 3:
+                                    registerPhoneBlock(db, incomingNumber, false);
+                                    Toast.makeText(ctx, R.string.call_detector_has_allowed, Toast.LENGTH_SHORT).show();
+                                    break;
+                            }
+                        }
+                    });
+
+            return builder.create();
+        }
+
+        /**
+         * Creates a {@link AlertDialog} for incoming call of private number (phone number is unknown).
          *
          * @param title title of the dialog to display
          * @param incomingNumber contains the number of incoming call (equals to Private number)
          * @param db database for registering blocking in registry list
          * @return created {@link AlertDialog} with options for incoming call dialog for private number
          */
-        private AlertDialog createIncomingCallDialogSpecialNumber(String title, final String incomingNumber, final DatabaseHandler db)
+        private AlertDialog createIncomingCallDialogPrivateNumber(String title, final String incomingNumber, final DatabaseHandler db)
         {
             final AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
             builder.setTitle(title);
