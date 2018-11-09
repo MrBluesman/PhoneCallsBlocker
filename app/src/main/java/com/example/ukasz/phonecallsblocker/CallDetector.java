@@ -139,7 +139,7 @@ public class CallDetector
                                 @Override
                                 public void onDataChange(@NonNull DataSnapshot dataSnapshot)
                                 {
-                                    //Counter for count blocking category to decite whether block or not
+                                    //Counter for count blocking category to decide whether block or not
                                     int trueAmount = 0;
                                     int falseAmount = 0;
                                     for (DataSnapshot blockSnapshot : dataSnapshot.getChildren())
@@ -210,7 +210,7 @@ public class CallDetector
                             else if(foreignBlockEnabled && isForeignIncomingCall(incomingNumberFormatted) //phone number is foreign and foreignBlock is enabled
                                         || unknownBlockEnabled)
                             {
-                                alertDialog = createIncomingCallDialogUnknownOrForeignNumber(incomingNumberFormatted, db);
+                                alertDialog = createIncomingCallDialogGlobalUnknownForeignNumber(incomingNumberFormatted, db, null);
 
                                 alertDialog.getWindow().setType(getDialogLayoutFlag());
                                 alertDialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
@@ -232,7 +232,53 @@ public class CallDetector
                             }
                             else //check for GLOBAL BLOCKING
                             {
+                                blockings.addListenerForSingleValueEvent(new ValueEventListener()
+                                {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot)
+                                    {
+                                        //Counter for count blocking category to decide whether block or not
+                                        int trueAmount = 0;
+                                        int falseAmount = 0;
+                                        for (DataSnapshot blockSnapshot : dataSnapshot.getChildren())
+                                        {
+                                            Block block = blockSnapshot.getValue(Block.class);
+                                            assert block != null;
+                                            if (block.getNrRating()) trueAmount++;
+                                            else falseAmount++;
+                                        }
 
+                                        //GLOBAL BLOCK CONDITION - TODO: CONSIDER CONDITION!
+                                        if (trueAmount > falseAmount)
+                                        {
+                                            //Alert dla global blocking
+                                            AlertDialog alertDialogFirebase =
+                                                    createIncomingCallDialogGlobalUnknownForeignNumber(incomingNumberFormatted, db, trueAmount);
+
+                                            alertDialogFirebase.getWindow().setType(getDialogLayoutFlag());
+                                            alertDialogFirebase.getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
+                                                    | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
+                                                    | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
+                                                    | WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
+                                            alertDialogFirebase.show();
+                                        }
+                                        else //allow
+                                        {
+                                            //if notification allow is enabled - show a notification
+                                            if (notificationAllowEnabled) notificationManager.notify(
+                                                    NotificationID.getID(),
+                                                    createNotification(incomingNumberFormatted, NOTIFICATION_ALLOWED).build()
+                                            );
+                                            registerPhoneBlock(db, incomingNumberFormatted, false);
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError databaseError)
+                                    {
+                                        Toast.makeText(ctx, R.string.error, Toast.LENGTH_SHORT).show();
+                                    }
+                                });
                             }
                         }
                         else //allow
@@ -306,15 +352,24 @@ public class CallDetector
 
         /**
          * Creates a {@link AlertDialog} for incoming call with unknown or foreign number.
+         * Also supports manage Firebase block.
          *
          * @param incomingNumber contains the number of incoming call
          * @param db database for receive number of blockings and allow save to local list
+         * @param blockAmount optional param - amount of firebase blockings for firebase manual block
          * @return created {@link AlertDialog} with options for incoming call dialog for new number
          */
-        private AlertDialog createIncomingCallDialogUnknownOrForeignNumber(final String incomingNumber, final DatabaseHandler db)
+        private AlertDialog createIncomingCallDialogGlobalUnknownForeignNumber(final String incomingNumber, final DatabaseHandler db, Integer blockAmount)
         {
             AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
             builder.setTitle(incomingNumber);
+            if(blockAmount != null) builder.setTitle(incomingNumber
+                    + "\n"
+                    + ctx.getString(R.string.call_detector_is_blocked_by_community)
+                    + "\n"
+                    + ctx.getString(R.string.call_detector_is_blocked_by_community_subtitle)
+                    +  ": "
+                    + blockAmount);
             builder.setItems(R.array.incoming_unknown_or_foreign_options,
                     new DialogInterface.OnClickListener()
                     {

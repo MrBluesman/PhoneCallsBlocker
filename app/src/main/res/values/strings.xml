@@ -112,6 +112,8 @@
     <string name="call_detector_changed_to_positive">Zmieniono na tolerowany</string>
     <string name="call_detector_already_blocked">Numer jest już zablokowany!</string>
     <string name="call_detector_is_blocked_by_you">Ten numer jest przez Ciebie blokowany</string>
+    <string name="call_detector_is_blocked_by_community">Ten numer jest blokowany przez społeczność</string>
+    <string name="call_detector_is_blocked_by_community_subtitle">Negatywne oceny</string>
     <string name="call_detector_channel_name">Blokowanie połączeń</string>
     <string name="call_detector_channel_description">Kanał przeznaczony do zarządzania powiadomieniami związanymi z blokowaniem połączeń</string>
 </resources>
