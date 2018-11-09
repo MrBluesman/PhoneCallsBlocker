@@ -10,7 +10,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.telephony.TelephonyManager;
+import android.text.TextUtils;
 import android.util.Log;
+import android.util.Patterns;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -29,6 +31,10 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+
+import com.google.i18n.phonenumbers.NumberParseException;
+import com.google.i18n.phonenumbers.PhoneNumberUtil;
+import com.google.i18n.phonenumbers.Phonenumber;
 
 import java.util.List;
 import java.util.Objects;
@@ -105,68 +111,54 @@ public class AddPhoneBlock extends AppCompatActivity implements AdapterView.OnIt
             public void onClick(final View v)
             {
 
-                if (nrBlocked.getText().toString().length() == 0)
+                String countryCode = "+48";
+                String phoneNumber = nrBlocked.getText().toString().trim();
+                if(countryCode.length() > 0 && phoneNumber.length() > 0)
                 {
-                    nrBlocked.setError(v.getContext().getString(R.string.add_phone_block_nr_blocked_error));
-                    Toast.makeText(v.getContext(), R.string.add_phone_block_nr_blocked_error, Toast.LENGTH_SHORT).show();
-                }
-                else
-                {
-                    // TODO: Refactor! If possible keep adding phone number method in one common place
-                    //Block data depends on isPositiveSwitch
-                    final Block newBlock = isPositiveSwitch.isChecked() ? new Block(myPhoneNumber, nrBlocked.getText().toString(),
-                            0, description.getText().toString(), false)
-                            : new Block(myPhoneNumber, nrBlocked.getText().toString(),
-                            category.getSelectedItemPosition(), description.getText().toString(), true);
-
-                    //LOCAL SECTION! add to local blockings
-                    DatabaseHandler db = new DatabaseHandler(v.getContext());
-                    if(!db.existBlock(newBlock))
+                    if(isValidPhoneNumber(phoneNumber))
                     {
-                        db.addBlocking(newBlock);
-                        //ADD to blockings list to make notify data changed possible for adapter
-                        Toast.makeText(v.getContext(), R.string.add_phone_block_added, Toast.LENGTH_SHORT).show();
-                        PhoneBlockFragment.blockings.add(newBlock);
+                        //Format phone number
+                        PhoneNumberUtil phoneNumberUtil = PhoneNumberUtil.getInstance();
+                        String isoCode = phoneNumberUtil.getRegionCodeForCountryCode(Integer.parseInt(countryCode));
+                        Phonenumber.PhoneNumber phoneNumberLib = null;
+                        try
+                        {
+                            phoneNumberLib = phoneNumberUtil.parse(phoneNumber, isoCode);
+                        }
+                        catch (NumberParseException e)
+                        {
+                            System.err.println(e);
+                        }
+
+                        assert phoneNumberLib != null;
+                        String internationalFormat = phoneNumberUtil.format(phoneNumberLib, PhoneNumberUtil.PhoneNumberFormat.NATIONAL);
+
+                        boolean status = validateUsingLibphonenumber(countryCode, phoneNumber);
+                        if(status)
+                        {
+                            //Good - add phone number
+                            addPhoneBlock(internationalFormat);
+                            finish();
+                        }
+                        else
+                        {
+                            Toast.makeText(v.getContext(),
+                                    v.getContext().getText(R.string.add_phone_block_error_invalid) + ": " + internationalFormat,
+                                    Toast.LENGTH_LONG).show();
+                        }
                     }
                     else
                     {
-                        Toast.makeText(v.getContext(), R.string.add_phone_block_already_exist, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(v.getContext(),
+                                v.getContext().getText(R.string.add_phone_block_error_invalid) + ": " + phoneNumber,
+                                Toast.LENGTH_LONG).show();
                     }
-
-                    //GLOBAL SECTION! add to global blockings if sync is enabled
-                    boolean syncEnabled =  getSharedPreferences("data", Context.MODE_PRIVATE)
-                            .getBoolean("syncEnabled", false);
-
-                    if(syncEnabled)
-                    {
-                        final DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference();
-                        Query newBlockingRef = databaseRef
-                                .child("blockings")
-                                .orderByChild("nrDeclarantBlocked")
-                                .equalTo(newBlock.getNrDeclarant() + "_" + newBlock.getNrBlocked())
-                                .limitToFirst(1);
-
-                        newBlockingRef.addListenerForSingleValueEvent(new ValueEventListener()
-                        {
-                            @Override
-                            public void onDataChange(@NonNull DataSnapshot dataSnapshot)
-                            {
-                                if(!dataSnapshot.exists())
-                                {
-                                    Log.e("TEST_ISTNIEJE", "NIE");
-                                    databaseRef.child("blockings").push().setValue(newBlock);
-                                }
-                            }
-
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError databaseError)
-                            {
-                                Toast.makeText(v.getContext(), R.string.error, Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                    }
-
-                    finish();
+                }
+                else
+                {
+                    Toast.makeText(v.getContext(),
+                            v.getContext().getText(R.string.add_phone_block_error_empty),
+                            Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -215,5 +207,106 @@ public class AddPhoneBlock extends AppCompatActivity implements AdapterView.OnIt
     public void onNothingSelected(AdapterView<?> parent)
     {
 
+    }
+
+    /**
+     * Adds phoneNumber to the blocking list.
+     *
+     * @param phoneNumber phone number to add to blocking list
+     */
+    private void addPhoneBlock(String phoneNumber)
+    {
+        // TODO: Refactor! If possible keep adding phone number method in one common place
+        //Block data depends on isPositiveSwitch
+        final Block newBlock = isPositiveSwitch.isChecked() ? new Block(myPhoneNumber, phoneNumber,
+                0, description.getText().toString(), false)
+                : new Block(myPhoneNumber, phoneNumber,
+                category.getSelectedItemPosition(), description.getText().toString(), true);
+
+        //LOCAL SECTION! add to local blockings
+        DatabaseHandler db = new DatabaseHandler(getApplicationContext());
+        if(!db.existBlock(newBlock))
+        {
+            db.addBlocking(newBlock);
+            //ADD to blockings list to make notify data changed possible for adapter
+            Toast.makeText(getApplicationContext(), R.string.add_phone_block_added, Toast.LENGTH_SHORT).show();
+            PhoneBlockFragment.blockings.add(newBlock);
+        }
+        else
+        {
+            Toast.makeText(getApplicationContext(), R.string.add_phone_block_already_exist, Toast.LENGTH_SHORT).show();
+        }
+
+        //GLOBAL SECTION! add to global blockings if sync is enabled
+        boolean syncEnabled =  getSharedPreferences("data", Context.MODE_PRIVATE)
+                .getBoolean("syncEnabled", false);
+
+        if(syncEnabled)
+        {
+            final DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference();
+            Query newBlockingRef = databaseRef
+                    .child("blockings")
+                    .orderByChild("nrDeclarantBlocked")
+                    .equalTo(newBlock.getNrDeclarant() + "_" + newBlock.getNrBlocked())
+                    .limitToFirst(1);
+
+            newBlockingRef.addListenerForSingleValueEvent(new ValueEventListener()
+            {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot)
+                {
+                    if(!dataSnapshot.exists())
+                    {
+                        Log.e("TEST_ISTNIEJE", "NIE");
+                        databaseRef.child("blockings").push().setValue(newBlock);
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError)
+                {
+                    Toast.makeText(getApplicationContext(), R.string.error, Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+    }
+
+    /**
+     * Validates phoneNumber using basic patterns.
+     *
+     * @param phoneNumber phone number to validate
+     * @return true if phone number is valid, false if is not
+     */
+    private boolean isValidPhoneNumber(CharSequence phoneNumber)
+    {
+        if (!TextUtils.isEmpty(phoneNumber))
+        {
+            return Patterns.PHONE.matcher(phoneNumber).matches();
+        }
+        return false;
+    }
+
+    /**
+     * Validates phNumber using libphonenumber library including countryCode.
+     * @param countryCode country code of the phNumber
+     * @param phNumber phone number to validate
+     * @return true if phone is valid, false if is not
+     */
+    private boolean validateUsingLibphonenumber(String countryCode, String phNumber)
+    {
+        PhoneNumberUtil phoneNumberUtil = PhoneNumberUtil.getInstance();
+        String isoCode = phoneNumberUtil.getRegionCodeForCountryCode(Integer.parseInt(countryCode));
+        Phonenumber.PhoneNumber phoneNumber = null;
+        try
+        {
+            //phoneNumber = phoneNumberUtil.parse(phNumber, "IN");  //if you want to pass region code
+            phoneNumber = phoneNumberUtil.parse(phNumber, isoCode);
+        }
+        catch (NumberParseException e)
+        {
+            System.err.println(e);
+        }
+
+        return phoneNumberUtil.isValidNumber(phoneNumber);
     }
 }
