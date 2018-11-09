@@ -60,6 +60,8 @@ public class CallDetector
      */
     private class CallStateListener extends PhoneStateListener
     {
+        int previousState = 0;
+
         /**
          * This method runs when the Listener is working, and call state has changed.
          * Creating a Toast and Notification when the calls incoming.
@@ -101,6 +103,10 @@ public class CallDetector
                 {
                     Toast.makeText(ctx, "Połączenie przychodzące: " + incomingNumberFormatted, Toast.LENGTH_LONG).show();
                     Log.e("incomingNumber", incomingNumberFormatted);
+
+                    //set ringing flag
+                    previousState = state;
+
                     //database and settings load
                     final DatabaseHandler db = new DatabaseHandler(ctx);
 
@@ -296,7 +302,22 @@ public class CallDetector
                 }
                 case TelephonyManager.CALL_STATE_OFFHOOK:
                 {
-                    Log.e("ABC", "już nie dzwoni");
+                    if((previousState==TelephonyManager.CALL_STATE_RINGING))
+                    {
+                        //Answered Call which is ended
+                        Log.e("ABC", "ODEBRANE!");
+                    }
+                    previousState = state;
+                    break;
+                }
+                case TelephonyManager.CALL_STATE_IDLE:
+                {
+                    //unset ringing flag
+                    if((previousState==TelephonyManager.CALL_STATE_RINGING))
+                    {
+                        previousState=state;
+                        Log.e("ABC", "NIE ODEBRANE!");
+                    }
                     break;
                 }
             }
