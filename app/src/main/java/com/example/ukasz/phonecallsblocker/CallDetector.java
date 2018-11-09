@@ -61,6 +61,7 @@ public class CallDetector
     private class CallStateListener extends PhoneStateListener
     {
         final AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
+        AlertDialog alertDialog = builder.create();
         int previousState = 0;
 
         /**
@@ -279,7 +280,7 @@ public class CallDetector
                     if((previousState==TelephonyManager.CALL_STATE_RINGING))
                     {
                         //Answered Call which is ended
-                        Log.e("ABC", "ODEBRANE!");
+                        alertDialog.dismiss();
                     }
                     previousState = state;
                     break;
@@ -290,7 +291,7 @@ public class CallDetector
                     if((previousState==TelephonyManager.CALL_STATE_RINGING))
                     {
                         previousState=state;
-                        Log.e("ABC", "NIE ODEBRANE!");
+                        alertDialog.dismiss();
                     }
                     break;
                 }
@@ -469,7 +470,7 @@ public class CallDetector
          */
         private void showAlertDialogForManualBlocking()
         {
-            AlertDialog alertDialog = builder.create();
+            alertDialog = builder.create();
             alertDialog.getWindow().setType(getDialogLayoutFlag());
             alertDialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
                     | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
