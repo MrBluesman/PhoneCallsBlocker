@@ -117,7 +117,7 @@ public class MyRegistryRecyclerViewAdapter extends RecyclerView.Adapter<MyRegist
     }
 
     /**
-     * Allows an actions after bind a {@link MyPhoneBlockRecyclerViewAdapter.ViewHolder}.
+     * Allows an actions after bind a {@link MyPhoneBlockRecyclerViewAdapter.PhoneBlockHolder}.
      *
      * @param holder {@link MyRegistryRecyclerViewAdapter.ViewHolder} instance.
      * @param position position of element on the list (One of Blocks).

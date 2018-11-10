@@ -44,9 +44,6 @@ public class MyPhoneBlockRecyclerViewAdapter extends RecyclerView.Adapter<MyPhon
     // index is used to animate only the selected row
     private static int currentSelectedIndex = -1;
 
-    //default country code - supports only PL for now
-    private final static String COUNTRY_CODE = "+48";
-
     /**
      * ViewHolder class for single Block view.
      */
@@ -154,7 +151,7 @@ public class MyPhoneBlockRecyclerViewAdapter extends RecyclerView.Adapter<MyPhon
         //displaying text content of blockings
         holder.mNrBlocked.setText(formator.formatPhoneNumber(
                 mBlockings.get(position).getNrBlocked(),
-                COUNTRY_CODE,
+                StartActivity.COUNTRY_CODE,
                 PhoneNumberUtil.PhoneNumberFormat.NATIONAL));
 
         //change the row state to activated

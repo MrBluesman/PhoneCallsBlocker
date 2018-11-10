@@ -615,11 +615,11 @@ public class CallDetector
 
         PhoneNumberValidator validator = new PhoneNumberValidator();
 
-        if(COUNTRY_CODE.length() > 0 && phoneNumber.length() > 0)
+        if(StartActivity.COUNTRY_CODE.length() > 0 && phoneNumber.length() > 0)
         {
             if(validator.isValidPhoneNumber(phoneNumber))
             {
-                boolean status = validator.validateUsingLibphonenumber(COUNTRY_CODE, phoneNumber);
+                boolean status = validator.validateUsingLibphonenumber(StartActivity.COUNTRY_CODE, phoneNumber);
                 if(status)
                 {
                     //Good - add phone number
@@ -802,8 +802,6 @@ public class CallDetector
     private final static int NOTIFICATION_ALLOWED = 1;
     private DatabaseReference mDatabase;
 
-    //default country code - supports only PL for now
-    private final static String COUNTRY_CODE = "+48";
     private PhoneNumberValidator validator;
 
     /**
