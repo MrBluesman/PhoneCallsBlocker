@@ -128,15 +128,15 @@ public class MyRegistryRecyclerViewAdapter extends RecyclerView.Adapter<MyRegist
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder holder, int position)
     {
-        //Get validator phone number lib to format
-        PhoneNumberHelper formator = new PhoneNumberHelper();
-
         RegistryBlock rBlock = mRegistryBlockings.get(position);
 
-        holder.mNrRegisteredBlock.setText(formator.formatPhoneNumber(
-                rBlock.getNrBlocked(),
-                StartActivity.COUNTRY_CODE,
-                PhoneNumberUtil.PhoneNumberFormat.NATIONAL));
+        //Get validator phone number lib to format
+        PhoneNumberHelper phoneNumberHelper = new PhoneNumberHelper();
+        String contactName = phoneNumberHelper.getContactName(mContext, rBlock.getNrBlocked());
+
+        holder.mNrRegisteredBlock.setText(contactName != null
+                ? contactName
+                : phoneNumberHelper.formatPhoneNumber(rBlock.getNrBlocked(), StartActivity.COUNTRY_CODE, PhoneNumberUtil.PhoneNumberFormat.NATIONAL));
 
         holder.mDate.setText(String.valueOf(rBlock.getNrBlockingDateFormatted("MM/dd/yyyy HH:mm")));
 
