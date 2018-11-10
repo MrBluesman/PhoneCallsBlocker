@@ -47,6 +47,8 @@ public class AddPhoneBlock extends AppCompatActivity implements AdapterView.OnIt
     private String myPhoneNumber;
     private TelephonyManager tm;
 
+    final static String COUNTRY_CODE = "+48";
+
     /**
      * Initializes var instances and view for start {@link AddPhoneBlock} activity.
      *
@@ -107,20 +109,18 @@ public class AddPhoneBlock extends AppCompatActivity implements AdapterView.OnIt
             @Override
             public void onClick(final View v)
             {
-
-                String countryCode = "+48";
                 String phoneNumber = nrBlocked.getText().toString().trim();
 
                 PhoneNumberValidator validator = new PhoneNumberValidator();
 
-                if(countryCode.length() > 0 && phoneNumber.length() > 0)
+                if(COUNTRY_CODE.length() > 0 && phoneNumber.length() > 0)
                 {
                     if(validator.isValidPhoneNumber(phoneNumber))
                     {
                         //Format phone number
-                        String internationalFormat = validator.formatPhoneNuber(phoneNumber, countryCode,PhoneNumberUtil.PhoneNumberFormat.NATIONAL);
+                        String internationalFormat = validator.formatPhoneNuber(phoneNumber, COUNTRY_CODE,PhoneNumberUtil.PhoneNumberFormat.E164);
 
-                        boolean status = validator.validateUsingLibphonenumber(countryCode, phoneNumber);
+                        boolean status = validator.validateUsingLibphonenumber(COUNTRY_CODE, phoneNumber);
                         if(status)
                         {
                             //Good - add phone number

@@ -41,12 +41,14 @@ import com.example.ukasz.androidsqlite.Block;
 import com.example.ukasz.androidsqlite.DatabaseHandler;
 import com.example.ukasz.permissions.PermissionsStartupActivity;
 import com.example.ukasz.phonecallsblocker.tab_layout_helper.CustomViewPager;
+import com.example.ukasz.phonecallsblocker.validator.PhoneNumberValidator;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.i18n.phonenumbers.PhoneNumberUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -100,6 +102,9 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
 
     //job unique ids for job scheduler
     private static final int CALL_DETECT_JOB_ID = 2000;
+
+    //static country code
+    final static String COUNTRY_CODE = "+48";
 
     /**
      * Method which runs on activity start.
@@ -770,7 +775,8 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
                                             if(!usedNumbers.contains(nrBlocked))
                                             {
                                                 usedNumbers.add(nrBlocked);
-                                                createRatingDialog(nrBlocked).show();
+                                                Dialog ratingDialog = createRatingDialog(nrBlocked);
+                                                if(ratingDialog != null) ratingDialog.show();
                                             }
                                         }
 
@@ -815,7 +821,11 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
                 if (c != null)
                 {
                     c.moveToPosition(item);
-                    createRatingDialog(c.getString(c.getColumnIndex(android.provider.CallLog.Calls.NUMBER))).show();
+
+                    String phoneNumber = c.getString(c.getColumnIndex(android.provider.CallLog.Calls.NUMBER));
+                    Dialog ratingDialog = createRatingDialog(phoneNumber);
+
+                    if(ratingDialog!= null) ratingDialog.show();
                     c.close();
                 }
             }
@@ -835,17 +845,54 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
     private Dialog createRatingDialog(final String nrBlocked)
     {
         final AlertDialog.Builder builder = new AlertDialog.Builder(StartActivity.this);
-        builder.setTitle(nrBlocked)
-                .setItems(R.array.blocking_rating_options, new DialogInterface.OnClickListener()
+        PhoneNumberValidator validator = new PhoneNumberValidator();
+
+        if(COUNTRY_CODE.length() > 0 && nrBlocked.length() > 0)
+        {
+            if(validator.isValidPhoneNumber(nrBlocked))
+            {
+                //Format phone number
+                final String internationalFormat = validator.formatPhoneNuber(nrBlocked, COUNTRY_CODE,PhoneNumberUtil.PhoneNumberFormat.E164);
+
+                boolean status = validator.validateUsingLibphonenumber(COUNTRY_CODE, nrBlocked);
+                if(status)
                 {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which)
-                    {
-                        //0 - positive, 1 - negative
-                        boolean rating = which != 0;
-                        addPhoneBlock(nrBlocked, rating);
-                    }
-                });
+                    //Good - create rating dialog
+                    builder.setTitle(nrBlocked)
+                            .setItems(R.array.blocking_rating_options, new DialogInterface.OnClickListener()
+                            {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which)
+                                {
+                                    //0 - positive, 1 - negative
+                                    boolean rating = which != 0;
+                                    addPhoneBlock(internationalFormat, rating);
+                                }
+                            });
+                }
+                else
+                {
+                    Toast.makeText(StartActivity.this,
+                            StartActivity.this.getText(R.string.add_phone_block_error_invalid) + ": " + internationalFormat,
+                            Toast.LENGTH_LONG).show();
+                    return null;
+                }
+            }
+            else
+            {
+                Toast.makeText(StartActivity.this,
+                        StartActivity.this.getText(R.string.add_phone_block_error_invalid) + ": " + nrBlocked,
+                        Toast.LENGTH_LONG).show();
+                return null;
+            }
+        }
+        else
+        {
+            Toast.makeText(StartActivity.this,
+                    StartActivity.this.getText(R.string.add_phone_block_error_empty),
+                    Toast.LENGTH_SHORT).show();
+            return null;
+        }
 
         return builder.create();
     }
