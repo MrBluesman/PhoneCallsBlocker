@@ -118,7 +118,7 @@ public class AddPhoneBlock extends AppCompatActivity implements AdapterView.OnIt
                     if(validator.isValidPhoneNumber(phoneNumber))
                     {
                         //Format phone number
-                        String internationalFormat = validator.formatPhoneNuber(phoneNumber, COUNTRY_CODE,PhoneNumberUtil.PhoneNumberFormat.E164);
+                        String internationalFormat = validator.formatPhoneNumber(phoneNumber, COUNTRY_CODE,PhoneNumberUtil.PhoneNumberFormat.E164);
 
                         boolean status = validator.validateUsingLibphonenumber(COUNTRY_CODE, phoneNumber);
                         if(status)
@@ -130,7 +130,7 @@ public class AddPhoneBlock extends AppCompatActivity implements AdapterView.OnIt
                         else
                         {
                             Toast.makeText(v.getContext(),
-                                    v.getContext().getText(R.string.add_phone_block_error_invalid) + ": " + internationalFormat,
+                                    v.getContext().getText(R.string.add_phone_block_error_invalid) + ": " + phoneNumber,
                                     Toast.LENGTH_LONG).show();
                         }
                     }

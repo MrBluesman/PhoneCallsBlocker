@@ -852,7 +852,7 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
             if(validator.isValidPhoneNumber(nrBlocked))
             {
                 //Format phone number
-                final String internationalFormat = validator.formatPhoneNuber(nrBlocked, COUNTRY_CODE,PhoneNumberUtil.PhoneNumberFormat.E164);
+                final String internationalFormat = validator.formatPhoneNumber(nrBlocked, COUNTRY_CODE,PhoneNumberUtil.PhoneNumberFormat.E164);
 
                 boolean status = validator.validateUsingLibphonenumber(COUNTRY_CODE, nrBlocked);
                 if(status)

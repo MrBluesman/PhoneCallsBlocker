@@ -88,24 +88,28 @@ public class CallDetector
             final boolean notificationBlockEnabled = data.getBoolean("notificationBlockEnabled", false);
             final boolean notificationAllowEnabled = data.getBoolean("notificationAllowEnabled", false);
 
-            final String incomingNumberFormatted = incomingNumber != null ? incomingNumber : "Numer prywatny";
-            final String incomingContactName = (unknownBlockEnabled && !incomingNumberFormatted.isEmpty())
-                    ? getContactName(ctx, incomingNumberFormatted)
+            //Format phone number
+
+            final String incomingNumberV = incomingNumber != null ? incomingNumber : "Numer prywatny";
+            final String incomingContactName = (unknownBlockEnabled && !incomingNumberV.isEmpty())
+                    ? getContactName(ctx, incomingNumberV)
                     : null;
 
             //Firebase blockings data
             Query blockings = mDatabase
                     .child("blockings")
                     .orderByChild("nrBlocked")
-                    .equalTo(incomingNumberFormatted);
+                    .equalTo(incomingNumberV);
             blockings.getRef().keepSynced(true);
 
             switch (state)
             {
                 case TelephonyManager.CALL_STATE_RINGING:
                 {
-                    Toast.makeText(ctx, "Połączenie przychodzące: " + incomingNumberFormatted, Toast.LENGTH_LONG).show();
-                    Log.e("incomingNumber", incomingNumberFormatted);
+                    final String phoneNumberFormatted = validator.formatPhoneNumber(incomingNumberV, "+48", PhoneNumberUtil.PhoneNumberFormat.E164);
+
+                    Toast.makeText(ctx, "Połączenie przychodzące: " + incomingNumberV, Toast.LENGTH_LONG).show();
+                    Log.e("incomingNumber", phoneNumberFormatted);
 
                     //set ringing flag
                     previousState = state;
@@ -114,20 +118,20 @@ public class CallDetector
                     final DatabaseHandler db = new DatabaseHandler(ctx);
 
                     //tolerated locally or exist in contacts - always allow!
-                    if(db.existBlock(myPhoneNumber, incomingNumberFormatted, false) || incomingContactName != null)
+                    if(db.existBlock(myPhoneNumber, phoneNumberFormatted, false) || incomingContactName != null)
                     {
                         //if notification allow is enabled - show a notification
                         if (notificationAllowEnabled) notificationManager.notify(
                                 NotificationID.getID(),
-                                createNotification(incomingNumberFormatted, NOTIFICATION_ALLOWED).build()
+                                createNotification(phoneNumberFormatted, NOTIFICATION_ALLOWED).build()
                         );
-                        registerPhoneBlock(db, incomingNumberFormatted, false);
+                        registerPhoneBlock(db, phoneNumberFormatted, false);
                     }
                     else if(autoBlockEnabled) //auto blocking
                     {
                         //check for LOCAL BLOCKING
-                        if((db.getNumberBlockingsCount(incomingNumberFormatted, true) > 0) //Phone number is blocked locally
-                                || (foreignBlockEnabled && isForeignIncomingCall(incomingNumberFormatted)) //OR phone number is foreign and foreignBlock is enabled
+                        if((db.getNumberBlockingsCount(phoneNumberFormatted, true) > 0) //Phone number is blocked locally
+                                || (foreignBlockEnabled && isForeignIncomingCall(phoneNumberFormatted)) //OR phone number is foreign and foreignBlock is enabled
                                 || (privateBlockEnabled && incomingNumber == null) //OR phone number is private and privateBlock is enabled
                                 || (unknownBlockEnabled)) //OR phone number is unknown and uknownBlock is enabled
 
@@ -135,11 +139,11 @@ public class CallDetector
                             //if notification block is enabled - show a notification
                             if(notificationBlockEnabled) notificationManager.notify(
                                     NotificationID.getID(),
-                                    createNotification(incomingNumberFormatted, NOTIFICATION_BLOCKED).build()
+                                    createNotification(phoneNumberFormatted, NOTIFICATION_BLOCKED).build()
                             );
                             //decline and register
                             declinePhone(ctx);
-                            registerPhoneBlock(db, incomingNumberFormatted, true);
+                            registerPhoneBlock(db, phoneNumberFormatted, true);
                         }
                         else //check for GLOBAL BLOCKING
                         {
@@ -165,19 +169,19 @@ public class CallDetector
                                         //if notification block is enabled - show a notification
                                         if(notificationBlockEnabled) notificationManager.notify(
                                                 NotificationID.getID(),
-                                                createNotification(incomingNumberFormatted, NOTIFICATION_BLOCKED).build()
+                                                createNotification(phoneNumberFormatted, NOTIFICATION_BLOCKED).build()
                                         );
                                         declinePhone(ctx);
-                                        registerPhoneBlock(db, incomingNumberFormatted, true);
+                                        registerPhoneBlock(db, phoneNumberFormatted, true);
                                     }
                                     else //allow
                                     {
                                         //if notification allow is enabled - show a notification
                                         if (notificationAllowEnabled) notificationManager.notify(
                                                 NotificationID.getID(),
-                                                createNotification(incomingNumberFormatted, NOTIFICATION_ALLOWED).build()
+                                                createNotification(phoneNumberFormatted, NOTIFICATION_ALLOWED).build()
                                         );
-                                        registerPhoneBlock(db, incomingNumberFormatted, false);
+                                        registerPhoneBlock(db, phoneNumberFormatted, false);
                                     }
                                 }
 
@@ -203,20 +207,20 @@ public class CallDetector
                             final AlertDialog alertDialog;
 
                             //check for LOCAL BLOCKING
-                            if (db.existBlock(myPhoneNumber, incomingNumberFormatted, true)) //Phone number is blocked locally
+                            if (db.existBlock(myPhoneNumber, phoneNumberFormatted, true)) //Phone number is blocked locally
                             {
-                                setIncomingCallDialogBlockedNumber(incomingNumberFormatted, db);
+                                setIncomingCallDialogBlockedNumber(phoneNumberFormatted, db);
                                 showAlertDialogForManualBlocking();
                             }
-                            else if(foreignBlockEnabled && isForeignIncomingCall(incomingNumberFormatted) //phone number is foreign and foreignBlock is enabled
+                            else if(foreignBlockEnabled && isForeignIncomingCall(phoneNumberFormatted) //phone number is foreign and foreignBlock is enabled
                                         || unknownBlockEnabled)
                             {
-                                setIncomingCallDialogGlobalUnknownForeignNumber(incomingNumberFormatted, db, null);
+                                setIncomingCallDialogGlobalUnknownForeignNumber(phoneNumberFormatted, db, null);
                                 showAlertDialogForManualBlocking();
                             }
                             else if((privateBlockEnabled && incomingNumber == null)) //phone number is private and privateBlock is enabled
                             {
-                                setIncomingCallDialogPrivateNumber(ctx.getString(R.string.call_detector_private_number), incomingNumberFormatted, db);
+                                setIncomingCallDialogPrivateNumber(ctx.getString(R.string.call_detector_private_number), phoneNumberFormatted, db);
                                 showAlertDialogForManualBlocking();
                             }
                             else //check for GLOBAL BLOCKING
@@ -241,7 +245,7 @@ public class CallDetector
                                         if (trueAmount > falseAmount)
                                         {
                                             //Alert dla global blocking
-                                            setIncomingCallDialogGlobalUnknownForeignNumber(incomingNumberFormatted, db, trueAmount);
+                                            setIncomingCallDialogGlobalUnknownForeignNumber(phoneNumberFormatted, db, trueAmount);
                                             showAlertDialogForManualBlocking();
                                         }
                                         else //allow
@@ -249,9 +253,9 @@ public class CallDetector
                                             //if notification allow is enabled - show a notification
                                             if (notificationAllowEnabled) notificationManager.notify(
                                                     NotificationID.getID(),
-                                                    createNotification(incomingNumberFormatted, NOTIFICATION_ALLOWED).build()
+                                                    createNotification(phoneNumberFormatted, NOTIFICATION_ALLOWED).build()
                                             );
-                                            registerPhoneBlock(db, incomingNumberFormatted, false);
+                                            registerPhoneBlock(db, phoneNumberFormatted, false);
                                         }
                                     }
 
@@ -268,9 +272,9 @@ public class CallDetector
                             //if notification allow is enabled - show a notification
                             if (notificationAllowEnabled) notificationManager.notify(
                                     NotificationID.getID(),
-                                    createNotification(incomingNumberFormatted, NOTIFICATION_ALLOWED).build()
+                                    createNotification(phoneNumberFormatted, NOTIFICATION_ALLOWED).build()
                             );
-                            registerPhoneBlock(db, incomingNumberFormatted, false);
+                            registerPhoneBlock(db, phoneNumberFormatted, false);
                         }
                     }
 
@@ -609,21 +613,17 @@ public class CallDetector
                 != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(ctx, Manifest.permission.READ_PHONE_STATE)
                 != PackageManager.PERMISSION_GRANTED) return;
 
-        phoneNumber = phoneNumber.trim();
         PhoneNumberValidator validator = new PhoneNumberValidator();
 
         if(COUNTRY_CODE.length() > 0 && phoneNumber.length() > 0)
         {
             if(validator.isValidPhoneNumber(phoneNumber))
             {
-                //Format phone number
-                String internationalFormat = validator.formatPhoneNuber(phoneNumber, COUNTRY_CODE, PhoneNumberUtil.PhoneNumberFormat.E164);
-
                 boolean status = validator.validateUsingLibphonenumber(COUNTRY_CODE, phoneNumber);
                 if(status)
                 {
                     //Good - add phone number
-                    final Block newBlock = new Block(myPhoneNumber, internationalFormat, category, "", rating);
+                    final Block newBlock = new Block(myPhoneNumber, phoneNumber, category, "", rating);
 
                     //LOCAL SECTION! add to local blockings
                     if(!db.existBlock(newBlock))
@@ -676,7 +676,7 @@ public class CallDetector
                 else
                 {
                     Toast.makeText(ctx,
-                            ctx.getText(R.string.add_phone_block_error_invalid) + ": " + internationalFormat,
+                            ctx.getText(R.string.add_phone_block_error_invalid) + ": " + phoneNumber,
                             Toast.LENGTH_LONG).show();
                 }
             }
@@ -804,6 +804,7 @@ public class CallDetector
 
     //default country code - supports only PL for now
     private final static String COUNTRY_CODE = "+48";
+    private PhoneNumberValidator validator;
 
     /**
      * Constructor.
@@ -818,6 +819,9 @@ public class CallDetector
         ctx = _ctx;
         callStateListener = new CallStateListener();
         notificationManager = NotificationManagerCompat.from(ctx);
+
+        //phone number util validator
+        validator = new PhoneNumberValidator();
 
         /* TODO: refactor to keep all references in one place */
         //Database reference

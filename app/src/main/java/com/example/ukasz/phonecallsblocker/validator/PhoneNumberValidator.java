@@ -65,7 +65,7 @@ public class PhoneNumberValidator
      * @param format goal format using {@link PhoneNumberUtil.PhoneNumberFormat}
      * @return formatted {@link String} phone number
      */
-    public String formatPhoneNuber(String phoneNumber, String countryCode, PhoneNumberUtil.PhoneNumberFormat format)
+    public String formatPhoneNumber(String phoneNumber, String countryCode, PhoneNumberUtil.PhoneNumberFormat format)
     {
         PhoneNumberUtil phoneNumberUtil = PhoneNumberUtil.getInstance();
         String isoCode = phoneNumberUtil.getRegionCodeForCountryCode(Integer.parseInt(countryCode));
