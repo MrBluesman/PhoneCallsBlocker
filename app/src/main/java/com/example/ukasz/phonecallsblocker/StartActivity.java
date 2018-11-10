@@ -48,6 +48,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class StartActivity extends AppCompatActivity implements SettingsFragment.OnFragmentInteractionListener
 {
     /*
@@ -739,6 +742,7 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
 
                         if (c != null)
                         {
+
                             if (c.moveToFirst())
                             {
                                 String contactId = c.getString(c.getColumnIndex(ContactsContract.Contacts._ID));
@@ -755,13 +759,19 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
 
                                     if (numbers != null)
                                     {
+                                        List<String> usedNumbers = new ArrayList<>();
+
                                         while (numbers.moveToNext())
                                         {
 
                                             nrBlocked = numbers.getString(numbers.getColumnIndex
                                                     (ContactsContract.CommonDataKinds.Phone.NUMBER));
 
-                                            createRatingDialog(nrBlocked).show();
+                                            if(!usedNumbers.contains(nrBlocked))
+                                            {
+                                                usedNumbers.add(nrBlocked);
+                                                createRatingDialog(nrBlocked).show();
+                                            }
                                         }
 
                                         numbers.close();
