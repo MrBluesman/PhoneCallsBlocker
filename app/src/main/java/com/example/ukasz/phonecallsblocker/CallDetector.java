@@ -552,9 +552,12 @@ public class CallDetector
             }
 
             //Get validator phone number lib to format
-            PhoneNumberHelper formator = new PhoneNumberHelper();
+            PhoneNumberHelper phoneNumberHelper = new PhoneNumberHelper();
+            String contactName = phoneNumberHelper.getContactName(ctx, incomingNumber);
 
-            builder.setContentTitle(formator.formatPhoneNumber(incomingNumber, StartActivity.COUNTRY_CODE, PhoneNumberUtil.PhoneNumberFormat.NATIONAL))
+            builder.setContentTitle(contactName != null
+                    ? contactName
+                    : phoneNumberHelper.formatPhoneNumber(incomingNumber, StartActivity.COUNTRY_CODE, PhoneNumberUtil.PhoneNumberFormat.NATIONAL))
                     .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                     // Set the intent that will fire when the user taps the notification
                     .setContentIntent(pendingIntent)
