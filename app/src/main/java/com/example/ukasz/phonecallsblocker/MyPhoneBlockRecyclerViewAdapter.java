@@ -148,11 +148,12 @@ public class MyPhoneBlockRecyclerViewAdapter extends RecyclerView.Adapter<MyPhon
         String contactName = phoneNumberHelper.getContactName(mContext, mBlockings.get(position).getNrBlocked());
 
         Block block = mBlockings.get(position);
+        String phoneNumberFormatted = phoneNumberHelper.formatPhoneNumber(mBlockings.get(position).getNrBlocked(), StartActivity.COUNTRY_CODE, PhoneNumberUtil.PhoneNumberFormat.NATIONAL);
 
         //displaying text content of blockings
         holder.mNrBlocked.setText(contactName != null
-                ? contactName
-                : phoneNumberHelper.formatPhoneNumber(mBlockings.get(position).getNrBlocked(), StartActivity.COUNTRY_CODE, PhoneNumberUtil.PhoneNumberFormat.NATIONAL)
+                ? contactName + " - " + phoneNumberFormatted
+                : phoneNumberFormatted
         );
 
         //change the row state to activated

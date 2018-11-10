@@ -133,10 +133,12 @@ public class MyRegistryRecyclerViewAdapter extends RecyclerView.Adapter<MyRegist
         //Get validator phone number lib to format
         PhoneNumberHelper phoneNumberHelper = new PhoneNumberHelper();
         String contactName = phoneNumberHelper.getContactName(mContext, rBlock.getNrBlocked());
+        String phoneNumberFormatted = phoneNumberHelper.formatPhoneNumber(rBlock.getNrBlocked(), StartActivity.COUNTRY_CODE, PhoneNumberUtil.PhoneNumberFormat.NATIONAL);
 
         holder.mNrRegisteredBlock.setText(contactName != null
-                ? contactName
-                : phoneNumberHelper.formatPhoneNumber(rBlock.getNrBlocked(), StartActivity.COUNTRY_CODE, PhoneNumberUtil.PhoneNumberFormat.NATIONAL));
+                ? contactName + " - " + phoneNumberFormatted
+                : phoneNumberFormatted
+        );
 
         holder.mDate.setText(String.valueOf(rBlock.getNrBlockingDateFormatted("MM/dd/yyyy HH:mm")));
 
