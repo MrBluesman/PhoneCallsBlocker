@@ -14,6 +14,9 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.example.ukasz.androidsqlite.RegistryBlock;
+import com.example.ukasz.phonecallsblocker.validator.PhoneNumberValidator;
+import com.google.i18n.phonenumbers.PhoneNumberUtil;
+
 import java.util.List;
 
 /**
@@ -125,8 +128,15 @@ public class MyRegistryRecyclerViewAdapter extends RecyclerView.Adapter<MyRegist
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder holder, int position)
     {
+        //Get validator phone number lib to format
+        PhoneNumberValidator formator = new PhoneNumberValidator();
+
         RegistryBlock rBlock = mRegistryBlockings.get(position);
-        holder.mNrRegisteredBlock.setText(rBlock.getNrBlocked());
+
+        holder.mNrRegisteredBlock.setText(formator.formatPhoneNumber(
+                rBlock.getNrBlocked(),
+                StartActivity.COUNTRY_CODE,
+                PhoneNumberUtil.PhoneNumberFormat.NATIONAL));
 
         holder.mDate.setText(String.valueOf(rBlock.getNrBlockingDateFormatted("MM/dd/yyyy HH:mm")));
 
