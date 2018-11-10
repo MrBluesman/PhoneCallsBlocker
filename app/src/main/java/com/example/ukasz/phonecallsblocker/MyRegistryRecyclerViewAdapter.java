@@ -14,7 +14,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.example.ukasz.androidsqlite.RegistryBlock;
-import com.example.ukasz.phonecallsblocker.validator.PhoneNumberHelper;
+import com.example.ukasz.phonecallsblocker.phone_number_helper.PhoneNumberHelper;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 
 import java.util.List;

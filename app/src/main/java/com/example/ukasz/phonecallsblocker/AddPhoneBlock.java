@@ -23,7 +23,7 @@ import android.widget.Toast;
 
 import com.example.ukasz.androidsqlite.Block;
 import com.example.ukasz.androidsqlite.DatabaseHandler;
-import com.example.ukasz.phonecallsblocker.validator.PhoneNumberHelper;
+import com.example.ukasz.phonecallsblocker.phone_number_helper.PhoneNumberHelper;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;

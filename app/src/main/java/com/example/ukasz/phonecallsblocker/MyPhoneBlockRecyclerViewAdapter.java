@@ -15,7 +15,7 @@ import android.widget.TextView;
 
 import com.example.ukasz.androidsqlite.Block;
 import com.example.ukasz.phonecallsblocker.list_helper.FlipAnimator;
-import com.example.ukasz.phonecallsblocker.validator.PhoneNumberHelper;
+import com.example.ukasz.phonecallsblocker.phone_number_helper.PhoneNumberHelper;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 
 import java.util.ArrayList;

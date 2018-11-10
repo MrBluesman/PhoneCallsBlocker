@@ -1,4 +1,4 @@
-package com.example.ukasz.phonecallsblocker.validator;
+package com.example.ukasz.phonecallsblocker.phone_number_helper;
 
 import android.content.ContentResolver;
 import android.content.Context;
@@ -90,9 +90,9 @@ public class PhoneNumberHelper
     }
 
     /**
-     * Gets the contact name of incoming phone call.
+     * Gets the contact name of phone number.
      *
-     * @param context context of the app for the {@link CallDetector} object.
+     * @param context context of the app for the {@link CallDetector} object
      * @param incomingNumber contains the number of incoming call
      * @return contact name or null if it's unknown phone number
      */
