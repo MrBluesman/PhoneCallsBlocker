@@ -63,6 +63,8 @@ public class CallDetector
     {
         final AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
         AlertDialog alertDialog = builder.create();
+        final AlertDialog.Builder builderCategory = new AlertDialog.Builder(ctx);
+        AlertDialog alertDialogCategory = builderCategory.create();
         int previousState = 0;
 
         /**
@@ -285,6 +287,7 @@ public class CallDetector
                     {
                         //Answered Call which is ended
                         alertDialog.dismiss();
+                        alertDialogCategory.dismiss();
                     }
                     previousState = state;
                     break;
@@ -296,6 +299,7 @@ public class CallDetector
                     {
                         previousState=state;
                         alertDialog.dismiss();
+                        alertDialogCategory.dismiss();
                     }
                     break;
                 }
@@ -385,41 +389,8 @@ public class CallDetector
                             {
                                 //Save and block
                                 case 0:
-                                    final List<String> categories = db.getAllCategories();
-                                    AlertDialog.Builder builder2 = new AlertDialog.Builder(ctx);
-                                    builder2.setTitle(R.string.call_detector_choose_category_title);
-                                    CharSequence[] categoriesCharSequence = new CharSequence[categories.size()];
-
-                                    //Build categories list
-                                    int i=0;
-                                    for(String cat:categories)
-                                    {
-                                        categoriesCharSequence[i] = cat;
-                                        i++;
-                                    }
-
-                                    builder2.setItems(categoriesCharSequence,
-                                            new DialogInterface.OnClickListener()
-                                            {
-
-                                                @Override
-                                                public void onClick(DialogInterface dialog, int categoryId)
-                                                {
-                                                    addPhoneBlock(db, phoneNumberFormatted, categoryId, true);
-                                                    declinePhone(ctx);
-                                                    registerPhoneBlock(db, phoneNumberFormatted, true);
-                                                }
-                                            }
-                                    );
-
-                                    AlertDialog alertDialog2 = builder2.create();
-                                    alertDialog2.getWindow().setType(getDialogLayoutFlag());
-                                    alertDialog2.getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
-                                            | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
-                                            | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
-                                            | WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
-                                    alertDialog2.show();
-
+                                    setDialogForCategory(phoneNumberFormatted, db);
+                                    showAlertDialogForCategory();
                                     break;
                                 //Block
                                 case 1:
@@ -493,6 +464,57 @@ public class CallDetector
                     | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
                     | WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
             alertDialog.show();
+        }
+
+        /**
+         * Sets a {@link AlertDialog.Builder} for choose category for block.
+         *
+         * @param incomingNumber contains the number of incoming call (equals to Private number)
+         * @param db database for fetching categories and registering blocking in registry list
+         */
+        private void setDialogForCategory(final String incomingNumber, final DatabaseHandler db)
+        {
+            final List<String> categories = db.getAllCategories();
+
+            builderCategory.setTitle(R.string.call_detector_choose_category_title);
+            CharSequence[] categoriesCharSequence = new CharSequence[categories.size()];
+
+            //Build categories list
+            int i=0;
+            for(String cat:categories)
+            {
+                categoriesCharSequence[i] = cat;
+                i++;
+            }
+
+            builderCategory.setItems(categoriesCharSequence,
+                    new DialogInterface.OnClickListener()
+                    {
+
+                        @Override
+                        public void onClick(DialogInterface dialog, int categoryId)
+                        {
+                            addPhoneBlock(db, incomingNumber, categoryId, true);
+                            declinePhone(ctx);
+                            registerPhoneBlock(db, incomingNumber, true);
+                        }
+                    }
+            );
+        }
+
+        /**
+         * Shows an {@link AlertDialog} for choose category.
+         * Content is based on class {@link AlertDialog.Builder}.
+         */
+        private void showAlertDialogForCategory()
+        {
+            alertDialogCategory = builderCategory.create();
+            alertDialogCategory.getWindow().setType(getDialogLayoutFlag());
+            alertDialogCategory.getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
+                    | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
+                    | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
+                    | WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
+            alertDialogCategory.show();
         }
 
         /**
