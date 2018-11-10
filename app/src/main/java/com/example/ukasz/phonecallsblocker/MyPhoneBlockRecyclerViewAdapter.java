@@ -144,15 +144,16 @@ public class MyPhoneBlockRecyclerViewAdapter extends RecyclerView.Adapter<MyPhon
     public void onBindViewHolder(@NonNull PhoneBlockHolder holder, int position)
     {
         //Get validator phone number lib to format
-        PhoneNumberHelper formator = new PhoneNumberHelper();
+        PhoneNumberHelper phoneNumberHelper = new PhoneNumberHelper();
+        String contactName = phoneNumberHelper.getContactName(mContext, mBlockings.get(position).getNrBlocked());
 
         Block block = mBlockings.get(position);
 
         //displaying text content of blockings
-        holder.mNrBlocked.setText(formator.formatPhoneNumber(
-                mBlockings.get(position).getNrBlocked(),
-                StartActivity.COUNTRY_CODE,
-                PhoneNumberUtil.PhoneNumberFormat.NATIONAL));
+        holder.mNrBlocked.setText(contactName != null
+                ? contactName
+                : phoneNumberHelper.formatPhoneNumber(mBlockings.get(position).getNrBlocked(), StartActivity.COUNTRY_CODE, PhoneNumberUtil.PhoneNumberFormat.NATIONAL)
+        );
 
         //change the row state to activated
         holder.itemView.setActivated(selectedItems.get(position, false));
