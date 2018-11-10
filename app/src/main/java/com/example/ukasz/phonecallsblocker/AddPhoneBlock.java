@@ -25,6 +25,7 @@ import android.widget.Toast;
 
 import com.example.ukasz.androidsqlite.Block;
 import com.example.ukasz.androidsqlite.DatabaseHandler;
+import com.example.ukasz.phonecallsblocker.validator.PhoneNumberValidator;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -113,27 +114,17 @@ public class AddPhoneBlock extends AppCompatActivity implements AdapterView.OnIt
 
                 String countryCode = "+48";
                 String phoneNumber = nrBlocked.getText().toString().trim();
+
+                PhoneNumberValidator validator = new PhoneNumberValidator();
+
                 if(countryCode.length() > 0 && phoneNumber.length() > 0)
                 {
-                    if(isValidPhoneNumber(phoneNumber))
+                    if(validator.isValidPhoneNumber(phoneNumber))
                     {
                         //Format phone number
-                        PhoneNumberUtil phoneNumberUtil = PhoneNumberUtil.getInstance();
-                        String isoCode = phoneNumberUtil.getRegionCodeForCountryCode(Integer.parseInt(countryCode));
-                        Phonenumber.PhoneNumber phoneNumberLib = null;
-                        try
-                        {
-                            phoneNumberLib = phoneNumberUtil.parse(phoneNumber, isoCode);
-                        }
-                        catch (NumberParseException e)
-                        {
-                            System.err.println(e);
-                        }
+                        String internationalFormat = validator.formatPhoneNuber(phoneNumber, countryCode,PhoneNumberUtil.PhoneNumberFormat.NATIONAL);
 
-                        assert phoneNumberLib != null;
-                        String internationalFormat = phoneNumberUtil.format(phoneNumberLib, PhoneNumberUtil.PhoneNumberFormat.NATIONAL);
-
-                        boolean status = validateUsingLibphonenumber(countryCode, phoneNumber);
+                        boolean status = validator.validateUsingLibphonenumber(countryCode, phoneNumber);
                         if(status)
                         {
                             //Good - add phone number
@@ -269,44 +260,5 @@ public class AddPhoneBlock extends AppCompatActivity implements AdapterView.OnIt
                 }
             });
         }
-    }
-
-    /**
-     * Validates phoneNumber using basic patterns.
-     *
-     * @param phoneNumber phone number to validate
-     * @return true if phone number is valid, false if is not
-     */
-    private boolean isValidPhoneNumber(CharSequence phoneNumber)
-    {
-        if (!TextUtils.isEmpty(phoneNumber))
-        {
-            return Patterns.PHONE.matcher(phoneNumber).matches();
-        }
-        return false;
-    }
-
-    /**
-     * Validates phNumber using libphonenumber library including countryCode.
-     * @param countryCode country code of the phNumber
-     * @param phNumber phone number to validate
-     * @return true if phone is valid, false if is not
-     */
-    private boolean validateUsingLibphonenumber(String countryCode, String phNumber)
-    {
-        PhoneNumberUtil phoneNumberUtil = PhoneNumberUtil.getInstance();
-        String isoCode = phoneNumberUtil.getRegionCodeForCountryCode(Integer.parseInt(countryCode));
-        Phonenumber.PhoneNumber phoneNumber = null;
-        try
-        {
-            //phoneNumber = phoneNumberUtil.parse(phNumber, "IN");  //if you want to pass region code
-            phoneNumber = phoneNumberUtil.parse(phNumber, isoCode);
-        }
-        catch (NumberParseException e)
-        {
-            System.err.println(e);
-        }
-
-        return phoneNumberUtil.isValidNumber(phoneNumber);
     }
 }
