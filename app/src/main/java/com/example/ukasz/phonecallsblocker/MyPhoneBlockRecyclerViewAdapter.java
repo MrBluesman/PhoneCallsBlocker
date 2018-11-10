@@ -3,7 +3,6 @@ package com.example.ukasz.phonecallsblocker;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.HapticFeedbackConstants;
 import android.view.LayoutInflater;
@@ -16,8 +15,8 @@ import android.widget.TextView;
 
 import com.example.ukasz.androidsqlite.Block;
 import com.example.ukasz.phonecallsblocker.list_helper.FlipAnimator;
-import com.firebase.ui.database.FirebaseRecyclerAdapter;
-import com.firebase.ui.database.FirebaseRecyclerOptions;
+import com.example.ukasz.phonecallsblocker.validator.PhoneNumberValidator;
+import com.google.i18n.phonenumbers.PhoneNumberUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,6 +43,9 @@ public class MyPhoneBlockRecyclerViewAdapter extends RecyclerView.Adapter<MyPhon
 
     // index is used to animate only the selected row
     private static int currentSelectedIndex = -1;
+
+    //default country code - supports only PL for now
+    private final static String COUNTRY_CODE = "+48";
 
     /**
      * ViewHolder class for single Block view.
@@ -144,10 +146,16 @@ public class MyPhoneBlockRecyclerViewAdapter extends RecyclerView.Adapter<MyPhon
     @Override
     public void onBindViewHolder(@NonNull PhoneBlockHolder holder, int position)
     {
+        //Get validator phone number lib to format
+        PhoneNumberValidator formator = new PhoneNumberValidator();
+
         Block block = mBlockings.get(position);
 
         //displaying text content of blockings
-        holder.mNrBlocked.setText(mBlockings.get(position).getNrBlocked());
+        holder.mNrBlocked.setText(formator.formatPhoneNumber(
+                mBlockings.get(position).getNrBlocked(),
+                COUNTRY_CODE,
+                PhoneNumberUtil.PhoneNumberFormat.NATIONAL));
 
         //change the row state to activated
         holder.itemView.setActivated(selectedItems.get(position, false));
@@ -385,7 +393,7 @@ public class MyPhoneBlockRecyclerViewAdapter extends RecyclerView.Adapter<MyPhon
      *
      * @param position position of blocking do remove
      */
-    public void removeData(int position)
+    void removeData(int position)
     {
         mBlockings.remove(position);
         resetCurrentIndex();
