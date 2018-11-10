@@ -33,6 +33,7 @@ import com.example.ukasz.androidsqlite.Block;
 import com.example.ukasz.androidsqlite.DatabaseHandler;
 import com.example.ukasz.androidsqlite.RegistryBlock;
 import com.example.ukasz.phonecallsblocker.notification_helper.NotificationID;
+import com.example.ukasz.phonecallsblocker.validator.PhoneNumberValidator;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -608,54 +609,89 @@ public class CallDetector
                 != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(ctx, Manifest.permission.READ_PHONE_STATE)
                 != PackageManager.PERMISSION_GRANTED) return;
 
-        final Block newBlock = new Block(myPhoneNumber, phoneNumber, category, "", rating);
+        phoneNumber = phoneNumber.trim();
+        PhoneNumberValidator validator = new PhoneNumberValidator();
 
-        //LOCAL SECTION! add to local blockings
-        if(!db.existBlock(newBlock))
+        if(COUNTRY_CODE.length() > 0 && phoneNumber.length() > 0)
         {
-            db.addBlocking(newBlock);
-            //ADD to blocking list to make notify data changed possible for adapter
-            Toast.makeText(ctx, R.string.add_phone_block_added, Toast.LENGTH_SHORT).show();
-            //TODO: Refresh adapter after add
-            PhoneBlockFragment.blockings.add(newBlock);
+            if(validator.isValidPhoneNumber(phoneNumber))
+            {
+                //Format phone number
+                String internationalFormat = validator.formatPhoneNuber(phoneNumber, COUNTRY_CODE, PhoneNumberUtil.PhoneNumberFormat.E164);
+
+                boolean status = validator.validateUsingLibphonenumber(COUNTRY_CODE, phoneNumber);
+                if(status)
+                {
+                    //Good - add phone number
+                    final Block newBlock = new Block(myPhoneNumber, internationalFormat, category, "", rating);
+
+                    //LOCAL SECTION! add to local blockings
+                    if(!db.existBlock(newBlock))
+                    {
+                        db.addBlocking(newBlock);
+                        //ADD to blocking list to make notify data changed possible for adapter
+                        Toast.makeText(ctx, R.string.add_phone_block_added, Toast.LENGTH_SHORT).show();
+                        //TODO: Refresh adapter after add
+                        PhoneBlockFragment.blockings.add(newBlock);
+                    }
+                    else
+                    {
+                        Toast.makeText(ctx, R.string.add_phone_block_already_exist, Toast.LENGTH_SHORT).show();
+                    }
+
+                    //GLOBAL SECTION! add to global blockings if sync is enabled
+                    boolean syncEnabled =  ctx.getSharedPreferences("data", Context.MODE_PRIVATE)
+                            .getBoolean("syncEnabled", false);
+
+                    if(syncEnabled)
+                    {
+                        final DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference();
+                        Query newBlockingRef = databaseRef
+                                .child("blockings")
+                                .orderByChild("nrDeclarantBlocked")
+                                .equalTo(newBlock.getNrDeclarant() + "_" + newBlock.getNrBlocked())
+                                .limitToFirst(1);
+
+
+                        newBlockingRef.addListenerForSingleValueEvent(new ValueEventListener()
+                        {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot)
+                            {
+                                if(!dataSnapshot.exists())
+                                {
+                                    Log.e("TEST_ISTNIEJE", "NIE");
+                                    databaseRef.child("blockings").push().setValue(newBlock);
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError)
+                            {
+                                Toast.makeText(ctx, R.string.error, Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+                }
+                else
+                {
+                    Toast.makeText(ctx,
+                            ctx.getText(R.string.add_phone_block_error_invalid) + ": " + internationalFormat,
+                            Toast.LENGTH_LONG).show();
+                }
+            }
+            else
+            {
+                Toast.makeText(ctx,
+                        ctx.getText(R.string.add_phone_block_error_invalid) + ": " + phoneNumber,
+                        Toast.LENGTH_LONG).show();
+            }
         }
         else
         {
-            Toast.makeText(ctx, R.string.add_phone_block_already_exist, Toast.LENGTH_SHORT).show();
-        }
-
-        //GLOBAL SECTION! add to global blockings if sync is enabled
-        boolean syncEnabled =  ctx.getSharedPreferences("data", Context.MODE_PRIVATE)
-                .getBoolean("syncEnabled", false);
-
-        if(syncEnabled)
-        {
-            final DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference();
-            Query newBlockingRef = databaseRef
-                    .child("blockings")
-                    .orderByChild("nrDeclarantBlocked")
-                    .equalTo(newBlock.getNrDeclarant() + "_" + newBlock.getNrBlocked())
-                    .limitToFirst(1);
-
-
-            newBlockingRef.addListenerForSingleValueEvent(new ValueEventListener()
-            {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot)
-                {
-                    if(!dataSnapshot.exists())
-                    {
-                        Log.e("TEST_ISTNIEJE", "NIE");
-                        databaseRef.child("blockings").push().setValue(newBlock);
-                    }
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError)
-                {
-                    Toast.makeText(ctx, R.string.error, Toast.LENGTH_SHORT).show();
-                }
-            });
+            Toast.makeText(ctx,
+                    ctx.getText(R.string.add_phone_block_error_empty),
+                    Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -765,6 +801,9 @@ public class CallDetector
     private final static int NOTIFICATION_BLOCKED = 0;
     private final static int NOTIFICATION_ALLOWED = 1;
     private DatabaseReference mDatabase;
+
+    //default country code - supports only PL for now
+    private final static String COUNTRY_CODE = "+48";
 
     /**
      * Constructor.
