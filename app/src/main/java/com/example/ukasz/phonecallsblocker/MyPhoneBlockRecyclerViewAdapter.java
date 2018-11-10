@@ -52,6 +52,7 @@ public class MyPhoneBlockRecyclerViewAdapter extends RecyclerView.Adapter<MyPhon
 
         final View mViewContainer;
         final TextView mNrBlocked;
+        final TextView mNrBlockedSubContent;
         private ImageView mImgBlock;
         private LinearLayout mPhoneblockContainer;
         private RelativeLayout mIconContainer, mIconBack, mIconFront;
@@ -66,6 +67,7 @@ public class MyPhoneBlockRecyclerViewAdapter extends RecyclerView.Adapter<MyPhon
             super(view);
             mViewContainer = view;
             mNrBlocked = view.findViewById(R.id.phoneblock_number);
+            mNrBlockedSubContent = view.findViewById(R.id.phoneblock_subnumber);
             mImgBlock = view.findViewById(R.id.icon_block);
             mPhoneblockContainer = view.findViewById(R.id.phoneblock_container);
             mIconContainer = view.findViewById(R.id.icon_container);
@@ -151,10 +153,9 @@ public class MyPhoneBlockRecyclerViewAdapter extends RecyclerView.Adapter<MyPhon
         String phoneNumberFormatted = phoneNumberHelper.formatPhoneNumber(mBlockings.get(position).getNrBlocked(), StartActivity.COUNTRY_CODE, PhoneNumberUtil.PhoneNumberFormat.NATIONAL);
 
         //displaying text content of blockings
-        holder.mNrBlocked.setText(contactName != null
-                ? contactName + " - " + phoneNumberFormatted
-                : phoneNumberFormatted
-        );
+        holder.mNrBlocked.setText(contactName != null ? contactName : phoneNumberFormatted);
+
+        holder.mNrBlockedSubContent.setText(contactName != null ? "(" + phoneNumberFormatted + ")" : "");
 
         //change the row state to activated
         holder.itemView.setActivated(selectedItems.get(position, false));

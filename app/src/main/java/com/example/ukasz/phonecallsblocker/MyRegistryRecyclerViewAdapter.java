@@ -136,7 +136,7 @@ public class MyRegistryRecyclerViewAdapter extends RecyclerView.Adapter<MyRegist
         String phoneNumberFormatted = phoneNumberHelper.formatPhoneNumber(rBlock.getNrBlocked(), StartActivity.COUNTRY_CODE, PhoneNumberUtil.PhoneNumberFormat.NATIONAL);
 
         holder.mNrRegisteredBlock.setText(contactName != null
-                ? contactName + " - " + phoneNumberFormatted
+                ? contactName
                 : phoneNumberFormatted
         );
 

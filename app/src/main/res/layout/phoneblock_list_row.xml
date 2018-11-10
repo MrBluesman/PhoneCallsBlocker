@@ -6,30 +6,43 @@
     android:clickable="true"
     android:focusable="true"
     android:orientation="vertical"
-    android:paddingBottom="@dimen/padding_list_row"
     android:paddingStart="?listPreferredItemPaddingLeft"
+    android:paddingTop="@dimen/padding_list_row"
     android:paddingEnd="?listPreferredItemPaddingRight"
-    android:paddingTop="@dimen/padding_list_row">
+    android:paddingBottom="@dimen/padding_list_row_bottom">
 
     <LinearLayout
         android:id="@+id/phoneblock_container"
         android:layout_width="395dp"
-        android:layout_height="36dp"
+        android:layout_height="48dp"
+        android:layout_alignParentStart="true"
+        android:layout_centerVertical="true"
         android:clickable="true"
         android:focusable="true"
-        android:orientation="vertical"
-        android:paddingEnd="@dimen/padding_list_row"
-        android:paddingStart="72dp">
+        android:orientation="horizontal"
+        android:paddingStart="62dp"
+        android:paddingTop="10dp"
+        android:paddingEnd="@dimen/padding_list_row">
 
         <TextView
             android:id="@+id/phoneblock_number"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_height="33dp"
             android:ellipsize="end"
             android:lines="1"
             android:textColor="@color/block_number"
             android:textSize="@dimen/phoneblock_text_primary"
             android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/phoneblock_subnumber"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="7sp"
+            android:ellipsize="end"
+            android:lines="1"
+            android:textColor="@color/block_number_sub_content"
+            android:textSize="@dimen/phoneblock_text_secondary" />
 
     </LinearLayout>
 
