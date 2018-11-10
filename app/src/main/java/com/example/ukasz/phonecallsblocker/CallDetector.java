@@ -109,7 +109,6 @@ public class CallDetector
                     final String phoneNumberFormatted = validator.formatPhoneNumber(incomingNumberV, "+48", PhoneNumberUtil.PhoneNumberFormat.E164);
 
                     Toast.makeText(ctx, "Połączenie przychodzące: " + incomingNumberV, Toast.LENGTH_LONG).show();
-                    Log.e("incomingNumber", phoneNumberFormatted);
 
                     //set ringing flag
                     previousState = state;
@@ -209,13 +208,13 @@ public class CallDetector
                             //check for LOCAL BLOCKING
                             if (db.existBlock(myPhoneNumber, phoneNumberFormatted, true)) //Phone number is blocked locally
                             {
-                                setIncomingCallDialogBlockedNumber(phoneNumberFormatted, db);
+                                setIncomingCallDialogBlockedNumber(incomingNumberV, db);
                                 showAlertDialogForManualBlocking();
                             }
                             else if(foreignBlockEnabled && isForeignIncomingCall(phoneNumberFormatted) //phone number is foreign and foreignBlock is enabled
                                         || unknownBlockEnabled)
                             {
-                                setIncomingCallDialogGlobalUnknownForeignNumber(phoneNumberFormatted, db, null);
+                                setIncomingCallDialogGlobalUnknownForeignNumber(incomingNumberV, db, null);
                                 showAlertDialogForManualBlocking();
                             }
                             else if((privateBlockEnabled && incomingNumber == null)) //phone number is private and privateBlock is enabled
@@ -245,7 +244,7 @@ public class CallDetector
                                         if (trueAmount > falseAmount)
                                         {
                                             //Alert dla global blocking
-                                            setIncomingCallDialogGlobalUnknownForeignNumber(phoneNumberFormatted, db, trueAmount);
+                                            setIncomingCallDialogGlobalUnknownForeignNumber(incomingNumberV, db, trueAmount);
                                             showAlertDialogForManualBlocking();
                                         }
                                         else //allow
@@ -312,6 +311,12 @@ public class CallDetector
          */
         private void setIncomingCallDialogBlockedNumber(final String incomingNumber, final DatabaseHandler db)
         {
+            //Get validator phone number lib to format
+            PhoneNumberValidator formator = new PhoneNumberValidator();
+            final String phoneNumberFormatted = formator.formatPhoneNumber(incomingNumber,
+                StartActivity.COUNTRY_CODE,
+                PhoneNumberUtil.PhoneNumberFormat.E164);
+
             builder.setTitle(incomingNumber + "\n" + ctx.getString(R.string.call_detector_is_blocked_by_you)+".");
 
             builder.setItems(R.array.incoming_blocked_number_options,
@@ -324,8 +329,8 @@ public class CallDetector
                             {
                                 case 0:
                                 //Change to positive (white list) - false is positive (not blocked)
-                                    updatePhoneBlock(db, incomingNumber, false);
-                                    registerPhoneBlock(db, incomingNumber, false);
+                                    updatePhoneBlock(db, phoneNumberFormatted, false);
+                                    registerPhoneBlock(db, phoneNumberFormatted, false);
 
                                     Toast.makeText(ctx, R.string.call_detector_changed_to_positive, Toast.LENGTH_SHORT).show();
                                     break;
@@ -333,14 +338,14 @@ public class CallDetector
                                 //Block
                                 case 1:
                                     declinePhone(ctx);
-                                    registerPhoneBlock(db, incomingNumber, true);
+                                    registerPhoneBlock(db, phoneNumberFormatted, true);
                                     Toast.makeText(ctx, R.string.call_detector_has_blocked, Toast.LENGTH_SHORT).show();
                                     break;
 
                                 //Allow
                                 case 2:
                                     Toast.makeText(ctx, R.string.call_detector_has_allowed, Toast.LENGTH_SHORT).show();
-                                    registerPhoneBlock(db, incomingNumber, false);
+                                    registerPhoneBlock(db, phoneNumberFormatted, false);
                                     break;
                             }
                         }
@@ -357,6 +362,12 @@ public class CallDetector
          */
         private void setIncomingCallDialogGlobalUnknownForeignNumber(final String incomingNumber, final DatabaseHandler db, Integer blockAmount)
         {
+            //Get validator phone number lib to format
+            PhoneNumberValidator formator = new PhoneNumberValidator();
+            final String phoneNumberFormatted = formator.formatPhoneNumber(incomingNumber,
+                    StartActivity.COUNTRY_CODE,
+                    PhoneNumberUtil.PhoneNumberFormat.E164);
+
             builder.setTitle(incomingNumber);
             if(blockAmount != null) builder.setTitle(incomingNumber
                     + "\n"
@@ -394,9 +405,9 @@ public class CallDetector
                                                 @Override
                                                 public void onClick(DialogInterface dialog, int categoryId)
                                                 {
-                                                    addPhoneBlock(db, incomingNumber, categoryId, true);
+                                                    addPhoneBlock(db, phoneNumberFormatted, categoryId, true);
                                                     declinePhone(ctx);
-                                                    registerPhoneBlock(db, incomingNumber, true);
+                                                    registerPhoneBlock(db, phoneNumberFormatted, true);
                                                 }
                                             }
                                     );
@@ -413,19 +424,19 @@ public class CallDetector
                                 //Block
                                 case 1:
                                     declinePhone(ctx);
-                                    registerPhoneBlock(db, incomingNumber, true);
+                                    registerPhoneBlock(db, phoneNumberFormatted, true);
                                     Toast.makeText(ctx, R.string.call_detector_has_blocked, Toast.LENGTH_SHORT).show();
                                     break;
 
                                 //Save as positive (white list)
                                 case 2:
-                                    addPhoneBlock(db, incomingNumber, 0, false);
-                                    registerPhoneBlock(db, incomingNumber, false);
+                                    addPhoneBlock(db, phoneNumberFormatted, 0, false);
+                                    registerPhoneBlock(db, phoneNumberFormatted, false);
                                     Toast.makeText(ctx, R.string.call_detector_has_saved_positive, Toast.LENGTH_SHORT).show();
 
                                     //Allow
                                 case 3:
-                                    registerPhoneBlock(db, incomingNumber, false);
+                                    registerPhoneBlock(db, phoneNumberFormatted, false);
                                     Toast.makeText(ctx, R.string.call_detector_has_allowed, Toast.LENGTH_SHORT).show();
                                     break;
                             }
