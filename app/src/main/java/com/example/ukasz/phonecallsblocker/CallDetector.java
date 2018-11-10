@@ -106,7 +106,7 @@ public class CallDetector
             {
                 case TelephonyManager.CALL_STATE_RINGING:
                 {
-                    final String phoneNumberFormatted = validator.formatPhoneNumber(incomingNumberV, "+48", PhoneNumberUtil.PhoneNumberFormat.E164);
+                    final String phoneNumberFormatted = validator.formatPhoneNumber(incomingNumberV, StartActivity.COUNTRY_CODE, PhoneNumberUtil.PhoneNumberFormat.E164);
 
                     Toast.makeText(ctx, "Połączenie przychodzące: " + incomingNumberV, Toast.LENGTH_LONG).show();
 
@@ -533,7 +533,10 @@ public class CallDetector
                 }
             }
 
-            builder.setContentTitle(incomingNumber)
+            //Get validator phone number lib to format
+            PhoneNumberValidator formator = new PhoneNumberValidator();
+
+            builder.setContentTitle(formator.formatPhoneNumber(incomingNumber, StartActivity.COUNTRY_CODE, PhoneNumberUtil.PhoneNumberFormat.NATIONAL))
                     .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                     // Set the intent that will fire when the user taps the notification
                     .setContentIntent(pendingIntent)
