@@ -41,7 +41,7 @@ import com.example.ukasz.androidsqlite.Block;
 import com.example.ukasz.androidsqlite.DatabaseHandler;
 import com.example.ukasz.permissions.PermissionsStartupActivity;
 import com.example.ukasz.phonecallsblocker.tab_layout_helper.CustomViewPager;
-import com.example.ukasz.phonecallsblocker.validator.PhoneNumberValidator;
+import com.example.ukasz.phonecallsblocker.validator.PhoneNumberHelper;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -845,7 +845,7 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
     private Dialog createRatingDialog(final String nrBlocked)
     {
         final AlertDialog.Builder builder = new AlertDialog.Builder(StartActivity.this);
-        PhoneNumberValidator validator = new PhoneNumberValidator();
+        PhoneNumberHelper validator = new PhoneNumberHelper();
 
         if(COUNTRY_CODE.length() > 0 && nrBlocked.length() > 0)
         {

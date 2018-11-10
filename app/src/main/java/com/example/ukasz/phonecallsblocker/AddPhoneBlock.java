@@ -23,7 +23,7 @@ import android.widget.Toast;
 
 import com.example.ukasz.androidsqlite.Block;
 import com.example.ukasz.androidsqlite.DatabaseHandler;
-import com.example.ukasz.phonecallsblocker.validator.PhoneNumberValidator;
+import com.example.ukasz.phonecallsblocker.validator.PhoneNumberHelper;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -109,7 +109,7 @@ public class AddPhoneBlock extends AppCompatActivity implements AdapterView.OnIt
             {
                 String phoneNumber = nrBlocked.getText().toString().trim();
 
-                PhoneNumberValidator validator = new PhoneNumberValidator();
+                PhoneNumberHelper validator = new PhoneNumberHelper();
 
                 if(StartActivity.COUNTRY_CODE.length() > 0 && phoneNumber.length() > 0)
                 {

@@ -1,19 +1,25 @@
 package com.example.ukasz.phonecallsblocker.validator;
 
+import android.content.ContentResolver;
+import android.content.Context;
+import android.database.Cursor;
+import android.net.Uri;
+import android.provider.ContactsContract;
 import android.text.TextUtils;
 import android.util.Patterns;
 
+import com.example.ukasz.phonecallsblocker.CallDetector;
 import com.google.i18n.phonenumbers.NumberParseException;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.Phonenumber;
 
-public class PhoneNumberValidator
+public class PhoneNumberHelper
 {
     /**
      * Mandatory empty constructor.
-     * Creates a instance of {@link PhoneNumberValidator}
+     * Creates a instance of {@link PhoneNumberHelper}
      */
-    public PhoneNumberValidator()
+    public PhoneNumberHelper()
     {
 
     }
@@ -81,5 +87,31 @@ public class PhoneNumberValidator
 
         assert phoneNumberLib != null;
         return phoneNumberUtil.format(phoneNumberLib, format);
+    }
+
+    /**
+     * Gets the contact name of incoming phone call.
+     *
+     * @param context context of the app for the {@link CallDetector} object.
+     * @param incomingNumber contains the number of incoming call
+     * @return contact name or null if it's unknown phone number
+     */
+    public String getContactName(final Context context, final String incomingNumber)
+    {
+        ContentResolver cr = context.getContentResolver();
+        Uri uri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(incomingNumber));
+
+        Cursor cursor = cr.query(uri, new String[]{ContactsContract.PhoneLookup.DISPLAY_NAME}, null, null, null);
+        if (cursor == null) return null;
+
+        String contactName = null;
+        if(cursor.moveToFirst())
+        {
+            contactName = cursor.getString(cursor.getColumnIndex(ContactsContract.PhoneLookup.DISPLAY_NAME));
+        }
+
+        if(!cursor.isClosed()) cursor.close();
+
+        return contactName;
     }
 }

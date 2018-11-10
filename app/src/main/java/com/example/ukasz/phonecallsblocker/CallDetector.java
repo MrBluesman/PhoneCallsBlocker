@@ -6,17 +6,13 @@ import android.app.AlertDialog;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
@@ -33,7 +29,7 @@ import com.example.ukasz.androidsqlite.Block;
 import com.example.ukasz.androidsqlite.DatabaseHandler;
 import com.example.ukasz.androidsqlite.RegistryBlock;
 import com.example.ukasz.phonecallsblocker.notification_helper.NotificationID;
-import com.example.ukasz.phonecallsblocker.validator.PhoneNumberValidator;
+import com.example.ukasz.phonecallsblocker.validator.PhoneNumberHelper;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -93,9 +89,6 @@ public class CallDetector
             //Format phone number
 
             final String incomingNumberV = incomingNumber != null ? incomingNumber : "Numer prywatny";
-            final String incomingContactName = (unknownBlockEnabled && !incomingNumberV.isEmpty())
-                    ? getContactName(ctx, incomingNumberV)
-                    : null;
 
             //Firebase blockings data
             Query blockings = mDatabase
@@ -108,9 +101,14 @@ public class CallDetector
             {
                 case TelephonyManager.CALL_STATE_RINGING:
                 {
-                    final String phoneNumberFormatted = validator.formatPhoneNumber(incomingNumberV, StartActivity.COUNTRY_CODE, PhoneNumberUtil.PhoneNumberFormat.E164);
+                    final String phoneNumberFormatted = phoneNumberHelper.formatPhoneNumber(incomingNumberV, StartActivity.COUNTRY_CODE, PhoneNumberUtil.PhoneNumberFormat.E164);
 
                     Toast.makeText(ctx, "Połączenie przychodzące: " + incomingNumberV, Toast.LENGTH_LONG).show();
+
+                    //get incoming contact name
+                    final String incomingContactName = !incomingNumberV.isEmpty()
+                            ? phoneNumberHelper.getContactName(ctx, incomingNumberV)
+                            : null;
 
                     //set ringing flag
                     previousState = state;
@@ -205,8 +203,6 @@ public class CallDetector
 
                         if(canDrawOverlays)
                         {
-                            final AlertDialog alertDialog;
-
                             //check for LOCAL BLOCKING
                             if (db.existBlock(myPhoneNumber, phoneNumberFormatted, true)) //Phone number is blocked locally
                             {
@@ -316,7 +312,7 @@ public class CallDetector
         private void setIncomingCallDialogBlockedNumber(final String incomingNumber, final DatabaseHandler db)
         {
             //Get validator phone number lib to format
-            PhoneNumberValidator formator = new PhoneNumberValidator();
+            PhoneNumberHelper formator = new PhoneNumberHelper();
             final String phoneNumberFormatted = formator.formatPhoneNumber(incomingNumber,
                 StartActivity.COUNTRY_CODE,
                 PhoneNumberUtil.PhoneNumberFormat.E164);
@@ -367,7 +363,7 @@ public class CallDetector
         private void setIncomingCallDialogGlobalUnknownForeignNumber(final String incomingNumber, final DatabaseHandler db, Integer blockAmount)
         {
             //Get validator phone number lib to format
-            PhoneNumberValidator formator = new PhoneNumberValidator();
+            PhoneNumberHelper formator = new PhoneNumberHelper();
             final String phoneNumberFormatted = formator.formatPhoneNumber(incomingNumber,
                     StartActivity.COUNTRY_CODE,
                     PhoneNumberUtil.PhoneNumberFormat.E164);
@@ -556,7 +552,7 @@ public class CallDetector
             }
 
             //Get validator phone number lib to format
-            PhoneNumberValidator formator = new PhoneNumberValidator();
+            PhoneNumberHelper formator = new PhoneNumberHelper();
 
             builder.setContentTitle(formator.formatPhoneNumber(incomingNumber, StartActivity.COUNTRY_CODE, PhoneNumberUtil.PhoneNumberFormat.NATIONAL))
                     .setPriority(NotificationCompat.PRIORITY_DEFAULT)
@@ -592,32 +588,6 @@ public class CallDetector
 
             return false;
         }
-
-        /**
-         * Gets the contact name of incoming phone call.
-         *
-         * @param context context of the app for the {@link CallDetector} object.
-         * @param incomingNumber contains the number of incoming call
-         * @return contact name or null if it's unknown phone number
-         */
-        private String getContactName(final Context context, final String incomingNumber)
-        {
-            ContentResolver cr = context.getContentResolver();
-            Uri uri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(incomingNumber));
-
-            Cursor cursor = cr.query(uri, new String[]{ContactsContract.PhoneLookup.DISPLAY_NAME}, null, null, null);
-            if (cursor == null) return null;
-
-            String contactName = null;
-            if(cursor.moveToFirst())
-            {
-                contactName = cursor.getString(cursor.getColumnIndex(ContactsContract.PhoneLookup.DISPLAY_NAME));
-            }
-
-            if(!cursor.isClosed()) cursor.close();
-
-            return contactName;
-        }
     }
 
     /**
@@ -649,7 +619,7 @@ public class CallDetector
                 != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(ctx, Manifest.permission.READ_PHONE_STATE)
                 != PackageManager.PERMISSION_GRANTED) return;
 
-        PhoneNumberValidator validator = new PhoneNumberValidator();
+        PhoneNumberHelper validator = new PhoneNumberHelper();
 
         if(StartActivity.COUNTRY_CODE.length() > 0 && phoneNumber.length() > 0)
         {
@@ -838,7 +808,7 @@ public class CallDetector
     private final static int NOTIFICATION_ALLOWED = 1;
     private DatabaseReference mDatabase;
 
-    private PhoneNumberValidator validator;
+    private PhoneNumberHelper phoneNumberHelper;
 
     /**
      * Constructor.
@@ -855,7 +825,7 @@ public class CallDetector
         notificationManager = NotificationManagerCompat.from(ctx);
 
         //phone number util validator
-        validator = new PhoneNumberValidator();
+        phoneNumberHelper = new PhoneNumberHelper();
 
         /* TODO: refactor to keep all references in one place */
         //Database reference
@@ -891,7 +861,7 @@ public class CallDetector
      *  This method stops a listening incoming calls by set listener state on LISTEN_NONE.
      *  Unregisters receiver for outgoing calls.
      */
-    public void stop()
+    void stop()
     {
         Log.e("test", "CallDetector - stop() method !!!!!!!!!");
         tm = (TelephonyManager) ctx.getSystemService(Context.TELEPHONY_SERVICE);

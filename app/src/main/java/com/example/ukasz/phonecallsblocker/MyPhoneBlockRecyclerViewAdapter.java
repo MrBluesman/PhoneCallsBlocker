@@ -15,7 +15,7 @@ import android.widget.TextView;
 
 import com.example.ukasz.androidsqlite.Block;
 import com.example.ukasz.phonecallsblocker.list_helper.FlipAnimator;
-import com.example.ukasz.phonecallsblocker.validator.PhoneNumberValidator;
+import com.example.ukasz.phonecallsblocker.validator.PhoneNumberHelper;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 
 import java.util.ArrayList;
@@ -144,7 +144,7 @@ public class MyPhoneBlockRecyclerViewAdapter extends RecyclerView.Adapter<MyPhon
     public void onBindViewHolder(@NonNull PhoneBlockHolder holder, int position)
     {
         //Get validator phone number lib to format
-        PhoneNumberValidator formator = new PhoneNumberValidator();
+        PhoneNumberHelper formator = new PhoneNumberHelper();
 
         Block block = mBlockings.get(position);
 

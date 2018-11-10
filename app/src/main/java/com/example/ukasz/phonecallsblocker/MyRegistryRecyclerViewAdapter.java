@@ -14,7 +14,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.example.ukasz.androidsqlite.RegistryBlock;
-import com.example.ukasz.phonecallsblocker.validator.PhoneNumberValidator;
+import com.example.ukasz.phonecallsblocker.validator.PhoneNumberHelper;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 
 import java.util.List;
@@ -129,7 +129,7 @@ public class MyRegistryRecyclerViewAdapter extends RecyclerView.Adapter<MyRegist
     public void onBindViewHolder(@NonNull final ViewHolder holder, int position)
     {
         //Get validator phone number lib to format
-        PhoneNumberValidator formator = new PhoneNumberValidator();
+        PhoneNumberHelper formator = new PhoneNumberHelper();
 
         RegistryBlock rBlock = mRegistryBlockings.get(position);
 
