@@ -101,7 +101,9 @@ public class CallDetector
             {
                 case TelephonyManager.CALL_STATE_RINGING:
                 {
-                    final String phoneNumberFormatted = phoneNumberHelper.formatPhoneNumber(incomingNumberV, StartActivity.COUNTRY_CODE, PhoneNumberUtil.PhoneNumberFormat.E164);
+                    final String phoneNumberFormatted = !incomingNumberV.equals("Numer prywatny")
+                            ? phoneNumberHelper.formatPhoneNumber(incomingNumberV, StartActivity.COUNTRY_CODE, PhoneNumberUtil.PhoneNumberFormat.E164)
+                            : "Numer prywatny";
 
                     Toast.makeText(ctx, "Połączenie przychodzące: " + incomingNumberV, Toast.LENGTH_LONG).show();
 
@@ -557,7 +559,7 @@ public class CallDetector
 
             builder.setContentTitle(contactName != null
                     ? contactName
-                    : phoneNumberHelper.formatPhoneNumber(incomingNumber, StartActivity.COUNTRY_CODE, PhoneNumberUtil.PhoneNumberFormat.NATIONAL))
+                    : (incomingNumber.equals("Numer prywatny") ? incomingNumber : phoneNumberHelper.formatPhoneNumber(incomingNumber, StartActivity.COUNTRY_CODE, PhoneNumberUtil.PhoneNumberFormat.NATIONAL)))
                     .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                     // Set the intent that will fire when the user taps the notification
                     .setContentIntent(pendingIntent)

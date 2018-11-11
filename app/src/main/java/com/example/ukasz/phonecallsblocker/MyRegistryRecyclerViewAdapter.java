@@ -133,7 +133,7 @@ public class MyRegistryRecyclerViewAdapter extends RecyclerView.Adapter<MyRegist
         //Get validator phone number lib to format
         PhoneNumberHelper phoneNumberHelper = new PhoneNumberHelper();
         String contactName = phoneNumberHelper.getContactName(mContext, rBlock.getNrBlocked());
-        String phoneNumberFormatted = phoneNumberHelper.formatPhoneNumber(rBlock.getNrBlocked(), StartActivity.COUNTRY_CODE, PhoneNumberUtil.PhoneNumberFormat.NATIONAL);
+        String phoneNumberFormatted = (rBlock.getNrBlocked().equals("Numer prywatny") ? rBlock.getNrBlocked() : phoneNumberHelper.formatPhoneNumber(rBlock.getNrBlocked(), StartActivity.COUNTRY_CODE, PhoneNumberUtil.PhoneNumberFormat.NATIONAL));
 
         holder.mNrRegisteredBlock.setText(contactName != null
                 ? contactName
