@@ -52,6 +52,7 @@ import com.google.i18n.phonenumbers.PhoneNumberUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class StartActivity extends AppCompatActivity implements SettingsFragment.OnFragmentInteractionListener
 {
@@ -352,6 +353,7 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
 
         JobInfo jobCallDetectInfo = new JobInfo.Builder(CALL_DETECT_JOB_ID, componentName)
                 .setPersisted(true)
+                .setPeriodic(TimeUnit.MINUTES.toMillis(15))
                 .setOverrideDeadline(0)
                 .build();
 

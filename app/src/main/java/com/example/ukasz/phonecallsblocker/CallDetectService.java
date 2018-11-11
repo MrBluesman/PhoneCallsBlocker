@@ -30,8 +30,13 @@ public class CallDetectService extends JobService
         if(callDetector == null)
         {
             callDetector = new CallDetector(this);
-            callDetector.start();
         }
+        else
+        {
+            callDetector.stop();
+
+        }
+        callDetector.start();
         return true;
     }
 
