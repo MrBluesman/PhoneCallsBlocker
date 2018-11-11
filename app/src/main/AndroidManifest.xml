@@ -48,6 +48,10 @@
         <activity android:name=".AddPhoneBlock" />
         <activity android:name=".DetailsPhoneBlock" />
         <activity android:name=".EditPhoneBlock" />
+
+        <meta-data
+            android:name="preloaded_fonts"
+            android:resource="@array/preloaded_fonts" />
     </application>
 
 </manifest>
