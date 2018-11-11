@@ -917,8 +917,9 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
             db.addBlocking(newBlock);
             //ADD to blocking list to make notify data changed possible for adapter
             Toast.makeText(StartActivity.this, R.string.add_phone_block_added, Toast.LENGTH_SHORT).show();
-            //TODO: Refresh adapter after add
+
             PhoneBlockFragment.blockings.add(newBlock);
+            PhoneBlockFragment.loadBlockingsExternal();
         }
         else
         {

@@ -47,10 +47,10 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
 
     private static final String ARG_COLUMN_COUNT = "column-count";
     private int mColumnCount = 1;
-    private MyPhoneBlockRecyclerViewAdapter adapter;
+    public static MyPhoneBlockRecyclerViewAdapter adapter;
     private RecyclerView recyclerView;
     public static List<Block> blockings = new ArrayList<>(); //adapter data
-    DatabaseHandler db;
+    static DatabaseHandler db;
 
     private SwipeRefreshLayout swipeRefreshLayout;
     private ActionModeCallback actionModeCallback;
@@ -150,6 +150,8 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
             recyclerView.addItemDecoration(new DividerItemDecoration(context, LinearLayoutManager.VERTICAL));
             recyclerView.setAdapter(adapter);
 
+            loadBlockings();
+
             //Show loading spinner and fetch blockings
             swipeRefreshLayout.post(
                     new Runnable()
@@ -194,7 +196,22 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
     }
 
     /**
-     *  Refresh the list of blockings.
+     * Loads all blockings from database.
+     * For external usage only.
+     * Without swipe refreshing.
+     */
+    public static void loadBlockingsExternal()
+    {
+        List<Block> blockingsToAddFromDb = db.getAllBlockings();
+
+        blockings.clear();
+        blockings.addAll(blockingsToAddFromDb);
+
+        adapter.notifyDataSetChanged();
+    }
+
+    /**
+     *  Refreshes the list of blockings.
      */
     @Override
     public void onRefresh()
@@ -220,7 +237,7 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
     }
 
     /**
-     * Catch the selected options menu.
+     * Catches the selected options menu.
      *
      * @param item selected option
      * @return true
