@@ -108,12 +108,14 @@
 
     <TextView
         android:id="@+id/permissions_startup_activity_phone_checkbox_warning"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
         android:text="@string/permissions_startup_activity_phone_checkbox_warning"
         android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/imageView4"
         app:layout_constraintTop_toBottomOf="@+id/permissions_startup_activity_phone_checkbox_description" />
 
@@ -184,12 +186,14 @@
 
     <TextView
         android:id="@+id/permissions_startup_activity_contacts_checkbox_warning"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
         android:text="@string/permissions_startup_activity_contacts_checkbox_warning"
         android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/imageView5"
         app:layout_constraintTop_toBottomOf="@+id/permissions_startup_activity_contacts_checkbox_description" />
 
@@ -258,12 +262,14 @@
 
     <TextView
         android:id="@+id/permissions_startup_activity_windows_checkbox_warning"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
         android:text="@string/permissions_startup_activity_windows_checkbox_warning"
         android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/imageView6"
         app:layout_constraintTop_toBottomOf="@+id/permissions_startup_activity_windows_checkbox_description" />
 
