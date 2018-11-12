@@ -109,37 +109,7 @@ public class PermissionsStartupActivity extends AppCompatActivity {
                     @Override
                     public void onClick(View v)
                     {
-//                        if (phoneStateCheckBoxPerm.isChecked())
-//                        {
-//                            setOptionsUnVisible(phoneStateWarningText, phoneStateWarningImage);
-//                        }
-//                        else
-//                        {
-//                            phoneStateWarningText.setTextKeepState(getResources().getString(R.string.permissions_startup_activity_phone_checkbox_warning_nc));
-//                            setOptionsVisible(phoneStateWarningText, phoneStateWarningImage);
-//                        }
-//                        if (contactsStateCheckBoxPerm.isChecked())
-//                        {
-//                            setOptionsUnVisible(contactsStateWarningText, contactsStateWarningImage);
-//                        }
-//                        else
-//                        {
-//                            contactsStateWarningText.setTextKeepState(getResources().getString(R.string.permissions_startup_activity_contacts_checkbox_warning_nc));
-//                            setOptionsVisible(contactsStateWarningText, contactsStateWarningImage);
-//                        }
-
-                        if(contactsStateCheckBoxPerm.isChecked())
-                        {
-                            if(!hasGrantedReadContactsPermission(getApplicationContext()))
-                            {
-                                requestReadContactsPermission();
-                            }
-                        }
-                        else
-                        {
-                            contactsStateWarningText.setTextKeepState(getResources().getString(R.string.permissions_startup_activity_contacts_checkbox_warning_nc));
-                            setOptionsVisible(contactsStateWarningText, contactsStateWarningImage);
-                        }
+                        checkBasicPermissions();
                     }
                 });
             }
@@ -166,49 +136,7 @@ public class PermissionsStartupActivity extends AppCompatActivity {
                     @Override
                     public void onClick(View v)
                     {
-//                        if (phoneStateCheckBoxPerm.isChecked() && contactsStateCheckBoxPerm.isChecked() && allowWindowsCheckBoxPerm.isChecked())
-//                        {
-//                            if (!hasGrantedManageOverlayPermission(getApplicationContext())) requestManageOverlayPermission();
-//                            if (!hasGrantedPermissions(getApplicationContext()))
-//                            {
-//                                requestReadPhoneStatePermission();
-//                                requestReadContactsPermission();
-//                            }
-//                        }
-//                        else
-//                        {
-//                            phoneStateWarningText.setTextKeepState(getResources().getString(R.string.permissions_startup_activity_phone_checkbox_warning_nc));
-//                            contactsStateWarningText.setTextKeepState(getResources().getString(R.string.permissions_startup_activity_phone_checkbox_warning_nc));
-//                            allowWindowsWarningText.setTextKeepState(getResources().getString(R.string.permissions_startup_activity_windows_checkbox_warning_nc));
-//                            setOptionsVisible(allowWindowsWarningText, allowWindowsWarningImage);
-//                            setOptionsVisible(phoneStateWarningText, phoneStateWarningImage);
-//                            setOptionsVisible(contactsStateWarningText, contactsStateWarningImage);
-//                        }
-
-//                        if(phoneStateCheckBoxPerm.isChecked())
-//                        {
-//                            if(!hasGrantedPhoneStatePermission(getApplicationContext()))
-//                            {
-//                                requestReadPhoneStatePermission();
-//                            }
-//                        }
-//                        else
-//                        {
-//                            phoneStateWarningText.setTextKeepState(getResources().getString(R.string.permissions_startup_activity_phone_checkbox_warning_nc));
-//                            setOptionsVisible(phoneStateWarningText, phoneStateWarningImage);
-//                        }
-                        if(contactsStateCheckBoxPerm.isChecked())
-                        {
-                            if(!hasGrantedReadContactsPermission(getApplicationContext()))
-                            {
-                                requestReadContactsPermission();
-                            }
-                        }
-                        else
-                        {
-                            contactsStateWarningText.setTextKeepState(getResources().getString(R.string.permissions_startup_activity_contacts_checkbox_warning_nc));
-                            setOptionsVisible(contactsStateWarningText, contactsStateWarningImage);
-                        }
+                        checkBasicPermissions();
 
                         if(allowWindowsCheckBoxPerm.isChecked())
                         {
@@ -333,6 +261,60 @@ public class PermissionsStartupActivity extends AppCompatActivity {
     }
 
     /**
+     * Checks basic permissions (allow|deny).
+     * Doesn't include checking the permissions in intent new activities like manage overlay.
+     */
+    public void checkBasicPermissions()
+    {
+        if(phoneStateCheckBoxPerm.isChecked())
+        {
+            if(!hasGrantedPhoneStatePermission(getApplicationContext()))
+            {
+                requestReadPhoneStatePermission();
+            }
+            if(!contactsStateCheckBoxPerm.isChecked())
+            {
+                contactsStateWarningText.setTextKeepState(getResources().getString(R.string.permissions_startup_activity_contacts_checkbox_warning_nc));
+                setOptionsVisible(contactsStateWarningText, contactsStateWarningImage);
+            }
+        }
+        else
+        {
+            phoneStateWarningText.setTextKeepState(getResources().getString(R.string.permissions_startup_activity_phone_checkbox_warning_nc));
+            setOptionsVisible(phoneStateWarningText, phoneStateWarningImage);
+
+            if(contactsStateCheckBoxPerm.isChecked())
+            {
+                if(!hasGrantedReadContactsPermission(getApplicationContext()))
+                {
+                    requestReadContactsPermission();
+                }
+            }
+            else
+            {
+                contactsStateWarningText.setTextKeepState(getResources().getString(R.string.permissions_startup_activity_contacts_checkbox_warning_nc));
+                setOptionsVisible(contactsStateWarningText, contactsStateWarningImage);
+            }
+        }
+
+        if(hasGrantedPhoneStatePermission(getApplicationContext()))
+        {
+            if(contactsStateCheckBoxPerm.isChecked())
+            {
+                if(!hasGrantedReadContactsPermission(getApplicationContext()))
+                {
+                    requestReadContactsPermission();
+                }
+            }
+            else
+            {
+                contactsStateWarningText.setTextKeepState(getResources().getString(R.string.permissions_startup_activity_contacts_checkbox_warning_nc));
+                setOptionsVisible(contactsStateWarningText, contactsStateWarningImage);
+            }
+        }
+    }
+
+    /**
      * Opens a window to ask for a permission to read a phone state.
      */
     public void requestReadPhoneStatePermission()
@@ -444,18 +426,13 @@ public class PermissionsStartupActivity extends AppCompatActivity {
         {
             case READ_PHONE_STATE_PERMISSION_REQUEST_CODE:
             {
+                setOptionsUnVisible(phoneStateWarningText, phoneStateWarningImage);
+
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED)
                 {
-                    // permission was granted, we can open a Main Activity
-                    if(hasGrantedManageOverlayPermission(getApplicationContext()))
-                    {
-                        requestCallPhonePermission();
-                        //openStartActivity();
-                    }
-                    else setOptionsUnVisible(phoneStateWarningText, phoneStateWarningImage);
-
+                    requestCallPhonePermission();
                 }
                 else
                 {
@@ -471,6 +448,8 @@ public class PermissionsStartupActivity extends AppCompatActivity {
             }
             case CALL_PHONE_PERMISSION_REQUEST_CODE:
             {
+                setOptionsUnVisible(phoneStateWarningText, phoneStateWarningImage);
+
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED)
@@ -480,13 +459,25 @@ public class PermissionsStartupActivity extends AppCompatActivity {
                     {
                         openStartActivity();
                     }
-                    else
+                }
+                else
+                {
+                    phoneStateWarningText.setTextKeepState(getResources().getString(R.string.permissions_startup_activity_phone_checkbox_warning));
+                    setOptionsVisible(phoneStateWarningText, phoneStateWarningImage);
+                }
+
+                //Check for read contacts
+                if(contactsStateCheckBoxPerm.isChecked())
+                {
+                    if(!hasGrantedReadContactsPermission(getApplicationContext()))
                     {
-                        // permission denied, boo! Disable the
-                        // functionality that depends on this permission.
-                        phoneStateWarningText.setTextKeepState(getResources().getString(R.string.permissions_startup_activity_phone_checkbox_warning));
-                        setOptionsVisible(phoneStateWarningText, phoneStateWarningImage);
+                        requestReadContactsPermission();
                     }
+                }
+                else
+                {
+                    contactsStateWarningText.setTextKeepState(getResources().getString(R.string.permissions_startup_activity_contacts_checkbox_warning_nc));
+                    setOptionsVisible(contactsStateWarningText, contactsStateWarningImage);
                 }
 
                 setVisibility();
