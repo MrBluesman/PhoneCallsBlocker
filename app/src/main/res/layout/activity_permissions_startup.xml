@@ -281,7 +281,7 @@
         android:layout_marginTop="32dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
-        android:background="@color/colorPrimary"
+        android:background="@color/colorPrimaryDark"
         android:elevation="0dp"
         android:text="@string/permissions_startup_activity_accept_button"
         android:textColor="@color/colorBackground"
