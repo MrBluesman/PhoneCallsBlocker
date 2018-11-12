@@ -1,6 +1,6 @@
 <resources>
     <!-- Common strings -->
-    <string name="app_name">Phone Calls Blocker</string>
+    <string name="app_name">Blokada połączeń</string>
     <string name="menu_settings">Ustawienia</string>
     <string name="title_activity_main">Blokowanie połączeń</string>
     <string name="title_activity_permissions_startup">Uprawnienia</string>

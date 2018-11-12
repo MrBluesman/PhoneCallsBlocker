@@ -55,7 +55,11 @@ public class CallDetectService extends JobService
         SharedPreferences data = getApplicationContext().getSharedPreferences("data", Context.MODE_PRIVATE);
         boolean callDetectorEnabled = data.getBoolean("detectEnabled", false);
         //Stop only if call detection service is not enabled
-        if(callDetector != null && !callDetectorEnabled) callDetector.stop();
+        if(callDetector != null && !callDetectorEnabled)
+        {
+            callDetector.stop();
+            callDetector = null;
+        }
         jobFinished(params, false);
         return false;
     }
