@@ -95,19 +95,20 @@ public class PermissionsStartupActivity extends AppCompatActivity {
             {
                 openStartActivity();
             }
-//            else //If we haven't, we have to request for this permissions
-//            {
-//                phoneStateWarningText = findViewById(R.id.permissions_startup_activity_phone_checkbox_warning);
-//                phoneStateWarningImage = findViewById(R.id.imageView4);
-//
-//                contactsStateWarningText = findViewById(R.id.permissions_startup_activity_contacts_checkbox_warning);
-//                contactsStateWarningImage = findViewById(R.id.imageView5);
-//
-//                grantPermissionsButton.setOnClickListener(new View.OnClickListener()
-//                {
-//                    @Override
-//                    public void onClick(View v)
-//                    {
+
+            else //If we haven't, we have to request for this permissions
+            {
+                phoneStateWarningText = findViewById(R.id.permissions_startup_activity_phone_checkbox_warning);
+                phoneStateWarningImage = findViewById(R.id.imageView4);
+
+                contactsStateWarningText = findViewById(R.id.permissions_startup_activity_contacts_checkbox_warning);
+                contactsStateWarningImage = findViewById(R.id.imageView5);
+
+                grantPermissionsButton.setOnClickListener(new View.OnClickListener()
+                {
+                    @Override
+                    public void onClick(View v)
+                    {
 //                        if (phoneStateCheckBoxPerm.isChecked())
 //                        {
 //                            setOptionsUnVisible(phoneStateWarningText, phoneStateWarningImage);
@@ -126,9 +127,22 @@ public class PermissionsStartupActivity extends AppCompatActivity {
 //                            contactsStateWarningText.setTextKeepState(getResources().getString(R.string.permissions_startup_activity_contacts_checkbox_warning_nc));
 //                            setOptionsVisible(contactsStateWarningText, contactsStateWarningImage);
 //                        }
-//                    }
-//                });
-//            }
+
+                        if(contactsStateCheckBoxPerm.isChecked())
+                        {
+                            if(!hasGrantedReadContactsPermission(getApplicationContext()))
+                            {
+                                requestReadContactsPermission();
+                            }
+                        }
+                        else
+                        {
+                            contactsStateWarningText.setTextKeepState(getResources().getString(R.string.permissions_startup_activity_contacts_checkbox_warning_nc));
+                            setOptionsVisible(contactsStateWarningText, contactsStateWarningImage);
+                        }
+                    }
+                });
+            }
         }
         else //Android SDK >= M
         {
@@ -194,6 +208,16 @@ public class PermissionsStartupActivity extends AppCompatActivity {
                         {
                             contactsStateWarningText.setTextKeepState(getResources().getString(R.string.permissions_startup_activity_contacts_checkbox_warning_nc));
                             setOptionsVisible(contactsStateWarningText, contactsStateWarningImage);
+                        }
+
+                        if(allowWindowsCheckBoxPerm.isChecked())
+                        {
+                            if(!hasGrantedManageOverlayPermission(getApplicationContext())) requestManageOverlayPermission();
+                        }
+                        else
+                        {
+                            allowWindowsWarningText.setTextKeepState(getResources().getString(R.string.permissions_startup_activity_windows_checkbox_warning_nc));
+                            setOptionsVisible(allowWindowsWarningText, allowWindowsWarningImage);
                         }
                     }
                 });
@@ -521,18 +545,18 @@ public class PermissionsStartupActivity extends AppCompatActivity {
     {
         super.onActivityResult(requestCode, resultCode, data);
 
-        ImageView allowWindowsWarningImage = findViewById(R.id.imageView6);
-        TextView allowWindowsWarningText = findViewById(R.id.permissions_startup_activity_windows_checkbox_warning);
-
         if (requestCode == ACTION_MANAGE_OVERLAY_PERMISSION_REQUEST_CODE)
         {
-            if (!Settings.canDrawOverlays(this))
+            setOptionsUnVisible(allowWindowsWarningText, allowWindowsWarningImage);
+
+            if (!Settings.canDrawOverlays(getApplicationContext()))
             {
                 allowWindowsWarningText.setTextKeepState(getResources().getString(R.string.permissions_startup_activity_windows_checkbox_warning));
                 setOptionsVisible(allowWindowsWarningText, allowWindowsWarningImage);
             }
             else if(hasGrantedPermissions(getApplicationContext())) openStartActivity();
-            else setOptionsUnVisible(allowWindowsWarningText, allowWindowsWarningImage );
+
+            setVisibility();
         }
     }
 }
