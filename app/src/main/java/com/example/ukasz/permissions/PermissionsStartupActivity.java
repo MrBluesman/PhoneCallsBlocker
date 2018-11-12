@@ -170,17 +170,30 @@ public class PermissionsStartupActivity extends AppCompatActivity {
 //                            setOptionsVisible(phoneStateWarningText, phoneStateWarningImage);
 //                            setOptionsVisible(contactsStateWarningText, contactsStateWarningImage);
 //                        }
-                        if(phoneStateCheckBoxPerm.isChecked())
+
+//                        if(phoneStateCheckBoxPerm.isChecked())
+//                        {
+//                            if(!hasGrantedPhoneStatePermission(getApplicationContext()))
+//                            {
+//                                requestReadPhoneStatePermission();
+//                            }
+//                        }
+//                        else
+//                        {
+//                            phoneStateWarningText.setTextKeepState(getResources().getString(R.string.permissions_startup_activity_phone_checkbox_warning_nc));
+//                            setOptionsVisible(phoneStateWarningText, phoneStateWarningImage);
+//                        }
+                        if(contactsStateCheckBoxPerm.isChecked())
                         {
-                            if(!hasGrantedPhoneStatePermission(getApplicationContext()))
+                            if(!hasGrantedReadContactsPermission(getApplicationContext()))
                             {
-                                requestReadPhoneStatePermission();
+                                requestReadContactsPermission();
                             }
                         }
                         else
                         {
-                            phoneStateWarningText.setTextKeepState(getResources().getString(R.string.permissions_startup_activity_phone_checkbox_warning_nc));
-                            setOptionsVisible(phoneStateWarningText, phoneStateWarningImage);
+                            contactsStateWarningText.setTextKeepState(getResources().getString(R.string.permissions_startup_activity_contacts_checkbox_warning_nc));
+                            setOptionsVisible(contactsStateWarningText, contactsStateWarningImage);
                         }
                     }
                 });
@@ -320,7 +333,8 @@ public class PermissionsStartupActivity extends AppCompatActivity {
     /**
      * Opens a window to ask for a permission to call phone.
      */
-    public void requestCallPhonePermission(){
+    public void requestCallPhonePermission()
+    {
         //Request the permission
         Log.e("CallPhone", "true");
         ActivityCompat.requestPermissions(this,
@@ -402,13 +416,10 @@ public class PermissionsStartupActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode,
                                            @NonNull String permissions[], @NonNull int[] grantResults)
     {
-        ImageView phoneStateWarningImage = findViewById(R.id.imageView4);
-        TextView phoneStateWarningText = findViewById(R.id.permissions_startup_activity_phone_checkbox_warning);
-
         switch (requestCode)
         {
             case READ_PHONE_STATE_PERMISSION_REQUEST_CODE:
-                {
+            {
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED)
@@ -420,6 +431,7 @@ public class PermissionsStartupActivity extends AppCompatActivity {
                         //openStartActivity();
                     }
                     else setOptionsUnVisible(phoneStateWarningText, phoneStateWarningImage);
+
                 }
                 else
                 {
@@ -428,6 +440,8 @@ public class PermissionsStartupActivity extends AppCompatActivity {
                     phoneStateWarningText.setTextKeepState(getResources().getString(R.string.permissions_startup_activity_phone_checkbox_warning));
                     setOptionsVisible(phoneStateWarningText, phoneStateWarningImage);
                 }
+
+                setVisibility();
 
                 break;
             }
@@ -451,10 +465,14 @@ public class PermissionsStartupActivity extends AppCompatActivity {
                     }
                 }
 
+                setVisibility();
+
                 break;
             }
             case READ_CONTACTS_PERMISSION_REQUEST_CODE:
             {
+                setOptionsUnVisible(contactsStateWarningText, contactsStateWarningImage);
+
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED)
@@ -464,14 +482,14 @@ public class PermissionsStartupActivity extends AppCompatActivity {
                     {
                         openStartActivity();
                     }
-                    else
-                    {
-                        // permission denied, boo! Disable the
-                        // functionality that depends on this permission.
-                        contactsStateWarningText.setTextKeepState(getResources().getString(R.string.permissions_startup_activity_contacts_checkbox_warning));
-                        setOptionsVisible(contactsStateWarningText, contactsStateWarningImage);
-                    }
                 }
+                else
+                {
+                    contactsStateWarningText.setTextKeepState(getResources().getString(R.string.permissions_startup_activity_contacts_checkbox_warning));
+                    setOptionsVisible(contactsStateWarningText, contactsStateWarningImage);
+                }
+
+                setVisibility();
             }
         }
     }
