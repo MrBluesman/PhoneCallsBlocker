@@ -33,6 +33,9 @@
     <string name="permissions_startup_activity_contacts_checkbox_warning">
         Stuknij ZEZWÓJ na pytanie o Kontakty
     </string>
+    <string name="permissions_startup_activity_contacts_checkbox_warning_nc">
+        Zaznacz pole obok na pytanie o Kotakty
+    </string>
     <string name="permissions_startup_activity_windows_checkbox_header">
         Wyskakujące okienka
     </string>
