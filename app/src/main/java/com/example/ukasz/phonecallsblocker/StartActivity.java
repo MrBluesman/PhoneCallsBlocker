@@ -207,11 +207,7 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
             public void onClick(View v)
             {
                 Intent contactsIntent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
-                if (!hasGrantedReadContactsPermission())
-                {
-                    requestReadContactsPermission();
-                }
-                else startActivityForResult(contactsIntent, ACTION_CONTACTS_CONTRACT_REQUEST_CODE);
+                startActivityForResult(contactsIntent, ACTION_CONTACTS_CONTRACT_REQUEST_CODE);
             }
         });
 
@@ -657,26 +653,6 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
 
         switch (requestCode)
         {
-            case READ_CONTACTS_PERMISSION_REQUEST_CODE:
-                {
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED)
-                {
-                    // permission was granted, we can open a Main Activity
-                    if (hasGrantedReadContactsPermission())
-                    {
-                        Intent contactsIntent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
-                        startActivityForResult(contactsIntent, ACTION_CONTACTS_CONTRACT_REQUEST_CODE);
-                    }
-                }
-                else
-                {
-                    Toast.makeText(StartActivity.this, "Do dodawania numerów z listy kontaktów potrzebujemy Twojej zgody na ich odczyt.",
-                            Toast.LENGTH_LONG).show();
-                }
-                break;
-            }
             case READ_CALL_LOG_PERMISSION_REQUEST_CODE:
                 {
                 // If request is cancelled, the result arrays are empty.
@@ -697,17 +673,6 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
                 break;
             }
         }
-    }
-
-    /**
-     * Checks if the read contacts permission is granted.
-     *
-     * @return true if it is granted, false if it's are not
-     */
-    public boolean hasGrantedReadContactsPermission()
-    {
-        return ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.READ_CONTACTS)
-                == PackageManager.PERMISSION_GRANTED;
     }
 
     /**
@@ -738,7 +703,7 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
         {
             case ACTION_CONTACTS_CONTRACT_REQUEST_CODE:
                 {
-                if (resultCode == Activity.RESULT_OK && hasGrantedReadContactsPermission())
+                if (resultCode == Activity.RESULT_OK)
                 {
                     Uri contactData = data.getData();
 

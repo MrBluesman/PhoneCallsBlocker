@@ -223,16 +223,13 @@ public class SettingsFragment extends Fragment
                 //get foreignBlockEnabled from data SharedPreferences
                 boolean unknownBlockEnabled = !data.getBoolean("unknownBlockEnabled", false);
 
-                if(unknownBlockEnabled && !hasGrantedReadContactsPermission()) requestReadContactsPermission();
-                else
-                {
-                    unknownBlockSwitch.setChecked(unknownBlockEnabled);
 
-                    //Save setting in SharedPreferences
-                    SharedPreferences.Editor editDataSettings = data.edit();
-                    editDataSettings.putBoolean("unknownBlockEnabled", unknownBlockEnabled);
-                    editDataSettings.apply(); //commit
-                }
+                unknownBlockSwitch.setChecked(unknownBlockEnabled);
+
+                //Save setting in SharedPreferences
+                SharedPreferences.Editor editDataSettings = data.edit();
+                editDataSettings.putBoolean("unknownBlockEnabled", unknownBlockEnabled);
+                editDataSettings.apply(); //commit
             }
         });
 
@@ -314,6 +311,7 @@ public class SettingsFragment extends Fragment
         autoBlockSwitch.setChecked(autoBlockEnabled);
         foreignBlockSwitch.setChecked(foreignBlockEnabled);
         privateBlockSwitch.setChecked(privateBlockEnabled);
+        unknownBlockSwitch.setChecked(unknownBlockEnabled);
 
         //sync settings
         syncSwitch.setChecked(syncEnabled);
@@ -327,17 +325,6 @@ public class SettingsFragment extends Fragment
         foreignBlockSwitch.setEnabled(detectEnabled);
         privateBlockSwitch.setEnabled(detectEnabled);
         unknownBlockSwitch.setEnabled(detectEnabled);
-
-        //SwitchOff unknownBLockEnabled if permissions are disabled
-        if(unknownBlockEnabled && !hasGrantedReadContactsPermission())
-        {
-            unknownBlockSwitch.setChecked(false);
-            //Save setting in SharedPreferences
-            SharedPreferences.Editor editDataSettings = data.edit();
-            editDataSettings.putBoolean("unknownBlockEnabled", false);
-            editDataSettings.apply(); //commit
-        }
-        else unknownBlockSwitch.setChecked(unknownBlockEnabled);
     }
 
     /**
@@ -385,90 +372,6 @@ public class SettingsFragment extends Fragment
                 }
             });
         }
-    }
-
-    /**
-     * Opens a window to ask for a permission to read contacts.
-     */
-    public void requestReadContactsPermission()
-    {
-        //Request the permission
-        Log.e("ReadContacts", "true");
-        requestPermissions(new String[]{Manifest.permission.READ_CONTACTS}, READ_CONTACTS_PERMISSION_REQUEST_CODE);
-    }
-
-    /**
-     * Checks if the read contacts permission is granted.
-     *
-     * @return true if it is granted, false if it's are not
-     */
-    public boolean hasGrantedReadContactsPermission()
-    {
-        return ContextCompat.checkSelfPermission(Objects.requireNonNull(getActivity()), Manifest.permission.READ_CONTACTS)
-                == PackageManager.PERMISSION_GRANTED;
-    }
-
-    /**
-     * Runs as a result of requesting for a grant a permissions.
-     *
-     * @param requestCode code of the request, identify a request
-     * @param permissions array of permissions
-     * @param grantResults array of granted permissions
-     */
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults)
-    {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-
-        switch (requestCode)
-        {
-            case READ_CONTACTS_PERMISSION_REQUEST_CODE:
-            {
-                boolean unknownBlockEnabled = false;
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED)
-                {
-                    //permission was granted, we can save a allow read contacts setting in
-                    //SharedPreferences
-                    if (hasGrantedReadContactsPermission())
-                    {
-                        //Set read contact setting as true
-                        unknownBlockEnabled = true;
-                    }
-                }
-                else Toast.makeText(getActivity(), "Do blokowania nieznanych numerów potrzebujemy Twojej zgody na odczyt listy kontaktów.",
-                        Toast.LENGTH_LONG).show();
-
-                //Save setting in SharedPreferences
-                unknownBlockSwitch.setChecked(unknownBlockEnabled);
-                SharedPreferences.Editor editDataSettings = data.edit();
-                editDataSettings.putBoolean("unknownBlockEnabled", unknownBlockEnabled);
-                editDataSettings.apply(); //commit
-                break;
-            }
-        }
-    }
-
-    /**
-     * Runs on fragment resume.
-     */
-    @Override
-    public void onResume()
-    {
-        super.onResume();
-        Log.e("SettingsFragment","onResume() method");
-
-        //SwitchOff unknownBLockEnabled if permissions are disabled
-        boolean unknownBlockEnabled = data.getBoolean("unknownBlockEnabled", false);
-        if(unknownBlockEnabled && !hasGrantedReadContactsPermission())
-        {
-            unknownBlockSwitch.setChecked(false);
-            //Save setting in SharedPreferences
-            SharedPreferences.Editor editDataSettings = data.edit();
-            editDataSettings.putBoolean("unknownBlockEnabled", false);
-            editDataSettings.apply(); //commit
-        } else unknownBlockSwitch.setChecked(unknownBlockEnabled);
     }
 
     /**
