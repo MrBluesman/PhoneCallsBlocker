@@ -137,21 +137,21 @@ public class PermissionsStartupActivity extends AppCompatActivity {
             {
                 openStartActivity();
             }
-//            else //If we haven't, we have to request for this permissions
-//            {
-//                phoneStateWarningText = findViewById(R.id.permissions_startup_activity_phone_checkbox_warning);
-//                phoneStateWarningImage = findViewById(R.id.imageView4);
-//                contactsStateWarningText = findViewById(R.id.permissions_startup_activity_contacts_checkbox_warning);
-//                contactsStateWarningImage = findViewById(R.id.imageView5);
-//                allowWindowsWarningText = findViewById(R.id.permissions_startup_activity_windows_checkbox_warning);
-//                allowWindowsWarningImage = findViewById(R.id.imageView6);
-//
-//                grantPermissionsButton = findViewById(R.id.permissions_startup_activity_accept_button);
-//                grantPermissionsButton.setOnClickListener(new View.OnClickListener()
-//                {
-//                    @Override
-//                    public void onClick(View v)
-//                    {
+            else //If we haven't, we have to request for this permissions
+            {
+                phoneStateWarningText = findViewById(R.id.permissions_startup_activity_phone_checkbox_warning);
+                phoneStateWarningImage = findViewById(R.id.imageView4);
+                contactsStateWarningText = findViewById(R.id.permissions_startup_activity_contacts_checkbox_warning);
+                contactsStateWarningImage = findViewById(R.id.imageView5);
+                allowWindowsWarningText = findViewById(R.id.permissions_startup_activity_windows_checkbox_warning);
+                allowWindowsWarningImage = findViewById(R.id.imageView6);
+
+                grantPermissionsButton = findViewById(R.id.permissions_startup_activity_accept_button);
+                grantPermissionsButton.setOnClickListener(new View.OnClickListener()
+                {
+                    @Override
+                    public void onClick(View v)
+                    {
 //                        if (phoneStateCheckBoxPerm.isChecked() && contactsStateCheckBoxPerm.isChecked() && allowWindowsCheckBoxPerm.isChecked())
 //                        {
 //                            if (!hasGrantedManageOverlayPermission(getApplicationContext())) requestManageOverlayPermission();
@@ -170,9 +170,21 @@ public class PermissionsStartupActivity extends AppCompatActivity {
 //                            setOptionsVisible(phoneStateWarningText, phoneStateWarningImage);
 //                            setOptionsVisible(contactsStateWarningText, contactsStateWarningImage);
 //                        }
-//                    }
-//                });
-//            }
+                        if(phoneStateCheckBoxPerm.isChecked())
+                        {
+                            if(!hasGrantedPhoneStatePermission(getApplicationContext()))
+                            {
+                                requestReadPhoneStatePermission();
+                            }
+                        }
+                        else
+                        {
+                            phoneStateWarningText.setTextKeepState(getResources().getString(R.string.permissions_startup_activity_phone_checkbox_warning_nc));
+                            setOptionsVisible(phoneStateWarningText, phoneStateWarningImage);
+                        }
+                    }
+                });
+            }
         }
     }
 
@@ -233,14 +245,27 @@ public class PermissionsStartupActivity extends AppCompatActivity {
             findViewById(R.id.permissions_startup_activity_phone_checkbox_header).setVisibility(View.GONE);
             findViewById(R.id.permissions_startup_activity_phone_checkbox_description).setVisibility(View.GONE);
         }
+        else
+        {
+            phoneStateCheckBoxPerm.setVisibility(View.VISIBLE);
+            findViewById(R.id.view).setVisibility(View.VISIBLE);
+            findViewById(R.id.permissions_startup_activity_phone_checkbox_header).setVisibility(View.VISIBLE);
+            findViewById(R.id.permissions_startup_activity_phone_checkbox_description).setVisibility(View.VISIBLE);
+        }
 
-        //Disable permissions if we have already granted them
         if(hasGrantedReadContactsPermission(getApplicationContext()))
         {
             contactsStateCheckBoxPerm.setVisibility(View.GONE);
             findViewById(R.id.view2).setVisibility(View.GONE);
             findViewById(R.id.permissions_startup_activity_contacts_checkbox_header).setVisibility(View.GONE);
             findViewById(R.id.permissions_startup_activity_contacts_checkbox_description).setVisibility(View.GONE);
+        }
+        else
+        {
+            contactsStateCheckBoxPerm.setVisibility(View.VISIBLE);
+            findViewById(R.id.view2).setVisibility(View.VISIBLE);
+            findViewById(R.id.permissions_startup_activity_contacts_checkbox_header).setVisibility(View.VISIBLE);
+            findViewById(R.id.permissions_startup_activity_contacts_checkbox_description).setVisibility(View.VISIBLE);
         }
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M)
@@ -253,13 +278,19 @@ public class PermissionsStartupActivity extends AppCompatActivity {
         }
         else
         {
-            //Disable permissions if we have already granted them
             if(hasGrantedManageOverlayPermission(getApplicationContext()))
             {
                 allowWindowsCheckBoxPerm.setVisibility(View.GONE);
                 findViewById(R.id.view3).setVisibility(View.GONE);
                 findViewById(R.id.permissions_startup_activity_windows_checkbox_header).setVisibility(View.GONE);
                 findViewById(R.id.permissions_startup_activity_windows_checkbox_description).setVisibility(View.GONE);
+            }
+            else
+            {
+                allowWindowsCheckBoxPerm.setVisibility(View.VISIBLE);
+                findViewById(R.id.view3).setVisibility(View.VISIBLE);
+                findViewById(R.id.permissions_startup_activity_windows_checkbox_header).setVisibility(View.VISIBLE);
+                findViewById(R.id.permissions_startup_activity_windows_checkbox_description).setVisibility(View.VISIBLE);
             }
         }
     }
