@@ -85,7 +85,7 @@ public class PermissionsStartupActivity extends AppCompatActivity {
         {
             //disable manage overlay permission options
             allowWindowsCheckBoxPerm.setVisibility(View.GONE);
-            findViewById(R.id.view2).setVisibility(View.GONE);
+            findViewById(R.id.view3).setVisibility(View.GONE);
             findViewById(R.id.permissions_startup_activity_windows_checkbox_header).setVisibility(View.GONE);
             findViewById(R.id.permissions_startup_activity_windows_checkbox_description).setVisibility(View.GONE);
 
@@ -129,7 +129,7 @@ public class PermissionsStartupActivity extends AppCompatActivity {
                 phoneStateWarningText = findViewById(R.id.permissions_startup_activity_phone_checkbox_warning);
                 phoneStateWarningImage = findViewById(R.id.imageView4);
                 allowWindowsWarningText = findViewById(R.id.permissions_startup_activity_windows_checkbox_warning);
-                allowWindowsWarningImage = findViewById(R.id.imageView5);
+                allowWindowsWarningImage = findViewById(R.id.imageView6);
 
                 grantPermissionsButton = findViewById(R.id.permissions_startup_activity_accept_button);
                 grantPermissionsButton.setOnClickListener(new View.OnClickListener()
@@ -342,7 +342,7 @@ public class PermissionsStartupActivity extends AppCompatActivity {
     {
         super.onActivityResult(requestCode, resultCode, data);
 
-        ImageView allowWindowsWarningImage = findViewById(R.id.imageView5);
+        ImageView allowWindowsWarningImage = findViewById(R.id.imageView6);
         TextView allowWindowsWarningText = findViewById(R.id.permissions_startup_activity_windows_checkbox_warning);
 
         if (requestCode == ACTION_MANAGE_OVERLAY_PERMISSION_REQUEST_CODE)

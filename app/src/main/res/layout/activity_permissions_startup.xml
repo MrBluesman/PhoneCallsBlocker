@@ -13,11 +13,11 @@
 
     <TextView
         android:id="@+id/permissions_startup_activity_header"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="60dp"
-        android:layout_marginStart="60dp"
+        android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
         android:text="@string/permissions_startup_activity_header"
         android:textAlignment="center"
         android:textColor="@android:color/black"
@@ -32,9 +32,9 @@
         android:id="@+id/permissions_startup_activity_logo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="32dp"
+        android:layout_marginEnd="8dp"
         android:contentDescription="TODO"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -45,9 +45,9 @@
         android:id="@+id/view"
         android:layout_width="match_parent"
         android:layout_height="0.5dp"
-        android:layout_marginEnd="16dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="32dp"
+        android:layout_marginEnd="16dp"
         android:background="@android:color/darker_gray"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -121,13 +121,89 @@
         android:id="@+id/view2"
         android:layout_width="match_parent"
         android:layout_height="0.5dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:background="@android:color/darker_gray"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/permissions_startup_activity_phone_checkbox_warning"
+        app:layout_constraintTop_toBottomOf="@+id/permissions_startup_activity_phone_checkbox_warning" />
+
+    <TextView
+        android:id="@+id/permissions_startup_activity_contacts_checkbox_header"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:fontFamily="sans-serif"
+        android:text="@string/permissions_startup_activity_contacts_checkbox_header"
+        android:textAlignment="textStart"
+        android:textSize="18sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/view2" />
+
+    <TextView
+        android:id="@+id/permissions_startup_activity_contacts_checkbox_description"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="64dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:text="@string/permissions_startup_activity_contacts_checkbox_description"
+        android:textColor="@android:color/darker_gray"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/permissions_startup_activity_contacts_checkbox_header" />
+
+    <CheckBox
+        android:id="@+id/permissions_startup_activity_contacts_checkbox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:checked="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/permissions_startup_activity_contacts_checkbox_description"
+        app:layout_constraintTop_toTopOf="@+id/permissions_startup_activity_contacts_checkbox_description" />
+
+    <ImageView
+        android:id="@+id/imageView5"
+        android:layout_width="18dp"
+        android:layout_height="22dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:adjustViewBounds="false"
+        android:contentDescription="TODO"
+        android:cropToPadding="false"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/permissions_startup_activity_phone_checkbox_description"
+        app:srcCompat="@mipmap/ic_launcher" />
+
+    <TextView
+        android:id="@+id/permissions_startup_activity_contacts_checkbox_warning"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="@string/permissions_startup_activity_contacts_checkbox_warning"
+        android:visibility="gone"
+        app:layout_constraintStart_toEndOf="@+id/imageView5"
+        app:layout_constraintTop_toBottomOf="@+id/permissions_startup_activity_contacts_checkbox_description" />
+
+    <View
+        android:id="@+id/view3"
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
         android:layout_marginEnd="16dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:background="@android:color/darker_gray"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/permissions_startup_activity_phone_checkbox_warning" />
+        app:layout_constraintTop_toBottomOf="@+id/permissions_startup_activity_contacts_checkbox_warning" />
 
     <TextView
         android:id="@+id/permissions_startup_activity_windows_checkbox_header"
@@ -138,7 +214,7 @@
         android:text="@string/permissions_startup_activity_windows_checkbox_header"
         android:textSize="18sp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/view2" />
+        app:layout_constraintTop_toBottomOf="@+id/view3" />
 
     <TextView
         android:id="@+id/permissions_startup_activity_windows_checkbox_description"
@@ -167,7 +243,7 @@
         app:layout_constraintTop_toTopOf="@+id/permissions_startup_activity_windows_checkbox_description" />
 
     <ImageView
-        android:id="@+id/imageView5"
+        android:id="@+id/imageView6"
         android:layout_width="18dp"
         android:layout_height="22dp"
         android:layout_marginStart="16dp"
@@ -188,21 +264,23 @@
         android:layout_marginTop="8dp"
         android:text="@string/permissions_startup_activity_windows_checkbox_warning"
         android:visibility="gone"
-        app:layout_constraintStart_toEndOf="@+id/imageView5"
+        app:layout_constraintStart_toEndOf="@+id/imageView6"
         app:layout_constraintTop_toBottomOf="@+id/permissions_startup_activity_windows_checkbox_description" />
 
     <Button
         android:id="@+id/permissions_startup_activity_accept_button"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
+        android:layout_marginStart="16dp"
         android:layout_marginTop="32dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
         android:background="@color/colorPrimary"
         android:elevation="0dp"
         android:text="@string/permissions_startup_activity_accept_button"
         android:textColor="@color/colorBackground"
         android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/permissions_startup_activity_windows_checkbox_warning" />
