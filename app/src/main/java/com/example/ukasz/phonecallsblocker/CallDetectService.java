@@ -14,7 +14,7 @@ import android.widget.Toast;
  */
 public class CallDetectService extends JobService
 {
-    private CallDetector callDetector;
+//    private CallDetector callDetector;
 
     /**
      * This method runs on starting the job service of detecting calls.
@@ -27,16 +27,28 @@ public class CallDetectService extends JobService
     public boolean onStartJob(JobParameters params)
     {
         Log.e("test","CallDetectService - onStartJob() method");
-        if(callDetector == null)
+//        if(callDetector == null)
+//        {
+//            callDetector = new CallDetector(this);
+//        }
+//        else
+//        {
+//            callDetector.stop();
+//
+//        }
+//        callDetector.start();
+        if(StartActivity.callDetector != null)
         {
-            callDetector = new CallDetector(this);
+            StartActivity.callDetector.stop();
+            StartActivity.callDetector.start();
         }
         else
         {
-            callDetector.stop();
-
+            StartActivity.callDetector = new CallDetector(getApplicationContext());
+            StartActivity.callDetector.start();
         }
-        callDetector.start();
+
+        jobFinished(params, false);
         return true;
     }
 
@@ -55,10 +67,15 @@ public class CallDetectService extends JobService
         SharedPreferences data = getApplicationContext().getSharedPreferences("data", Context.MODE_PRIVATE);
         boolean callDetectorEnabled = data.getBoolean("detectEnabled", false);
         //Stop only if call detection service is not enabled
-        if(callDetector != null && !callDetectorEnabled)
+//        if(callDetector != null && !callDetectorEnabled)
+//        {
+//            callDetector.stop();
+//            callDetector = null;
+//        }
+        if(StartActivity.callDetector != null && !callDetectorEnabled)
         {
-            callDetector.stop();
-            callDetector = null;
+            StartActivity.callDetector.stop();
+            StartActivity.callDetector = null;
         }
         jobFinished(params, false);
         return false;

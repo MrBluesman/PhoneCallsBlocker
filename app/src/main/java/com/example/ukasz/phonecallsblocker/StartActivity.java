@@ -98,7 +98,6 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
 
     //request unique codes
     private final int ACTION_CONTACTS_CONTRACT_REQUEST_CODE = 1111;
-    private final int READ_CONTACTS_PERMISSION_REQUEST_CODE = 1112;
     private final int READ_CALL_LOG_PERMISSION_REQUEST_CODE = 1113;
 
     //job unique ids for job scheduler
@@ -106,6 +105,9 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
 
     //static country code
     final static String COUNTRY_CODE = "+48";
+
+    //call detector
+    public static CallDetector callDetector;
 
     /**
      * Method which runs on activity start.
@@ -147,6 +149,9 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
 
         //Set telephony manager for fetch user phone number
         tm = (TelephonyManager) StartActivity.this.getSystemService(Context.TELEPHONY_SERVICE);
+
+        //set call detector
+        callDetector = new CallDetector(getApplicationContext());
 
         //Set up the listeners
         tabLayout = findViewById(R.id.start_activity_tabs);
@@ -612,18 +617,6 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
             return 3;
         }
 
-    }
-
-    /**
-     * Opens a window to ask for a permission to read contacts.
-     */
-    public void requestReadContactsPermission()
-    {
-        //Request the permission
-        Log.e("ReadContacts", "true");
-        ActivityCompat.requestPermissions(this,
-                new String[]{Manifest.permission.READ_CONTACTS},
-                READ_CONTACTS_PERMISSION_REQUEST_CODE);
     }
 
     /**
