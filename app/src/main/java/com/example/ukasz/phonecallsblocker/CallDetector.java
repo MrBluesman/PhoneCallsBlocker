@@ -118,8 +118,8 @@ public class CallDetector
                     //database and settings load
                     final DatabaseHandler db = new DatabaseHandler(ctx);
 
-                    //tolerated locally or exist in contacts - always allow!
-                    if(db.existBlock(myPhoneNumber, phoneNumberFormatted, false) || incomingContactName != null)
+                    //tolerated locally - always allow!
+                    if(db.existBlock(myPhoneNumber, phoneNumberFormatted, false))
                     {
                         //if notification allow is enabled - show a notification
                         if (notificationAllowEnabled) notificationManager.notify(
@@ -145,6 +145,15 @@ public class CallDetector
                             //decline and register
                             declinePhone(ctx);
                             registerPhoneBlock(db, phoneNumberFormatted, true);
+                        }
+                        else if(incomingContactName != null) //always allow number in contacts if they haven't been blocked locally
+                        {
+                            //if notification allow is enabled - show a notification
+                            if (notificationAllowEnabled) notificationManager.notify(
+                                    NotificationID.getID(),
+                                    createNotification(phoneNumberFormatted, NOTIFICATION_ALLOWED).build()
+                            );
+                            registerPhoneBlock(db, phoneNumberFormatted, false);
                         }
                         else //check for GLOBAL BLOCKING
                         {
@@ -210,6 +219,15 @@ public class CallDetector
                             {
                                 setIncomingCallDialogBlockedNumber(incomingNumberV, db);
                                 showAlertDialogForManualBlocking();
+                            }
+                            else if(incomingContactName != null) //always allow number in contacts if they haven't been blocked locally
+                            {
+                                //if notification allow is enabled - show a notification
+                                if (notificationAllowEnabled) notificationManager.notify(
+                                        NotificationID.getID(),
+                                        createNotification(phoneNumberFormatted, NOTIFICATION_ALLOWED).build()
+                                );
+                                registerPhoneBlock(db, phoneNumberFormatted, false);
                             }
                             else if(foreignBlockEnabled && isForeignIncomingCall(phoneNumberFormatted) //phone number is foreign and foreignBlock is enabled
                                         || unknownBlockEnabled)
