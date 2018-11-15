@@ -1,28 +1,61 @@
 package com.example.ukasz.phonecallsblocker;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.pm.PackageManager;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.telephony.TelephonyManager;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Spinner;
+import android.widget.Switch;
 import android.widget.TextView;
 
+import com.example.ukasz.androidsqlite.DatabaseHandler;
+
+import java.util.List;
 import java.util.Objects;
 
-public class EditPhoneBlock extends AppCompatActivity
+public class EditPhoneBlock extends AppCompatActivity implements AdapterView.OnItemSelectedListener
 {
     private Toolbar mActionBar;
-    private TextView phoneNumberTextView;
+    private TextView nrBlocked;
+    private Switch isPositiveSwitch;
+    private Spinner category;
+    private EditText description;
+    private Button editButton;
+    private String myPhoneNumber;
+    private TelephonyManager tm;
+
 
     /**
      * Initialize var instances and view for start {@link EditPhoneBlock} activity.
      *
-     * @param savedInstanceState Instance state.
+     * @param savedInstanceState instance state
      */
     @Override
+    @SuppressLint("HardwareIds")
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_phone_block);
+
+        // TODO: Refactor: Consider keeping myPhoneNumber in external common place
+        //getMyPhoneNumber
+        tm = (TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_NUMBERS)
+                != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE)
+                != PackageManager.PERMISSION_GRANTED) return;
+        myPhoneNumber = !tm.getLine1Number().equals("") ? tm.getLine1Number() : tm.getSubscriberId();
+        myPhoneNumber = !myPhoneNumber.equals("") ? myPhoneNumber : tm.getSimSerialNumber();
 
         //set toolbar
         mActionBar = findViewById(R.id.edit_phone_block_toolbar);
@@ -30,19 +63,44 @@ public class EditPhoneBlock extends AppCompatActivity
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-        //Get extras param from Intent (phone number)
+        //nr info ---------------------------------------------------------------------------
+        nrBlocked = findViewById(R.id.edit_phone_block_nr_blocked_textView);
+        isPositiveSwitch = findViewById(R.id.edit_phone_block_is_positive_switch);
+        description = findViewById(R.id.edit_phone_block_descriptionEditText);
+
+        //spinner --------------------------------------------------------------------------
+        category = findViewById(R.id.edit_phone_block_spinner);
+        loadCategoriesToSpinner(category);
+        category.setOnItemSelectedListener(this);
+
+        //set the fields as number info
         Bundle b = getIntent().getExtras();
         String phoneNumber = "";
         if(b != null) phoneNumber = b.getString("phoneNumber");
-//        phoneNumberTextView = findViewById(R.id.edit_phone_block_phone_number);
-//        phoneNumberTextView.setText(phoneNumber);
+        nrBlocked.setText(phoneNumber);
+
+        category.setSelection(1);
+    }
+
+    /**
+     * Loads categories from database to spinner.
+     *
+     * @param spinner spinner which will have a set adapter with loaded categories
+     */
+    public void loadCategoriesToSpinner(Spinner spinner)
+    {
+        DatabaseHandler db = new DatabaseHandler(this);
+        List<String> categories = db.getAllCategories();
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, categories);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
     }
 
     /**
      * Catch the arrow back action as one of {@link MenuItem} item.
      *
      * @param item {@link MenuItem} selected menu item
-     * @return This method applied to superclass with this item
+     * @return this method applied to superclass with this item
      */
     @Override
     public boolean onOptionsItemSelected(MenuItem item)
@@ -55,5 +113,17 @@ public class EditPhoneBlock extends AppCompatActivity
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id)
+    {
+
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent)
+    {
+
     }
 }
