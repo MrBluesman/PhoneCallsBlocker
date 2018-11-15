@@ -111,10 +111,13 @@ public class EditPhoneBlock extends AppCompatActivity implements AdapterView.OnI
             @Override
             public void onClick(View v)
             {
+                //change data
                 block.setNrRating(!isPositiveSwitch.isChecked());
                 block.setReasonDescription(String.valueOf(description.getText()));
                 block.setReasonCategory(category.getSelectedItemPosition());
-                updatePhoneBlock(db, block.getNrBlocked(), block.getNrRating());
+
+                //update with changed data
+                updatePhoneBlock();
                 finish();
             }
         });
@@ -148,11 +151,8 @@ public class EditPhoneBlock extends AppCompatActivity implements AdapterView.OnI
     /**
      * Updates the phone block with new edited data.
      *
-     * @param db {@link DatabaseHandler} to make a update phoneNumber exists
-     * @param phoneNumber phone number which rating will be updated
-     * @param rating new blocking rating
      */
-    private void updatePhoneBlock(DatabaseHandler db, final String phoneNumber, final boolean rating)
+    private void updatePhoneBlock()
     {
         //LOCAL UPDATING
         //In listener button set properties to the newest one (edited)
@@ -161,40 +161,42 @@ public class EditPhoneBlock extends AppCompatActivity implements AdapterView.OnI
         //Refresh blockings after update
         PhoneBlockFragment.loadBlockingsExternal();
 
-//        //GLOBAL UPDATING - if sync is enabled
-//        boolean syncEnabled =  getApplicationContext().getSharedPreferences("data", Context.MODE_PRIVATE)
-//                .getBoolean("syncEnabled", false);
-//
-//        if(syncEnabled)
-//        {
-//            final Query blockings = mDatabase
-//                    .child("blockings")
-//                    .orderByChild("nrDeclarantBlocked")
-//                    .equalTo(myPhoneNumber + "_" + phoneNumber);
-//
-//            blockings.addListenerForSingleValueEvent(new ValueEventListener()
-//            {
-//                @Override
-//                public void onDataChange(@NonNull DataSnapshot dataSnapshot)
-//                {
-//                    if(dataSnapshot.exists())
-//                    {
-//                        if(dataSnapshot.getChildren().iterator().hasNext())
-//                        {
-//                            HashMap<String, Object> updateData = new HashMap<>();
-//                            updateData.put("nrRating", rating);
-//                            dataSnapshot.getChildren().iterator().next().getRef().updateChildren(updateData);
-//                        }
-//                    }
-//                }
-//
-//                @Override
-//                public void onCancelled(@NonNull DatabaseError databaseError)
-//                {
-//                    Toast.makeText(getApplicationContext(), R.string.error, Toast.LENGTH_SHORT).show();
-//                }
-//            });
-//        }
+        //GLOBAL UPDATING - if sync is enabled
+        boolean syncEnabled =  getApplicationContext().getSharedPreferences("data", Context.MODE_PRIVATE)
+                .getBoolean("syncEnabled", false);
+
+        if(syncEnabled)
+        {
+            final Query blockings = mDatabase
+                    .child("blockings")
+                    .orderByChild("nrDeclarantBlocked")
+                    .equalTo(myPhoneNumber + "_" + block.getNrBlocked());
+
+            blockings.addListenerForSingleValueEvent(new ValueEventListener()
+            {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot)
+                {
+                    if(dataSnapshot.exists())
+                    {
+                        if(dataSnapshot.getChildren().iterator().hasNext())
+                        {
+                            HashMap<String, Object> updateData = new HashMap<>();
+                            updateData.put("nrRating", block.getNrRating());
+                            updateData.put("reasonCategory", block.getReasonCategory());
+                            updateData.put("reasonDescription", block.getReasonDescription());
+                            dataSnapshot.getChildren().iterator().next().getRef().updateChildren(updateData);
+                        }
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError)
+                {
+                    Toast.makeText(getApplicationContext(), R.string.error, Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
     }
 
     /**
