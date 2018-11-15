@@ -23,12 +23,14 @@ import android.widget.Toast;
 
 import com.example.ukasz.androidsqlite.Block;
 import com.example.ukasz.androidsqlite.DatabaseHandler;
+import com.example.ukasz.phonecallsblocker.phone_number_helper.PhoneNumberHelper;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.i18n.phonenumbers.PhoneNumberUtil;
 
 import java.util.HashMap;
 import java.util.List;
@@ -38,6 +40,7 @@ public class EditPhoneBlock extends AppCompatActivity implements AdapterView.OnI
 {
     private Toolbar mActionBar;
     private TextView nrBlocked;
+    private TextView nrBlocked2; //for contact name if available
     private Switch isPositiveSwitch;
     private Spinner category;
     private EditText description;
@@ -85,6 +88,7 @@ public class EditPhoneBlock extends AppCompatActivity implements AdapterView.OnI
 
         //nr info ---------------------------------------------------------------------------
         nrBlocked = findViewById(R.id.edit_phone_block_nr_blocked_textView);
+        nrBlocked2 = findViewById(R.id.edit_phone_block_nr_blocked_textView2);
         isPositiveSwitch = findViewById(R.id.edit_phone_block_is_positive_switch);
         description = findViewById(R.id.edit_phone_block_descriptionEditText);
 
@@ -99,7 +103,24 @@ public class EditPhoneBlock extends AppCompatActivity implements AdapterView.OnI
         if(b != null) phoneNumber = b.getString("phoneNumber");
         block = getBlock(phoneNumber);
 
-        nrBlocked.setText(block.getNrBlocked());
+        //Get validator phone number lib to format
+        PhoneNumberHelper phoneNumberHelper = new PhoneNumberHelper();
+
+        String contactName = phoneNumberHelper.getContactName(getApplicationContext(), block.getNrBlocked());
+        String phoneNumberFormatted = phoneNumberHelper.formatPhoneNumber(block.getNrBlocked(), StartActivity.COUNTRY_CODE, PhoneNumberUtil.PhoneNumberFormat.NATIONAL);
+
+        if(contactName != null)
+        {
+            nrBlocked.setText(contactName);
+            nrBlocked2.setText(phoneNumberFormatted);
+        }
+        else
+        {
+            nrBlocked.setText(phoneNumberFormatted);
+            nrBlocked2.setVisibility(View.GONE);
+        }
+
+
         isPositiveSwitch.setChecked(!block.getNrRating());
         description.setText(block.getReasonDescription());
         category.setSelection(block.getReasonCategory());
