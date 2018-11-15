@@ -34,8 +34,8 @@ public class EditPhoneBlock extends AppCompatActivity
         Bundle b = getIntent().getExtras();
         String phoneNumber = "";
         if(b != null) phoneNumber = b.getString("phoneNumber");
-        phoneNumberTextView = findViewById(R.id.edit_phone_block_phone_number);
-        phoneNumberTextView.setText(phoneNumber);
+//        phoneNumberTextView = findViewById(R.id.edit_phone_block_phone_number);
+//        phoneNumberTextView.setText(phoneNumber);
     }
 
     /**

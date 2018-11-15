@@ -111,11 +111,15 @@
     <string name="add_phone_block_error_invalid">Numer jest nieprawidłowy</string>
     <string name="add_phone_block_error_empty">Numer telefonu jest wymagany</string>
 
+    <!-- Strings related to EditPhoneBlock -->
+    <string name="edit_phone_block_title">Edycja numeru</string>
+    <string name="edit_phone_block_button_add">Edytuj numer</string>
+    <string name="edit_phone_block_is_positive_switch">Zapisz jako pozytywny (tolerowany)</string>
+    <string name="add_phone_block_edited">Numer wyedytowany</string>
+
     <!-- Strings related to DetailsPhoneBlock -->
     <string name="details_phone_block_title">Szczegóły numeru</string>
 
-    <!-- Strings related to EditPhoneBlock -->
-    <string name="edit_phone_block_title">Edycja numeru</string>
 
     <!-- String related to CallDetector -->
     <string name="call_detector_choose_category_title">Wybierz kategorię</string>
