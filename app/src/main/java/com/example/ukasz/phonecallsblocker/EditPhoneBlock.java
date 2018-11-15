@@ -19,6 +19,7 @@ import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import com.example.ukasz.androidsqlite.Block;
 import com.example.ukasz.androidsqlite.DatabaseHandler;
 
 import java.util.List;
@@ -35,6 +36,12 @@ public class EditPhoneBlock extends AppCompatActivity implements AdapterView.OnI
     private String myPhoneNumber;
     private TelephonyManager tm;
 
+    //Editing blocking
+    Block block;
+
+    //Database handler
+    private DatabaseHandler db;
+
 
     /**
      * Initialize var instances and view for start {@link EditPhoneBlock} activity.
@@ -47,6 +54,8 @@ public class EditPhoneBlock extends AppCompatActivity implements AdapterView.OnI
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_phone_block);
+
+        db = new DatabaseHandler(getApplicationContext());
 
         // TODO: Refactor: Consider keeping myPhoneNumber in external common place
         //getMyPhoneNumber
@@ -77,9 +86,12 @@ public class EditPhoneBlock extends AppCompatActivity implements AdapterView.OnI
         Bundle b = getIntent().getExtras();
         String phoneNumber = "";
         if(b != null) phoneNumber = b.getString("phoneNumber");
-        nrBlocked.setText(phoneNumber);
+        block = getBlock(phoneNumber);
 
-        category.setSelection(1);
+        nrBlocked.setText(block.getNrBlocked());
+        isPositiveSwitch.setChecked(!block.getNrRating());
+        description.setText(block.getReasonDescription());
+        category.setSelection(block.getReasonCategory());
     }
 
     /**
@@ -94,6 +106,17 @@ public class EditPhoneBlock extends AppCompatActivity implements AdapterView.OnI
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, categories);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
+    }
+
+    /**
+     * Gets {@link Block} from local database by passed blocked phone number.
+     *
+     * @param phoneNumber blocked number
+     * @return {@link Block} if exist blocked number number
+     */
+    private Block getBlock(String phoneNumber)
+    {
+        return db.getBlocking(myPhoneNumber, phoneNumber);
     }
 
     /**
