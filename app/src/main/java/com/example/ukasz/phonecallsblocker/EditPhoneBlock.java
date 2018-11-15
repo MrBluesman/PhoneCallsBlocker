@@ -97,6 +97,23 @@ public class EditPhoneBlock extends AppCompatActivity implements AdapterView.OnI
         loadCategoriesToSpinner(category);
         category.setOnItemSelectedListener(this);
 
+        //Switch view depends on blocking type (positive or negative)
+        isPositiveSwitch.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                if (isPositiveSwitch.isChecked())
+                {
+                    category.setVisibility(View.GONE);
+                }
+                else
+                {
+                    category.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+
         //set the fields as number info --------------------------------------------------------------------------
         Bundle b = getIntent().getExtras();
         String phoneNumber = "";
