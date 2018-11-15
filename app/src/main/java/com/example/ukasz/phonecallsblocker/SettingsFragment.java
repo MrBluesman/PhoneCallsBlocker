@@ -357,6 +357,8 @@ public class SettingsFragment extends Fragment
                     {
                         HashMap<String, Object> updateData = new HashMap<>();
                         updateData.put("nrRating", block.getNrRating());
+                        updateData.put("reasonCategory", block.getReasonCategory());
+                        updateData.put("reasonDescription", block.getReasonDescription());
                         dataSnapshot.getChildren().iterator().next().getRef().updateChildren(updateData);
                     }
                     else
