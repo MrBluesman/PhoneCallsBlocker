@@ -4,6 +4,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -18,10 +19,18 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.ukasz.androidsqlite.Block;
 import com.example.ukasz.androidsqlite.DatabaseHandler;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
@@ -39,8 +48,9 @@ public class EditPhoneBlock extends AppCompatActivity implements AdapterView.OnI
     //Editing blocking
     Block block;
 
-    //Database handler
+    //Database local and firebase handlers
     private DatabaseHandler db;
+    private DatabaseReference mDatabase;
 
 
     /**
@@ -56,6 +66,7 @@ public class EditPhoneBlock extends AppCompatActivity implements AdapterView.OnI
         setContentView(R.layout.activity_edit_phone_block);
 
         db = new DatabaseHandler(getApplicationContext());
+        mDatabase = FirebaseDatabase.getInstance().getReference();
 
         // TODO: Refactor: Consider keeping myPhoneNumber in external common place
         //getMyPhoneNumber
@@ -82,7 +93,7 @@ public class EditPhoneBlock extends AppCompatActivity implements AdapterView.OnI
         loadCategoriesToSpinner(category);
         category.setOnItemSelectedListener(this);
 
-        //set the fields as number info
+        //set the fields as number info --------------------------------------------------------------------------
         Bundle b = getIntent().getExtras();
         String phoneNumber = "";
         if(b != null) phoneNumber = b.getString("phoneNumber");
@@ -92,6 +103,21 @@ public class EditPhoneBlock extends AppCompatActivity implements AdapterView.OnI
         isPositiveSwitch.setChecked(!block.getNrRating());
         description.setText(block.getReasonDescription());
         category.setSelection(block.getReasonCategory());
+
+        //edit button listener --------------------------------------------------------------------------
+        editButton = findViewById(R.id.edit_phone_block_editButton);
+        editButton.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                block.setNrRating(!isPositiveSwitch.isChecked());
+                block.setReasonDescription(String.valueOf(description.getText()));
+                block.setReasonCategory(category.getSelectedItemPosition());
+                updatePhoneBlock(db, block.getNrBlocked(), block.getNrRating());
+                finish();
+            }
+        });
     }
 
     /**
@@ -117,6 +143,58 @@ public class EditPhoneBlock extends AppCompatActivity implements AdapterView.OnI
     private Block getBlock(String phoneNumber)
     {
         return db.getBlocking(myPhoneNumber, phoneNumber);
+    }
+
+    /**
+     * Updates the phone block with new edited data.
+     *
+     * @param db {@link DatabaseHandler} to make a update phoneNumber exists
+     * @param phoneNumber phone number which rating will be updated
+     * @param rating new blocking rating
+     */
+    private void updatePhoneBlock(DatabaseHandler db, final String phoneNumber, final boolean rating)
+    {
+        //LOCAL UPDATING
+        //In listener button set properties to the newest one (edited)
+        db.updateBlocking(block);
+
+        //Refresh blockings after update
+        PhoneBlockFragment.loadBlockingsExternal();
+
+//        //GLOBAL UPDATING - if sync is enabled
+//        boolean syncEnabled =  getApplicationContext().getSharedPreferences("data", Context.MODE_PRIVATE)
+//                .getBoolean("syncEnabled", false);
+//
+//        if(syncEnabled)
+//        {
+//            final Query blockings = mDatabase
+//                    .child("blockings")
+//                    .orderByChild("nrDeclarantBlocked")
+//                    .equalTo(myPhoneNumber + "_" + phoneNumber);
+//
+//            blockings.addListenerForSingleValueEvent(new ValueEventListener()
+//            {
+//                @Override
+//                public void onDataChange(@NonNull DataSnapshot dataSnapshot)
+//                {
+//                    if(dataSnapshot.exists())
+//                    {
+//                        if(dataSnapshot.getChildren().iterator().hasNext())
+//                        {
+//                            HashMap<String, Object> updateData = new HashMap<>();
+//                            updateData.put("nrRating", rating);
+//                            dataSnapshot.getChildren().iterator().next().getRef().updateChildren(updateData);
+//                        }
+//                    }
+//                }
+//
+//                @Override
+//                public void onCancelled(@NonNull DatabaseError databaseError)
+//                {
+//                    Toast.makeText(getApplicationContext(), R.string.error, Toast.LENGTH_SHORT).show();
+//                }
+//            });
+//        }
     }
 
     /**
