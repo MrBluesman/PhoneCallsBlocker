@@ -109,7 +109,7 @@
     <string name="add_phone_block_added">Numer dodany</string>
     <string name="add_phone_block_already_exist">Numer już istnieje na liście</string>
     <string name="add_phone_block_error_invalid">Numer jest nieprawidłowy</string>
-    <string name="add_phone_block_error_empty">Numer telefonu jest wymagane</string>
+    <string name="add_phone_block_error_empty">Numer telefonu jest wymagany</string>
 
     <!-- Strings related to DetailsPhoneBlock -->
     <string name="details_phone_block_title">Szczegóły numeru</string>
