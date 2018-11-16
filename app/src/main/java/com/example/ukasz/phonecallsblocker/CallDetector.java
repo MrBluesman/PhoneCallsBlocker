@@ -118,6 +118,8 @@ public class CallDetector
                     //database and settings load
                     final DatabaseHandler db = new DatabaseHandler(ctx);
 
+//                    getReasonCategory(phoneNumberFormatted, db);
+
                     //tolerated locally - always allow!
                     if(db.existBlock(myPhoneNumber, phoneNumberFormatted, false))
                     {
@@ -610,6 +612,26 @@ public class CallDetector
             }
 
             return false;
+        }
+
+        /**
+         * Gets stringified reason category of blocking of incoming call.
+         *
+         * @param incomingNumber contains the number of incoming call
+         * @param db database for fetching the category
+         * @return {@link String} category
+         */
+        private String getReasonCategory(String incomingNumber, DatabaseHandler db)
+        {
+            //Get util phone number lib to format
+            PhoneNumberHelper formator = new PhoneNumberHelper();
+            final String phoneNumberFormatted = formator.formatPhoneNumber(incomingNumber,
+                    StartActivity.COUNTRY_CODE,
+                    PhoneNumberUtil.PhoneNumberFormat.E164);
+
+            String category;
+            category = db.getCategory(db.getBlocking(myPhoneNumber, phoneNumberFormatted).getReasonCategory());
+            return category;
         }
     }
 

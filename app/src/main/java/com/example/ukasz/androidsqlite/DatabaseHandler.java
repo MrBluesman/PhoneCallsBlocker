@@ -171,8 +171,35 @@ public class DatabaseHandler extends SQLiteOpenHelper
         }
 
         assert cursor != null;
-        return new Block(cursor.getString(0), cursor.getString(1), Integer.parseInt(cursor.getString(2)),
+        Block block = new Block(cursor.getString(0), cursor.getString(1), Integer.parseInt(cursor.getString(2)),
                 cursor.getString(3), "1".equals(cursor.getString(4)));
+        cursor.close();
+        return block;
+    }
+
+    /**
+     * Gets reason category by id.
+     *
+     * @param cat_id category id
+     * @return {@link String} reason category if exists
+     */
+    public String getCategory(int cat_id)
+    {
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        String selectCategory = "SELECT * FROM " + TABLE_CATEGORY
+                + " WHERE " + ID_KEY_T_C + "='" + (cat_id + 1) + "'"
+                + " LIMIT 1;";
+
+        String category = null;
+        Cursor cursor = db.rawQuery(selectCategory, null);
+        if(cursor != null && cursor.moveToFirst())
+        {
+            category = cursor.getString(cursor.getColumnIndex(NAME_T_C));
+            cursor.close();
+        }
+
+        return category;
     }
 
     /**
