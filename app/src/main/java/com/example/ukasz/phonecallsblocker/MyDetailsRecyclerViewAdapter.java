@@ -10,6 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.ukasz.androidsqlite.Block;
+import com.example.ukasz.androidsqlite.DatabaseHandler;
 import com.example.ukasz.phonecallsblocker.phone_number_helper.PhoneNumberHelper;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
@@ -19,6 +20,7 @@ public class MyDetailsRecyclerViewAdapter extends FirebaseRecyclerAdapter<Block,
 {
     //Context
     private final Context mContext;
+    private DatabaseHandler db;
 
     public class DetailsPhoneBlockHolder extends RecyclerView.ViewHolder
     {
@@ -47,11 +49,13 @@ public class MyDetailsRecyclerViewAdapter extends FirebaseRecyclerAdapter<Block,
      *
      * @param options options for {@link FirebaseRecyclerAdapter} including query for selected values
      * @param context context of the application
+     * @param db database handler for fetching data from database
      */
-    MyDetailsRecyclerViewAdapter(FirebaseRecyclerOptions<Block> options, Context context)
+    MyDetailsRecyclerViewAdapter(FirebaseRecyclerOptions<Block> options, Context context, DatabaseHandler db)
     {
         super(options);
         mContext = context;
+        this.db = db;
     }
 
     /**
@@ -82,18 +86,12 @@ public class MyDetailsRecyclerViewAdapter extends FirebaseRecyclerAdapter<Block,
     @Override
     protected void onBindViewHolder(@NonNull DetailsPhoneBlockHolder holder, int position, @NonNull Block block)
     {
-        //Get validator phone number lib to format
-        PhoneNumberHelper phoneNumberHelper = new PhoneNumberHelper();
-        String contactName = phoneNumberHelper.getContactName(mContext, block.getNrBlocked());
-        String phoneNumberFormatted = (block.getNrBlocked().equals("Numer prywatny") ? block.getNrBlocked() : phoneNumberHelper.formatPhoneNumber(block.getNrBlocked(), StartActivity.COUNTRY_CODE, PhoneNumberUtil.PhoneNumberFormat.NATIONAL));
+        //Get category
+        holder.mDetailsReasonCategory.setText(db.getCategory(block.getReasonCategory()));
 
-        holder.mDetailsReasonCategory.setText(contactName != null
-                ? contactName
-                : phoneNumberFormatted
-        );
-
+        /* TODO: Add date when will be available */
 //        holder.mDetailsDate.setText(String.valueOf(rBlock.getNrBlockingDateFormatted("MM/dd/yyyy HH:mm")));
-        holder.mDetailsDate.setText(String.valueOf(String.valueOf(block.getReasonCategory())));
+        holder.mDetailsDate.setText(block.getNrBlocked());
 
         if(block.getNrRating()) holder.mDetailsItemIcon.setImageResource(R.drawable.bg_circle_negative);
         else holder.mDetailsItemIcon.setImageResource(R.drawable.bg_circle_positive);

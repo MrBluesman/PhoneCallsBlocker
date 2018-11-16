@@ -17,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.ukasz.androidsqlite.Block;
+import com.example.ukasz.androidsqlite.DatabaseHandler;
 import com.example.ukasz.phonecallsblocker.list_helper.DividerItemDecoration;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.database.DatabaseReference;
@@ -36,6 +37,7 @@ public class DetailsPhoneBlock extends AppCompatActivity
     private DatabaseReference databaseRef;
     private Query blockingsRef;
     FirebaseRecyclerOptions<Block> detailsBlockRecyclerOptions;
+    DatabaseHandler db;
 
     private TextView phoneNumberTextView;
 
@@ -59,6 +61,9 @@ public class DetailsPhoneBlock extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_details_phone_block);
 
+        //set up the DatabaseHandler
+        db = new DatabaseHandler(getApplicationContext());
+
         //set toolbar
         mActionBar = findViewById(R.id.details_phone_block_toolbar);
         setSupportActionBar(mActionBar);
@@ -73,9 +78,6 @@ public class DetailsPhoneBlock extends AppCompatActivity
         phoneNumberTextView.setText(phoneNumber);
 
         // ----------------------------------------------------------------------------------------
-        //Get the root of the phoneblock list fragment - ConstraintLayout
-//        View rootView = inflater.inflate(R.layout.activity_details_phone_block, container, false);
-        //Then get the recyclewView from rootView
         View view = findViewById(R.id.details_phone_block_list);
 
         //Firebase realtime database references
@@ -101,7 +103,7 @@ public class DetailsPhoneBlock extends AppCompatActivity
             detailsBlockRecyclerOptions = new FirebaseRecyclerOptions.Builder<Block>()
                     .setQuery(blockingsRef, Block.class)
                     .build();
-            adapter = new MyDetailsRecyclerViewAdapter(detailsBlockRecyclerOptions, context);
+            adapter = new MyDetailsRecyclerViewAdapter(detailsBlockRecyclerOptions, context, db);
 
             recyclerView.setItemAnimator(new DefaultItemAnimator());
             recyclerView.addItemDecoration(new DividerItemDecoration(context, LinearLayoutManager.VERTICAL));
