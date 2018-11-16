@@ -19,10 +19,12 @@ import android.widget.TextView;
 import com.example.ukasz.androidsqlite.Block;
 import com.example.ukasz.androidsqlite.DatabaseHandler;
 import com.example.ukasz.phonecallsblocker.list_helper.DividerItemDecoration;
+import com.example.ukasz.phonecallsblocker.phone_number_helper.PhoneNumberHelper;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
+import com.google.i18n.phonenumbers.PhoneNumberUtil;
 
 import java.util.Objects;
 
@@ -77,6 +79,14 @@ public class DetailsPhoneBlock extends AppCompatActivity
         phoneNumberTextView = findViewById(R.id.details_phone_block_phone_number);
         phoneNumberTextView.setText(phoneNumber);
 
+        //Set action bar title to formatted version
+        //Get validator phone number lib to format
+        PhoneNumberHelper phoneNumberHelper = new PhoneNumberHelper();
+
+        String contactName = phoneNumberHelper.getContactName(getApplicationContext(), phoneNumber);
+        String phoneNumberFormatted = phoneNumberHelper.formatPhoneNumber(phoneNumber, StartActivity.COUNTRY_CODE, PhoneNumberUtil.PhoneNumberFormat.NATIONAL);
+        mActionBar.setTitle(contactName != null ? contactName + " (" + phoneNumberFormatted + ")" : phoneNumberFormatted);
+
         // ----------------------------------------------------------------------------------------
         View view = findViewById(R.id.details_phone_block_list);
 
@@ -111,25 +121,6 @@ public class DetailsPhoneBlock extends AppCompatActivity
 
         }
     }
-
-//    /**
-//     * Creates a {@link View} using a RecyclerView Adapter
-//     * and a Linear or Grid Layout depends on {@param mColumnCount}.
-//     *
-//     * @param inflater {@link LayoutInflater} which will be used to inflate a {@link View}
-//     * @param container {@link ViewGroup} container
-//     * @param savedInstanceState saved state of instance this {@link DetailsPhoneBlock}
-//     * @return created {@link View}
-//     */
-//    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
-//                             Bundle savedInstanceState)
-//    {
-//        Log.e("DetailsPhoneBlock", "onCreateView()");
-//
-//
-//
-//        return rootView;
-//    }
 
     /**
      * Runs on resume application.
