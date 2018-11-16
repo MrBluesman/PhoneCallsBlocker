@@ -83,7 +83,7 @@ public class DetailsPhoneBlock extends AppCompatActivity
         //Firebase realtime database references
         //TODO: initialize keep Synced when is really needed and remember to unSync it
         databaseRef = FirebaseDatabase.getInstance().getReference();
-        blockingsRef = databaseRef.child("blockings");
+        blockingsRef = databaseRef.child("blockings").orderByChild("nrBlocked").equalTo(phoneNumber);
         blockingsRef.getRef().keepSynced(true);
 
         //Set the adapter
