@@ -4,7 +4,6 @@ import android.app.job.JobParameters;
 import android.app.job.JobService;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.util.Log;
 
 /**
  * Created by Łukasz on 2017-03-05.
@@ -25,7 +24,6 @@ public class CallDetectService extends JobService
     @Override
     public boolean onStartJob(JobParameters params)
     {
-        Log.e("test","CallDetectService - onStartJob() method");
 //        if(callDetector == null)
 //        {
 //            callDetector = new CallDetector(this);
@@ -62,7 +60,6 @@ public class CallDetectService extends JobService
     @Override
     public boolean onStopJob(JobParameters params)
     {
-        Log.e("test","CallDetectService - onStopJob() method");
         SharedPreferences data = getApplicationContext().getSharedPreferences("data", Context.MODE_PRIVATE);
         boolean callDetectorEnabled = data.getBoolean("detectEnabled", false);
         //Stop only if call detection service is not enabled

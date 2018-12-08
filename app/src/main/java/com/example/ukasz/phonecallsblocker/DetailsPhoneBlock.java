@@ -8,7 +8,6 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
@@ -127,7 +126,6 @@ public class DetailsPhoneBlock extends AppCompatActivity
     public void onResume()
     {
         super.onResume();
-        Log.e("DetailsPhoneBlock", "onResume()");
     }
 
     /**
@@ -139,7 +137,6 @@ public class DetailsPhoneBlock extends AppCompatActivity
     {
         super.onStart();
         adapter.startListening();
-        Log.e("DetailsPhoneBlock", "onStart()");
     }
 
     /**
@@ -151,7 +148,6 @@ public class DetailsPhoneBlock extends AppCompatActivity
     {
         super.onStop();
         adapter.stopListening();
-        Log.e("DetailsPhoneBlock", "onStop()");
     }
 
     /**

@@ -6,7 +6,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -385,13 +384,9 @@ public class DatabaseHandler extends SQLiteOpenHelper
                 + " WHERE " + DECLARANT_KEY_T_B + "=" + "'" + block.getNrDeclarant() + "'"
                 + " AND " + BLOCKED_KEY_T_B + "=" + "'" + block.getNrBlocked() + "'";
 
-//        Log.e("Exist: ", block.getNrDeclarant());
-//        Log.e("Exist: ", block.getNrBlocked());
-
         Cursor cursor = db.rawQuery(selectBlockings, null);
         boolean toReturn = cursor.getCount() > 0;
         cursor.close();
-//        Log.e("Exist: ", ""+cursor.getCount());
 
         return toReturn;
     }
@@ -414,13 +409,9 @@ public class DatabaseHandler extends SQLiteOpenHelper
                 + " AND " + BLOCKED_KEY_T_B + "=" + "'" + nr_blocked + "'"
                 + " AND " + RATING_T_B + "=" + sqlRating + ";";
 
-        Log.e("Exist: ", nr_declarant);
-        Log.e("Exist: ", nr_declarant);
-
         Cursor cursor = db.rawQuery(selectBlockings, null);
         boolean toReturn = cursor.getCount() > 0;
         cursor.close();
-        Log.e("Exist: ", ""+cursor.getCount());
 
         return toReturn;
     }

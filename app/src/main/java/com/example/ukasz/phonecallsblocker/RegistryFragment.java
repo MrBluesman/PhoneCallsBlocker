@@ -10,7 +10,6 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -72,7 +71,6 @@ public class RegistryFragment extends Fragment implements MyRegistryRecyclerView
     {
         super.onResume();
         adapter.notifyDataSetChanged();
-        Log.e("RegistryFragment", "onResume()");
     }
 
     /**
@@ -110,8 +108,6 @@ public class RegistryFragment extends Fragment implements MyRegistryRecyclerView
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState)
     {
-        Log.e("RegistryFragment", "onCreateView()");
-
         //Get the root of the registry list fragment - ConstraintLayout
         View rootView = inflater.inflate(R.layout.fragment_registry_list, container, false);
         //Then get the recyclewView from rootView
@@ -152,7 +148,6 @@ public class RegistryFragment extends Fragment implements MyRegistryRecyclerView
     @Override
     public void onAttach(Context context)
     {
-        Log.e("RegistryFragment", "onAttach()");
         super.onAttach(context);
     }
 
@@ -185,7 +180,6 @@ public class RegistryFragment extends Fragment implements MyRegistryRecyclerView
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-        Log.d("OPTIONS SELECTED:", "Fragment.onOptionsItemSelected");
         //noinspection SimplifiableIfStatement
         if (id == R.id.menu_action_clear_registry)
         {
@@ -201,7 +195,6 @@ public class RegistryFragment extends Fragment implements MyRegistryRecyclerView
      */
     public static void loadRegistryBlockings()
     {
-        Log.e("RegistryFragment", "loadRegistryBlockings()");
         List<RegistryBlock> registryBlockingsToAddFromDb = null;
         try
         {

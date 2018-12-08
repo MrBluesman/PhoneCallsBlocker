@@ -32,7 +32,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.os.Bundle;
 import android.telephony.TelephonyManager;
-import android.util.Log;
 import android.view.View;
 
 import android.widget.Toast;
@@ -254,7 +253,6 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
         {
             if(fab.isOpened()) fab.toggle(true);
         }
-        Log.e("StartActivity", "onResume() method");
     }
 
     /**
@@ -273,7 +271,6 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
         {
             if (fab.isOpened()) fab.toggle(true);
         }
-        Log.e("StartActivity", "onRestart() method");
     }
 
     /**
@@ -332,8 +329,6 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
         notificationBlockEnabled = data.getBoolean("notificationBlockEnabled", false);
         notificationAllowEnabled = data.getBoolean("notificationAllowEnabled", false);
 
-        Log.e("Loading data", "MainActivity - loadSettingsState() method");
-
         setDetectEnabled(detectEnabled);
     }
 
@@ -345,7 +340,6 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
     protected void onDestroy()
     {
         super.onDestroy();
-        Log.e("StartActivity", "onDestroy() method");
     }
 
     /**
@@ -418,16 +412,13 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
     public void setDetectEnabled(boolean enable)
     {
         detectEnabled = enable;
-        Log.e("setDetectEnabled", "method enabled");
 
         if (enable)
         {
-            Log.e("StartActivity", "START CallDetectService [method call]");
             scheduleDetectingJob();
         }
         else
         {
-            Log.e("StartActivity", "STOP CallDetectService [method call]");
             cancelDetectingJob();
         }
     }
@@ -440,7 +431,7 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
     @Override
     public void onFragmentInteraction(Uri uri)
     {
-        Log.e("bla", "bla JEST INTERAKCJA");
+
     }
 
     /**
@@ -631,7 +622,6 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
     public void requestReadCallLogPermission()
     {
         //Request the permission
-        Log.e("ReadCallLog", "true");
         ActivityCompat.requestPermissions(this,
                 new String[]{Manifest.permission.READ_CALL_LOG},
                 READ_CALL_LOG_PERMISSION_REQUEST_CODE);
@@ -912,7 +902,6 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
                 {
                     if(!dataSnapshot.exists())
                     {
-                        Log.e("TEST_ISTNIEJE", "NIE");
                         databaseRef.child("blockings").push().setValue(newBlock);
                     }
                 }

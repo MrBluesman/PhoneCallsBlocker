@@ -10,7 +10,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.telephony.TelephonyManager;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -242,7 +241,6 @@ public class AddPhoneBlock extends AppCompatActivity implements AdapterView.OnIt
                 {
                     if(!dataSnapshot.exists())
                     {
-                        Log.e("TEST_ISTNIEJE", "NIE");
                         databaseRef.child("blockings").push().setValue(newBlock);
                     }
                 }

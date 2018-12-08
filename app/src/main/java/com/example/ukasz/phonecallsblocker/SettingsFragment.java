@@ -6,7 +6,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -86,7 +85,6 @@ public class SettingsFragment extends Fragment
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        Log.e("SettingsFragment", "onCreate() method");
     }
 
     /**
@@ -101,7 +99,6 @@ public class SettingsFragment extends Fragment
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState)
     {
-        Log.e("SettingsFragment", "onCreateView() method");
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_settings, container, false);
     }
@@ -110,7 +107,6 @@ public class SettingsFragment extends Fragment
     public void onActivityCreated(Bundle savedInstanceState)
     {
         super.onActivityCreated(savedInstanceState);
-        Log.e("SettingsFragment","onActivityCreated() method");
         //Switches to enable/disable blocking options
         blockServiceSwitch = getView().findViewById(R.id.settings_fragment_switch1_block_service);
         autoBlockSwitch = getView().findViewById(R.id.settings_fragment_switch2_automatic_block);
@@ -380,8 +376,6 @@ public class SettingsFragment extends Fragment
     @Override
     public void onAttach(Context context)
     {
-        Log.e("SettingsFragment","onAttach() method");
-
         data = context.getSharedPreferences("data", Context.MODE_PRIVATE);
         super.onAttach(context);
 
@@ -402,7 +396,6 @@ public class SettingsFragment extends Fragment
     @Override
     public void onDetach()
     {
-        Log.e("SettingsFragment","onDetach() method");
         super.onDetach();
         mListener = null;
     }

@@ -14,7 +14,6 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -285,7 +284,6 @@ public class PermissionsStartupActivity extends AppCompatActivity {
      */
     public void requestCallPhonePermission() {
         //Request the permission
-        Log.e("CallPhone", "true");
         ActivityCompat.requestPermissions(this,
                 new String[]{Manifest.permission.CALL_PHONE},
                 CALL_PHONE_PERMISSION_REQUEST_CODE);

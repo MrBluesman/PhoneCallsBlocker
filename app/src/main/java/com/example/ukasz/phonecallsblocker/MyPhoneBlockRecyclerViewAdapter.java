@@ -111,7 +111,6 @@ public class MyPhoneBlockRecyclerViewAdapter extends RecyclerView.Adapter<MyPhon
      */
     MyPhoneBlockRecyclerViewAdapter(Context context, List<Block> blockings, BlockAdapterListener listener)
     {
-//        Log.e("blockings", blockings.toString());
         mContext = context;
         mBlockings = blockings;
         mListener = listener;

@@ -14,7 +14,6 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -88,7 +87,6 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
     {
         super.onResume();
         adapter.notifyDataSetChanged();
-        Log.e("PhoneBlockFragment", "onResume()");
     }
 
     /**
@@ -126,8 +124,6 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState)
     {
-        Log.e("PhoneBlockFragment", "onCreateView()");
-
         //Get the root of the phoneblock list fragment - ConstraintLayout
         View rootView = inflater.inflate(R.layout.fragment_phoneblock_list, container, false);
         //Then get the recyclewView from rootView
@@ -176,7 +172,6 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
     @Override
     public void onAttach(Context context)
     {
-        Log.e("PhoneBlockFragment", "onAttach()");
         super.onAttach(context);
     }
 
@@ -260,7 +255,6 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
     @Override
     public void onDetach()
     {
-        Log.e("PhoneBlockFragment", "onDetach()");
         super.onDetach();
     }
 
@@ -272,7 +266,6 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
     @Override
     public void onIconClicked(int position)
     {
-        Log.e("onIconClicked", String.valueOf(position));
         enableActionMode(position);
     }
 
@@ -312,7 +305,6 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
     @Override
     public void onBlockRowClicked(int position)
     {
-        Log.e("onBlockRowClicked", String.valueOf(position));
         // verify whether action mode is enabled or not
         // if enabled, change the row state to activated
         if (adapter.getSelectedItemCount() > 0)
@@ -335,7 +327,6 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
     @Override
     public void onRowLongClicked(int position)
     {
-        Log.e("onRowLongClicked", String.valueOf(position));
         // long press is performed, enable action mode
         enableActionMode(position);
     }

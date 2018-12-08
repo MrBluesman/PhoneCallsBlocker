@@ -21,7 +21,6 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
-import android.util.Log;
 import android.view.WindowManager;
 import android.widget.Toast;
 
@@ -607,7 +606,6 @@ public class CallDetector
             }
             catch (NumberParseException e)
             {
-                Log.e("CallDetector", "Unable to parse incoming phoneNumber " + e.toString());
             }
 
             return false;
@@ -710,7 +708,6 @@ public class CallDetector
                             {
                                 if(!dataSnapshot.exists())
                                 {
-                                    Log.e("TEST_ISTNIEJE", "NIE");
                                     databaseRef.child("blockings").push().setValue(newBlock);
                                 }
                             }
@@ -754,7 +751,6 @@ public class CallDetector
      */
     private void registerPhoneBlock(DatabaseHandler db, String phoneNumber, boolean rating)
     {
-        Log.e("CallDetector", "registerPhoneBlock - " + phoneNumber);
         db.addBlockingRegistry(new RegistryBlock(phoneNumber, rating, new Date()));
         RegistryFragment.loadRegistryBlockings();
     }
@@ -836,7 +832,6 @@ public class CallDetector
         catch (Exception e)
         {
             e.printStackTrace();
-            Log.d("declinePhone: ", "Nie mozna zakonczyc polaczenia");
         }
     }
 
@@ -864,7 +859,6 @@ public class CallDetector
     @SuppressLint("HardwareIds")
     public CallDetector(Context _ctx)
     {
-        Log.e("test","CallDetector - construct on creating detector (listener)");
         ctx = _ctx;
         callStateListener = new CallStateListener();
         notificationManager = NotificationManagerCompat.from(ctx);
@@ -887,7 +881,6 @@ public class CallDetector
     @SuppressLint("HardwareIds")
     public void start()
     {
-        Log.e("CallDetector", "start() method");
         tm = (TelephonyManager) ctx.getSystemService(Context.TELEPHONY_SERVICE);
         tm.listen(callStateListener, PhoneStateListener.LISTEN_CALL_STATE);
 
@@ -899,7 +892,6 @@ public class CallDetector
         myPhoneNumber = !tm.getLine1Number().equals("") ? tm.getLine1Number() : tm.getSubscriberId();
         myPhoneNumber = !myPhoneNumber.equals("") ? myPhoneNumber : tm.getSimSerialNumber();
         myCountryDialCode = PhoneNumberUtil.getInstance().getCountryCodeForRegion(tm.getSimCountryIso().toUpperCase());
-        Log.e("PHONE_NUMBER", String.valueOf(myCountryDialCode));
     }
 
     /**
@@ -908,7 +900,6 @@ public class CallDetector
      */
     void stop()
     {
-        Log.e("test", "CallDetector - stop() method !!!!!!!!!");
         tm = (TelephonyManager) ctx.getSystemService(Context.TELEPHONY_SERVICE);
         tm.listen(callStateListener, PhoneStateListener.LISTEN_NONE);
     }
