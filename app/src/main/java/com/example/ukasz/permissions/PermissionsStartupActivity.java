@@ -1,15 +1,12 @@
 package com.example.ukasz.permissions;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
-import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
@@ -17,27 +14,16 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.telephony.PhoneStateListener;
-import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.example.ukasz.androidsqlite.Block;
-import com.example.ukasz.androidsqlite.DatabaseHandler;
-import com.example.ukasz.phonecallsblocker.PhoneBlockFragment;
 import com.example.ukasz.phonecallsblocker.R;
 import com.example.ukasz.phonecallsblocker.StartActivity;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
-import com.google.firebase.database.ValueEventListener;
 
 /**
  * Class for grant permissions for the first run of app or when
@@ -75,8 +61,7 @@ public class PermissionsStartupActivity extends AppCompatActivity {
      */
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
+    protected void onCreate(Bundle savedInstanceState) {
         //View.VISIBLE || View.GONE
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_permissions_startup);
@@ -94,15 +79,11 @@ public class PermissionsStartupActivity extends AppCompatActivity {
         //Sets the visibility of elements
         setVisibility();
 
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M)
-        {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
             //If we have granted permissions we can open a Main Activity
-            if(hasGrantedPermissions(getApplicationContext()))
-            {
+            if (hasGrantedPermissions(getApplicationContext())) {
                 openStartActivity();
-            }
-
-            else //If we haven't, we have to request for this permissions
+            } else //If we haven't, we have to request for this permissions
             {
                 phoneStateWarningText = findViewById(R.id.permissions_startup_activity_phone_checkbox_warning);
                 phoneStateWarningImage = findViewById(R.id.imageView4);
@@ -110,24 +91,19 @@ public class PermissionsStartupActivity extends AppCompatActivity {
                 contactsStateWarningText = findViewById(R.id.permissions_startup_activity_contacts_checkbox_warning);
                 contactsStateWarningImage = findViewById(R.id.imageView5);
 
-                grantPermissionsButton.setOnClickListener(new View.OnClickListener()
-                {
+                grantPermissionsButton.setOnClickListener(new View.OnClickListener() {
                     @Override
-                    public void onClick(View v)
-                    {
+                    public void onClick(View v) {
                         checkBasicPermissions();
                     }
                 });
             }
-        }
-        else //Android SDK >= M
+        } else //Android SDK >= M
         {
             //If we have granted permissions we can open a Main Activity
-            if (hasGrantedPermissions(getApplicationContext()) && hasGrantedManageOverlayPermission(getApplicationContext()))
-            {
+            if (hasGrantedPermissions(getApplicationContext()) && hasGrantedManageOverlayPermission(getApplicationContext())) {
                 openStartActivity();
-            }
-            else //If we haven't, we have to request for this permissions
+            } else //If we haven't, we have to request for this permissions
             {
                 phoneStateWarningText = findViewById(R.id.permissions_startup_activity_phone_checkbox_warning);
                 phoneStateWarningImage = findViewById(R.id.imageView4);
@@ -137,19 +113,15 @@ public class PermissionsStartupActivity extends AppCompatActivity {
                 allowWindowsWarningImage = findViewById(R.id.imageView6);
 
                 grantPermissionsButton = findViewById(R.id.permissions_startup_activity_accept_button);
-                grantPermissionsButton.setOnClickListener(new View.OnClickListener()
-                {
+                grantPermissionsButton.setOnClickListener(new View.OnClickListener() {
                     @Override
-                    public void onClick(View v)
-                    {
+                    public void onClick(View v) {
                         checkBasicPermissions();
 
-                        if(allowWindowsCheckBoxPerm.isChecked())
-                        {
-                            if(!hasGrantedManageOverlayPermission(getApplicationContext())) requestManageOverlayPermission();
-                        }
-                        else
-                        {
+                        if (allowWindowsCheckBoxPerm.isChecked()) {
+                            if (!hasGrantedManageOverlayPermission(getApplicationContext()))
+                                requestManageOverlayPermission();
+                        } else {
                             allowWindowsWarningText.setTextKeepState(getResources().getString(R.string.permissions_startup_activity_windows_checkbox_warning_nc));
                             setOptionsVisible(allowWindowsWarningText, allowWindowsWarningImage);
                         }
@@ -163,8 +135,7 @@ public class PermissionsStartupActivity extends AppCompatActivity {
      * Runs on the restart of {@link PermissionsStartupActivity}.
      */
     @Override
-    protected void onRestart()
-    {
+    protected void onRestart() {
         super.onRestart();
         setVisibility();
     }
@@ -173,8 +144,7 @@ public class PermissionsStartupActivity extends AppCompatActivity {
      * Runs on the resume of {@link PermissionsStartupActivity}.
      */
     @Override
-    protected void onResume()
-    {
+    protected void onResume() {
         super.onResume();
         setVisibility();
     }
@@ -185,8 +155,7 @@ public class PermissionsStartupActivity extends AppCompatActivity {
      * @param t TextView to set as visible
      * @param i ImageView to set as visible
      */
-    public void setOptionsVisible(TextView t, ImageView i)
-    {
+    public void setOptionsVisible(TextView t, ImageView i) {
         t.setVisibility(View.VISIBLE);
         i.setVisibility(View.VISIBLE);
     }
@@ -197,8 +166,7 @@ public class PermissionsStartupActivity extends AppCompatActivity {
      * @param t TextView to set as unVisible
      * @param i ImageView to set as unVisible
      */
-    public void setOptionsUnVisible(TextView t, ImageView i)
-    {
+    public void setOptionsUnVisible(TextView t, ImageView i) {
         t.setVisibility(View.GONE);
         i.setVisibility(View.GONE);
     }
@@ -206,58 +174,45 @@ public class PermissionsStartupActivity extends AppCompatActivity {
     /**
      * Sets the visibility of elements based on granted and not granted permissions.
      */
-    public void setVisibility()
-    {
+    public void setVisibility() {
         //Disable permissions if we have already granted them
-        if(hasGrantedPhoneStatePermission(getApplicationContext()))
-        {
+        if (hasGrantedPhoneStatePermission(getApplicationContext())) {
             phoneStateCheckBoxPerm.setVisibility(View.GONE);
             findViewById(R.id.view).setVisibility(View.GONE);
             findViewById(R.id.permissions_startup_activity_phone_checkbox_header).setVisibility(View.GONE);
             findViewById(R.id.permissions_startup_activity_phone_checkbox_description).setVisibility(View.GONE);
-        }
-        else
-        {
+        } else {
             phoneStateCheckBoxPerm.setVisibility(View.VISIBLE);
             findViewById(R.id.view).setVisibility(View.VISIBLE);
             findViewById(R.id.permissions_startup_activity_phone_checkbox_header).setVisibility(View.VISIBLE);
             findViewById(R.id.permissions_startup_activity_phone_checkbox_description).setVisibility(View.VISIBLE);
         }
 
-        if(hasGrantedReadContactsPermission(getApplicationContext()))
-        {
+        if (hasGrantedReadContactsPermission(getApplicationContext())) {
             contactsStateCheckBoxPerm.setVisibility(View.GONE);
             findViewById(R.id.view2).setVisibility(View.GONE);
             findViewById(R.id.permissions_startup_activity_contacts_checkbox_header).setVisibility(View.GONE);
             findViewById(R.id.permissions_startup_activity_contacts_checkbox_description).setVisibility(View.GONE);
-        }
-        else
-        {
+        } else {
             contactsStateCheckBoxPerm.setVisibility(View.VISIBLE);
             findViewById(R.id.view2).setVisibility(View.VISIBLE);
             findViewById(R.id.permissions_startup_activity_contacts_checkbox_header).setVisibility(View.VISIBLE);
             findViewById(R.id.permissions_startup_activity_contacts_checkbox_description).setVisibility(View.VISIBLE);
         }
 
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M)
-        {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
             //disable manage overlay permission options
             allowWindowsCheckBoxPerm.setVisibility(View.GONE);
             findViewById(R.id.view3).setVisibility(View.GONE);
             findViewById(R.id.permissions_startup_activity_windows_checkbox_header).setVisibility(View.GONE);
             findViewById(R.id.permissions_startup_activity_windows_checkbox_description).setVisibility(View.GONE);
-        }
-        else
-        {
-            if(hasGrantedManageOverlayPermission(getApplicationContext()))
-            {
+        } else {
+            if (hasGrantedManageOverlayPermission(getApplicationContext())) {
                 allowWindowsCheckBoxPerm.setVisibility(View.GONE);
                 findViewById(R.id.view3).setVisibility(View.GONE);
                 findViewById(R.id.permissions_startup_activity_windows_checkbox_header).setVisibility(View.GONE);
                 findViewById(R.id.permissions_startup_activity_windows_checkbox_description).setVisibility(View.GONE);
-            }
-            else
-            {
+            } else {
                 allowWindowsCheckBoxPerm.setVisibility(View.VISIBLE);
                 findViewById(R.id.view3).setVisibility(View.VISIBLE);
                 findViewById(R.id.permissions_startup_activity_windows_checkbox_header).setVisibility(View.VISIBLE);
@@ -270,50 +225,35 @@ public class PermissionsStartupActivity extends AppCompatActivity {
      * Checks basic permissions (allow|deny).
      * Doesn't include checking the permissions in intent new activities like manage overlay.
      */
-    public void checkBasicPermissions()
-    {
-        if(phoneStateCheckBoxPerm.isChecked())
-        {
-            if(!hasGrantedPhoneStatePermission(getApplicationContext()))
-            {
+    public void checkBasicPermissions() {
+        if (phoneStateCheckBoxPerm.isChecked()) {
+            if (!hasGrantedPhoneStatePermission(getApplicationContext())) {
                 requestReadPhoneStatePermission();
             }
-            if(!contactsStateCheckBoxPerm.isChecked())
-            {
+            if (!contactsStateCheckBoxPerm.isChecked()) {
                 contactsStateWarningText.setTextKeepState(getResources().getString(R.string.permissions_startup_activity_contacts_checkbox_warning_nc));
                 setOptionsVisible(contactsStateWarningText, contactsStateWarningImage);
             }
-        }
-        else
-        {
+        } else {
             phoneStateWarningText.setTextKeepState(getResources().getString(R.string.permissions_startup_activity_phone_checkbox_warning_nc));
             setOptionsVisible(phoneStateWarningText, phoneStateWarningImage);
 
-            if(contactsStateCheckBoxPerm.isChecked())
-            {
-                if(!hasGrantedReadContactsPermission(getApplicationContext()))
-                {
+            if (contactsStateCheckBoxPerm.isChecked()) {
+                if (!hasGrantedReadContactsPermission(getApplicationContext())) {
                     requestReadContactsPermission();
                 }
-            }
-            else
-            {
+            } else {
                 contactsStateWarningText.setTextKeepState(getResources().getString(R.string.permissions_startup_activity_contacts_checkbox_warning_nc));
                 setOptionsVisible(contactsStateWarningText, contactsStateWarningImage);
             }
         }
 
-        if(hasGrantedPhoneStatePermission(getApplicationContext()))
-        {
-            if(contactsStateCheckBoxPerm.isChecked())
-            {
-                if(!hasGrantedReadContactsPermission(getApplicationContext()))
-                {
+        if (hasGrantedPhoneStatePermission(getApplicationContext())) {
+            if (contactsStateCheckBoxPerm.isChecked()) {
+                if (!hasGrantedReadContactsPermission(getApplicationContext())) {
                     requestReadContactsPermission();
                 }
-            }
-            else
-            {
+            } else {
                 contactsStateWarningText.setTextKeepState(getResources().getString(R.string.permissions_startup_activity_contacts_checkbox_warning_nc));
                 setOptionsVisible(contactsStateWarningText, contactsStateWarningImage);
             }
@@ -323,8 +263,7 @@ public class PermissionsStartupActivity extends AppCompatActivity {
     /**
      * Opens a window to ask for a permission to read a phone state.
      */
-    public void requestReadPhoneStatePermission()
-    {
+    public void requestReadPhoneStatePermission() {
         //Request the permission
         ActivityCompat.requestPermissions(this,
                 new String[]{Manifest.permission.READ_PHONE_STATE},
@@ -334,8 +273,7 @@ public class PermissionsStartupActivity extends AppCompatActivity {
     /**
      * Opens a window to ask for a permission to read a phone state.
      */
-    public void requestReadContactsPermission()
-    {
+    public void requestReadContactsPermission() {
         //Request the permission
         ActivityCompat.requestPermissions(this,
                 new String[]{Manifest.permission.READ_CONTACTS},
@@ -345,8 +283,7 @@ public class PermissionsStartupActivity extends AppCompatActivity {
     /**
      * Opens a window to ask for a permission to call phone.
      */
-    public void requestCallPhonePermission()
-    {
+    public void requestCallPhonePermission() {
         //Request the permission
         Log.e("CallPhone", "true");
         ActivityCompat.requestPermissions(this,
@@ -360,8 +297,7 @@ public class PermissionsStartupActivity extends AppCompatActivity {
      * @param context context of the app
      * @return true if they are granted, false if they are not
      */
-    public boolean hasGrantedPermissions(Context context)
-    {
+    public boolean hasGrantedPermissions(Context context) {
         return hasGrantedPhoneStatePermission(context)
                 && hasGrantedReadContactsPermission(context);
     }
@@ -372,8 +308,7 @@ public class PermissionsStartupActivity extends AppCompatActivity {
      * @param context context of the app
      * @return true if it is granted, false if they is not
      */
-    public boolean hasGrantedPhoneStatePermission(Context context)
-    {
+    public boolean hasGrantedPhoneStatePermission(Context context) {
         return ContextCompat.checkSelfPermission(context, Manifest.permission.READ_PHONE_STATE)
                 == PackageManager.PERMISSION_GRANTED &&
                 ContextCompat.checkSelfPermission(context, Manifest.permission.CALL_PHONE)
@@ -386,8 +321,7 @@ public class PermissionsStartupActivity extends AppCompatActivity {
      * @param context context of the app
      * @return true if it is granted, false if it is not
      */
-    public boolean hasGrantedReadContactsPermission(Context context)
-    {
+    public boolean hasGrantedReadContactsPermission(Context context) {
         return ContextCompat.checkSelfPermission(context, Manifest.permission.READ_CONTACTS)
                 == PackageManager.PERMISSION_GRANTED;
     }
@@ -400,16 +334,14 @@ public class PermissionsStartupActivity extends AppCompatActivity {
      * @return true if it is granted, false if it is not
      */
     @RequiresApi(api = Build.VERSION_CODES.M)
-    public boolean hasGrantedManageOverlayPermission(Context context)
-    {
+    public boolean hasGrantedManageOverlayPermission(Context context) {
         return Settings.canDrawOverlays(context);
     }
 
     /**
      * Opens a new activity with NO_HISTORY flag and destroys this startup activity.
      */
-    public void openStartActivity()
-    {
+    public void openStartActivity() {
         Intent i = new Intent(new Intent(getApplicationContext(), StartActivity.class));
         startActivity(i);
         finish();
@@ -419,29 +351,23 @@ public class PermissionsStartupActivity extends AppCompatActivity {
      * Runs as a result of requesting for a grant a permissions.
      * Opens a {@link StartActivity} if all permissions are granted.
      *
-     * @param requestCode code of the request, identify a request
-     * @param permissions array of permissions
+     * @param requestCode  code of the request, identify a request
+     * @param permissions  array of permissions
      * @param grantResults array of granted permissions
      */
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     public void onRequestPermissionsResult(int requestCode,
-                                           @NonNull String permissions[], @NonNull int[] grantResults)
-    {
-        switch (requestCode)
-        {
-            case READ_PHONE_STATE_PERMISSION_REQUEST_CODE:
-            {
+                                           @NonNull String permissions[], @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case READ_PHONE_STATE_PERMISSION_REQUEST_CODE: {
                 setOptionsUnVisible(phoneStateWarningText, phoneStateWarningImage);
 
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED)
-                {
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     requestCallPhonePermission();
-                }
-                else
-                {
+                } else {
                     // permission denied, boo! Disable the
                     // functionality that depends on this permission.
                     phoneStateWarningText.setTextKeepState(getResources().getString(R.string.permissions_startup_activity_phone_checkbox_warning));
@@ -452,36 +378,27 @@ public class PermissionsStartupActivity extends AppCompatActivity {
 
                 break;
             }
-            case CALL_PHONE_PERMISSION_REQUEST_CODE:
-            {
+            case CALL_PHONE_PERMISSION_REQUEST_CODE: {
                 setOptionsUnVisible(phoneStateWarningText, phoneStateWarningImage);
 
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED)
-                {
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     // permission was granted, we can open a Main Activity
-                    if(hasGrantedManageOverlayPermission(getApplicationContext()) && hasGrantedPermissions(getApplicationContext()))
-                    {
+                    if (hasGrantedManageOverlayPermission(getApplicationContext()) && hasGrantedPermissions(getApplicationContext())) {
                         openStartActivity();
                     }
-                }
-                else
-                {
+                } else {
                     phoneStateWarningText.setTextKeepState(getResources().getString(R.string.permissions_startup_activity_phone_checkbox_warning));
                     setOptionsVisible(phoneStateWarningText, phoneStateWarningImage);
                 }
 
                 //Check for read contacts
-                if(contactsStateCheckBoxPerm.isChecked())
-                {
-                    if(!hasGrantedReadContactsPermission(getApplicationContext()))
-                    {
+                if (contactsStateCheckBoxPerm.isChecked()) {
+                    if (!hasGrantedReadContactsPermission(getApplicationContext())) {
                         requestReadContactsPermission();
                     }
-                }
-                else
-                {
+                } else {
                     contactsStateWarningText.setTextKeepState(getResources().getString(R.string.permissions_startup_activity_contacts_checkbox_warning_nc));
                     setOptionsVisible(contactsStateWarningText, contactsStateWarningImage);
                 }
@@ -490,22 +407,17 @@ public class PermissionsStartupActivity extends AppCompatActivity {
 
                 break;
             }
-            case READ_CONTACTS_PERMISSION_REQUEST_CODE:
-            {
+            case READ_CONTACTS_PERMISSION_REQUEST_CODE: {
                 setOptionsUnVisible(contactsStateWarningText, contactsStateWarningImage);
 
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED)
-                {
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     // permission was granted, we can open a Main Activity
-                    if(hasGrantedManageOverlayPermission(getApplicationContext()) && hasGrantedPermissions(getApplicationContext()))
-                    {
+                    if (hasGrantedManageOverlayPermission(getApplicationContext()) && hasGrantedPermissions(getApplicationContext())) {
                         openStartActivity();
                     }
-                }
-                else
-                {
+                } else {
                     contactsStateWarningText.setTextKeepState(getResources().getString(R.string.permissions_startup_activity_contacts_checkbox_warning));
                     setOptionsVisible(contactsStateWarningText, contactsStateWarningImage);
                 }
@@ -521,37 +433,32 @@ public class PermissionsStartupActivity extends AppCompatActivity {
      * If the app doesn't have a permission the settings windows for set permission will be opened
      */
     @RequiresApi(api = Build.VERSION_CODES.M)
-    public void requestManageOverlayPermission()
-    {
+    public void requestManageOverlayPermission() {
         Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
                 Uri.parse("package:" + getPackageName()));
         startActivityForResult(intent, ACTION_MANAGE_OVERLAY_PERMISSION_REQUEST_CODE);
     }
 
     /**
-     *  Runs after request for manage overlay permission.
-     *  Opens a {@link StartActivity} if all permissions are granted.
+     * Runs after request for manage overlay permission.
+     * Opens a {@link StartActivity} if all permissions are granted.
      *
      * @param requestCode code of the request, identify a request
-     * @param resultCode code of the requests result
-     * @param data data
+     * @param resultCode  code of the requests result
+     * @param data        data
      */
     @TargetApi(Build.VERSION_CODES.M)
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data)
-    {
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == ACTION_MANAGE_OVERLAY_PERMISSION_REQUEST_CODE)
-        {
+        if (requestCode == ACTION_MANAGE_OVERLAY_PERMISSION_REQUEST_CODE) {
             setOptionsUnVisible(allowWindowsWarningText, allowWindowsWarningImage);
 
-            if (!Settings.canDrawOverlays(getApplicationContext()))
-            {
+            if (!Settings.canDrawOverlays(getApplicationContext())) {
                 allowWindowsWarningText.setTextKeepState(getResources().getString(R.string.permissions_startup_activity_windows_checkbox_warning));
                 setOptionsVisible(allowWindowsWarningText, allowWindowsWarningImage);
-            }
-            else if(hasGrantedPermissions(getApplicationContext())) openStartActivity();
+            } else if (hasGrantedPermissions(getApplicationContext())) openStartActivity();
 
             setVisibility();
         }

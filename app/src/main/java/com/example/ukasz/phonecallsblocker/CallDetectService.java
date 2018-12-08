@@ -5,7 +5,6 @@ import android.app.job.JobService;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
-import android.widget.Toast;
 
 /**
  * Created by Łukasz on 2017-03-05.

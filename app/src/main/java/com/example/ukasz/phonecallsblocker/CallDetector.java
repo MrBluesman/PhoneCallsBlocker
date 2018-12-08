@@ -105,7 +105,6 @@ public class CallDetector
                             ? phoneNumberHelper.formatPhoneNumber(incomingNumberV, StartActivity.COUNTRY_CODE, PhoneNumberUtil.PhoneNumberFormat.E164)
                             : "Numer prywatny";
 
-                    Toast.makeText(ctx, "Połączenie przychodzące: " + incomingNumberV, Toast.LENGTH_LONG).show();
 
                     //get incoming contact name
                     final String incomingContactName = !incomingNumberV.isEmpty()
