@@ -11,10 +11,8 @@ import android.widget.TextView;
 
 import com.example.ukasz.androidsqlite.Block;
 import com.example.ukasz.androidsqlite.DatabaseHandler;
-import com.example.ukasz.phonecallsblocker.phone_number_helper.PhoneNumberHelper;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
-import com.google.i18n.phonenumbers.PhoneNumberUtil;
 
 public class MyDetailsRecyclerViewAdapter extends FirebaseRecyclerAdapter<Block, MyDetailsRecyclerViewAdapter.DetailsPhoneBlockHolder>
 {
