@@ -77,7 +77,17 @@ public class DatabaseHandler extends SQLiteOpenHelper
         db.execSQL(createCategoryTable);
 
         String fillCategory = "INSERT INTO " + TABLE_CATEGORY + " (" + NAME_T_C + ") VALUES " +
-                "('Kategoria1'),('Kategoria2')";
+                "('Telemarketing')," +
+                "('Call center')," +
+                "('Nękanie')," +
+                "('Niechciane oferty')," +
+                "('Głuchy telefon')," +
+                "('Usługi finansowe')," +
+                "('Polityczne')," +
+                "('Oszustwo')," +
+                "('Robot')," +
+                "('Dowcip')," +
+                "('Inne')";
         db.execSQL(fillCategory);
 
         //create a blocking table
