@@ -2,7 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.example.ukasz.phonecallsblocker.StartActivity">
+    tools:context="com.clearwaterrevival.ukasz.phonecallsblocker.StartActivity">
     <item
         android:id="@+id/menu_action_clear_registry"
         android:orderInCategory="100"

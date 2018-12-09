@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.example.ukasz.phonecallsblocker">
+    package="com.clearwaterrevival.ukasz.phonecallsblocker">
 
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.PROCESS_INCOMING_CALLS" />
@@ -21,7 +21,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme.NoActionBar"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name="com.example.ukasz.permissions.PermissionsStartupActivity">
+        <activity android:name="com.clearwaterrevival.ukasz.permissions.PermissionsStartupActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -30,13 +30,13 @@
         </activity>
 
         <service
-            android:name=".CallDetectService"
+            android:name="com.clearwaterrevival.ukasz.phonecallsblocker.CallDetectService"
             android:enabled="true"
             android:exported="false"
             android:permission="android.permission.BIND_JOB_SERVICE" />
 
         <activity
-            android:name=".StartActivity"
+            android:name="com.clearwaterrevival.ukasz.phonecallsblocker.StartActivity"
             android:label="@string/start_activity_title_activity_start"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -45,9 +45,9 @@
                 <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
             </intent-filter>
         </activity>
-        <activity android:name=".AddPhoneBlock" />
-        <activity android:name=".DetailsPhoneBlock" />
-        <activity android:name=".EditPhoneBlock" />
+        <activity android:name="com.clearwaterrevival.ukasz.phonecallsblocker.AddPhoneBlock" />
+        <activity android:name="com.clearwaterrevival.ukasz.phonecallsblocker.DetailsPhoneBlock" />
+        <activity android:name="com.clearwaterrevival.ukasz.phonecallsblocker.EditPhoneBlock" />
 
         <meta-data
             android:name="preloaded_fonts"
