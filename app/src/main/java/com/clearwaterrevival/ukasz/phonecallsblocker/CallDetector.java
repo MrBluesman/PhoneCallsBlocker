@@ -39,7 +39,7 @@ import com.google.i18n.phonenumbers.NumberParseException;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.Phonenumber;
 
-import java.lang.reflect.Method;
+
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -818,16 +818,7 @@ public class CallDetector
     {
         try
         {
-            TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
-            Method m1 = tm.getClass().getDeclaredMethod("getITelephony");
-            m1.setAccessible(true);
-            Object iTelephony = m1.invoke(tm);
-
-            Method m2 = iTelephony.getClass().getDeclaredMethod("silenceRinger");
-            Method m3 = iTelephony.getClass().getDeclaredMethod("endCall");
-
-            m2.invoke(iTelephony);
-            m3.invoke(iTelephony);
+           //Decline
         }
         catch (Exception e)
         {
@@ -836,7 +827,6 @@ public class CallDetector
     }
 
     private Context ctx;
-    private TelephonyManager tm;
     private String myPhoneNumber;
     private int myCountryDialCode;
     private CallStateListener callStateListener;
@@ -881,17 +871,9 @@ public class CallDetector
     @SuppressLint("HardwareIds")
     public void start()
     {
-        tm = (TelephonyManager) ctx.getSystemService(Context.TELEPHONY_SERVICE);
-        tm.listen(callStateListener, PhoneStateListener.LISTEN_CALL_STATE);
-
-        //Save the user phone number (declarant)
-        //getMyPhoneNumber
-        if (ActivityCompat.checkSelfPermission(ctx, Manifest.permission.READ_PHONE_NUMBERS)
-                != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(ctx, Manifest.permission.READ_PHONE_STATE)
-                != PackageManager.PERMISSION_GRANTED) return;
-        myPhoneNumber = !tm.getLine1Number().equals("") ? tm.getLine1Number() : tm.getSubscriberId();
-        myPhoneNumber = !myPhoneNumber.equals("") ? myPhoneNumber : tm.getSimSerialNumber();
-        myCountryDialCode = PhoneNumberUtil.getInstance().getCountryCodeForRegion(tm.getSimCountryIso().toUpperCase());
+        //Testing
+        myPhoneNumber = "123456789";
+        myCountryDialCode = 48;
     }
 
     /**
@@ -900,8 +882,7 @@ public class CallDetector
      */
     void stop()
     {
-        tm = (TelephonyManager) ctx.getSystemService(Context.TELEPHONY_SERVICE);
-        tm.listen(callStateListener, PhoneStateListener.LISTEN_NONE);
+        //Stop
     }
 
     /**

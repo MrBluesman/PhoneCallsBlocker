@@ -1,15 +1,11 @@
 package com.clearwaterrevival.ukasz.phonecallsblocker;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.telephony.TelephonyManager;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -44,7 +40,6 @@ public class AddPhoneBlock extends AppCompatActivity implements AdapterView.OnIt
     private EditText description;
     private Button addButton;
     private String myPhoneNumber;
-    private TelephonyManager tm;
 
     /**
      * Initializes var instances and view for start {@link AddPhoneBlock} activity.
@@ -58,14 +53,8 @@ public class AddPhoneBlock extends AppCompatActivity implements AdapterView.OnIt
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_phone_block);
 
-        // TODO: Refactor: Consider keeping myPhoneNumber in external common place
-        //getMyPhoneNumber
-        tm = (TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE);
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_NUMBERS)
-                != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE)
-                != PackageManager.PERMISSION_GRANTED) return;
-        myPhoneNumber = !tm.getLine1Number().equals("") ? tm.getLine1Number() : tm.getSubscriberId();
-        myPhoneNumber = !myPhoneNumber.equals("") ? myPhoneNumber : tm.getSimSerialNumber();
+        //Testing
+        myPhoneNumber = "123456789";
 
         //set toolbar
         mActionBar = findViewById(R.id.add_phone_block_toolbar);

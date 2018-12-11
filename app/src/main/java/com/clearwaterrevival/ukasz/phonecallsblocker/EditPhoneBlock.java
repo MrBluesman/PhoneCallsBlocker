@@ -1,15 +1,11 @@
 package com.clearwaterrevival.ukasz.phonecallsblocker;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.telephony.TelephonyManager;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -46,7 +42,6 @@ public class EditPhoneBlock extends AppCompatActivity implements AdapterView.OnI
     private EditText description;
     private Button editButton;
     private String myPhoneNumber;
-    private TelephonyManager tm;
 
     //Editing blocking
     Block block;
@@ -71,14 +66,8 @@ public class EditPhoneBlock extends AppCompatActivity implements AdapterView.OnI
         db = new DatabaseHandler(getApplicationContext());
         mDatabase = FirebaseDatabase.getInstance().getReference();
 
-        // TODO: Refactor: Consider keeping myPhoneNumber in external common place
-        //getMyPhoneNumber
-        tm = (TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE);
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_NUMBERS)
-                != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE)
-                != PackageManager.PERMISSION_GRANTED) return;
-        myPhoneNumber = !tm.getLine1Number().equals("") ? tm.getLine1Number() : tm.getSubscriberId();
-        myPhoneNumber = !myPhoneNumber.equals("") ? myPhoneNumber : tm.getSimSerialNumber();
+        //Test purposes
+        myPhoneNumber = "123456789";
 
         //set toolbar
         mActionBar = findViewById(R.id.edit_phone_block_toolbar);

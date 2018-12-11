@@ -31,7 +31,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.os.Bundle;
-import android.telephony.TelephonyManager;
 import android.view.View;
 
 import android.widget.Toast;
@@ -72,9 +71,6 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
 
     //The {@link SharedPreferences} where are saved a app settings.
     private SharedPreferences data;
-
-    //The {@link TelephonyManager} for fetch user phone number
-    private TelephonyManager tm;
 
     //phone owner number
     private String myPhoneNumber;
@@ -133,14 +129,8 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
         //primary sections of the activity.
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
-        // TODO: Refactor: Consider keeping myPhoneNumber in external common place
-        //getMyPhoneNumber
-        tm = (TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE);
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_NUMBERS)
-                != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE)
-                != PackageManager.PERMISSION_GRANTED) return;
-        myPhoneNumber = !tm.getLine1Number().equals("") ? tm.getLine1Number() : tm.getSubscriberId();
-        myPhoneNumber = !myPhoneNumber.equals("") ? myPhoneNumber : tm.getSimSerialNumber();
+        //Test purposes
+        myPhoneNumber="123456789";
 
         //Apply first run actions
         applyFirstRunActions();
@@ -151,9 +141,6 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
         //Set up the ViewPager with the sections adapter.
         mViewPager = findViewById(R.id.start_activity_container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
-
-        //Set telephony manager for fetch user phone number
-        tm = (TelephonyManager) StartActivity.this.getSystemService(Context.TELEPHONY_SERVICE);
 
         //set call detector
         callDetector = new CallDetector(getApplicationContext());
