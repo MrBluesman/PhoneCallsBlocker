@@ -11,8 +11,10 @@ import android.widget.TextView;
 
 import com.clearwaterrevival.ukasz.androidsqlite.Block;
 import com.clearwaterrevival.ukasz.androidsqlite.DatabaseHandler;
+import com.clearwaterrevival.ukasz.phonecallsblocker.phone_number_helper.PhoneNumberHelper;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
+import com.google.i18n.phonenumbers.PhoneNumberUtil;
 
 public class MyDetailsRecyclerViewAdapter extends FirebaseRecyclerAdapter<Block, MyDetailsRecyclerViewAdapter.DetailsPhoneBlockHolder>
 {
@@ -87,9 +89,12 @@ public class MyDetailsRecyclerViewAdapter extends FirebaseRecyclerAdapter<Block,
         //Get category
         holder.mDetailsReasonCategory.setText(db.getCategory(block.getReasonCategory()));
 
+        //Get validator phone number lib to format
+        PhoneNumberHelper phoneNumberHelper = new PhoneNumberHelper();
+
         /* TODO: Add date when will be available */
 //        holder.mDetailsDate.setText(String.valueOf(rBlock.getNrBlockingDateFormatted("MM/dd/yyyy HH:mm")));
-        holder.mDetailsDate.setText(block.getNrBlocked());
+        holder.mDetailsDate.setText(phoneNumberHelper.formatPhoneNumber(block.getNrBlocked(), StartActivity.COUNTRY_CODE, PhoneNumberUtil.PhoneNumberFormat.NATIONAL));
 
         if(block.getNrRating()) holder.mDetailsItemIcon.setImageResource(R.drawable.bg_circle_negative);
         else holder.mDetailsItemIcon.setImageResource(R.drawable.bg_circle_positive);

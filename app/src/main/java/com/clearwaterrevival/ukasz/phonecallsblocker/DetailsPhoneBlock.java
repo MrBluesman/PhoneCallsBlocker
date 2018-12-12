@@ -1,6 +1,10 @@
 package com.clearwaterrevival.ukasz.phonecallsblocker;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.pm.PackageManager;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -8,6 +12,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.telephony.TelephonyManager;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
@@ -35,9 +40,16 @@ public class DetailsPhoneBlock extends AppCompatActivity
     private DatabaseReference databaseRef;
     private Query blockingsRef;
     FirebaseRecyclerOptions<Block> detailsBlockRecyclerOptions;
+    private String myPhoneNumber;
+    private TelephonyManager tm;
     DatabaseHandler db;
 
+    //Details blocking
+    Block block;
+
+    //phone number labels
     private TextView phoneNumberTextView;
+    private TextView phoneNumberTextView2;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -54,6 +66,7 @@ public class DetailsPhoneBlock extends AppCompatActivity
      * @param savedInstanceState Instance state.
      */
     @Override
+    @SuppressLint("HardwareIds")
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
@@ -62,26 +75,48 @@ public class DetailsPhoneBlock extends AppCompatActivity
         //set up the DatabaseHandler
         db = new DatabaseHandler(getApplicationContext());
 
+        // TODO: Refactor: Consider keeping myPhoneNumber in external common place
+        //getMyPhoneNumber
+        tm = (TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_NUMBERS)
+                != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE)
+                != PackageManager.PERMISSION_GRANTED) return;
+        myPhoneNumber = !tm.getLine1Number().equals("") ? tm.getLine1Number() : tm.getSubscriberId();
+        myPhoneNumber = !myPhoneNumber.equals("") ? myPhoneNumber : tm.getSimSerialNumber();
+
         //set toolbar
         mActionBar = findViewById(R.id.details_phone_block_toolbar);
         setSupportActionBar(mActionBar);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-        //Get extras param from Intent (phone number)
+        //nr info ---------------------------------------------------------------------------
+        phoneNumberTextView = findViewById(R.id.details_phone_block_phone_number);
+        phoneNumberTextView2 = findViewById(R.id.details_phone_block_phone_number2);
+
+        //Set action bar title to formatted version
+        //set the fields as number info --------------------------------------------------------------------------
         Bundle b = getIntent().getExtras();
         String phoneNumber = "";
         if(b != null) phoneNumber = b.getString("phoneNumber");
-        phoneNumberTextView = findViewById(R.id.details_phone_block_phone_number);
-        phoneNumberTextView.setText(phoneNumber);
+        block = getBlock(phoneNumber);
 
-        //Set action bar title to formatted version
         //Get validator phone number lib to format
         PhoneNumberHelper phoneNumberHelper = new PhoneNumberHelper();
 
-        String contactName = phoneNumberHelper.getContactName(getApplicationContext(), phoneNumber);
-        String phoneNumberFormatted = phoneNumberHelper.formatPhoneNumber(phoneNumber, StartActivity.COUNTRY_CODE, PhoneNumberUtil.PhoneNumberFormat.NATIONAL);
-        mActionBar.setTitle(contactName != null ? contactName + " (" + phoneNumberFormatted + ")" : phoneNumberFormatted);
+        String contactName = phoneNumberHelper.getContactName(getApplicationContext(), block.getNrBlocked());
+        String phoneNumberFormatted = phoneNumberHelper.formatPhoneNumber(block.getNrBlocked(), StartActivity.COUNTRY_CODE, PhoneNumberUtil.PhoneNumberFormat.NATIONAL);
+
+        if(contactName != null)
+        {
+            phoneNumberTextView.setText(contactName);
+            phoneNumberTextView2.setText(phoneNumberFormatted);
+        }
+        else
+        {
+            phoneNumberTextView.setText(phoneNumberFormatted);
+            phoneNumberTextView2.setVisibility(View.GONE);
+        }
 
         // ----------------------------------------------------------------------------------------
         View view = findViewById(R.id.details_phone_block_list);
@@ -116,6 +151,17 @@ public class DetailsPhoneBlock extends AppCompatActivity
             recyclerView.setAdapter(adapter);
 
         }
+    }
+
+    /**
+     * Gets {@link Block} from local database by passed blocked phone number.
+     *
+     * @param phoneNumber blocked number
+     * @return {@link Block} if exist blocked number number
+     */
+    private Block getBlock(String phoneNumber)
+    {
+        return db.getBlocking(myPhoneNumber, phoneNumber);
     }
 
     /**
