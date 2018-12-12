@@ -32,7 +32,7 @@ public class PhoneNumberHelper
      */
     public boolean isValidPhoneNumber(CharSequence phoneNumber)
     {
-        if (!TextUtils.isEmpty(phoneNumber))
+        if (!TextUtils.isEmpty(phoneNumber) && phoneNumber != "")
         {
             return Patterns.PHONE.matcher(phoneNumber).matches();
         }
@@ -47,6 +47,7 @@ public class PhoneNumberHelper
      */
     public boolean validateUsingLibphonenumber(String countryCode, String phNumber)
     {
+        if(phNumber.equals("") || countryCode.equals("")) return false;
         PhoneNumberUtil phoneNumberUtil = PhoneNumberUtil.getInstance();
         String isoCode = phoneNumberUtil.getRegionCodeForCountryCode(Integer.parseInt(countryCode));
         Phonenumber.PhoneNumber phoneNumber = null;
