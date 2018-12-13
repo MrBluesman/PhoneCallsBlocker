@@ -6,6 +6,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -165,16 +166,17 @@ public class DatabaseHandler extends SQLiteOpenHelper
                 + " AND " + BLOCKED_KEY_T_B + "='" + nr_blocked + "'"
                 + " LIMIT 1";
 
+        Block block = null;
+
         Cursor cursor = db.rawQuery(selectBlockings, null);
-        if(cursor != null)
+        Log.e("COS", String.valueOf(cursor));
+        if( cursor != null && cursor.moveToFirst())
         {
-            cursor.moveToFirst();
+            block = new Block(cursor.getString(0), cursor.getString(1), Integer.parseInt(cursor.getString(2)),
+                    cursor.getString(3), "1".equals(cursor.getString(4)));
+            cursor.close();
         }
 
-        assert cursor != null;
-        Block block = new Block(cursor.getString(0), cursor.getString(1), Integer.parseInt(cursor.getString(2)),
-                cursor.getString(3), "1".equals(cursor.getString(4)));
-        cursor.close();
         return block;
     }
 

@@ -13,6 +13,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.telephony.TelephonyManager;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
@@ -104,19 +105,30 @@ public class DetailsPhoneBlock extends AppCompatActivity
         //Get validator phone number lib to format
         PhoneNumberHelper phoneNumberHelper = new PhoneNumberHelper();
 
-        String contactName = phoneNumberHelper.getContactName(getApplicationContext(), block.getNrBlocked());
-        String phoneNumberFormatted = phoneNumberHelper.formatPhoneNumber(block.getNrBlocked(), StartActivity.COUNTRY_CODE, PhoneNumberUtil.PhoneNumberFormat.NATIONAL);
-
-        if(contactName != null)
+        if(block != null)
         {
-            phoneNumberTextView.setText(contactName);
-            phoneNumberTextView2.setText(phoneNumberFormatted);
+            String contactName = phoneNumberHelper.getContactName(getApplicationContext(), block.getNrBlocked());
+            String phoneNumberFormatted = phoneNumberHelper.formatPhoneNumber(block.getNrBlocked(), StartActivity.COUNTRY_CODE, PhoneNumberUtil.PhoneNumberFormat.NATIONAL);
+
+            if(contactName != null)
+            {
+                phoneNumberTextView.setText(contactName);
+                phoneNumberTextView2.setText(phoneNumberFormatted);
+            }
+            else
+            {
+                phoneNumberTextView.setText(phoneNumberFormatted);
+                phoneNumberTextView2.setVisibility(View.GONE);
+            }
         }
         else
         {
+            String phoneNumberFormatted = phoneNumberHelper.formatPhoneNumber(phoneNumber, StartActivity.COUNTRY_CODE, PhoneNumberUtil.PhoneNumberFormat.NATIONAL);
+
             phoneNumberTextView.setText(phoneNumberFormatted);
             phoneNumberTextView2.setVisibility(View.GONE);
         }
+
 
         // ----------------------------------------------------------------------------------------
         View view = findViewById(R.id.details_phone_block_list);
@@ -161,6 +173,7 @@ public class DetailsPhoneBlock extends AppCompatActivity
      */
     private Block getBlock(String phoneNumber)
     {
+        Log.e("NUMBER", myPhoneNumber);
         return db.getBlocking(myPhoneNumber, phoneNumber);
     }
 
