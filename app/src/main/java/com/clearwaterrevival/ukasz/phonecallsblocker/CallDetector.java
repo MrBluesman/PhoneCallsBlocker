@@ -754,6 +754,7 @@ public class CallDetector
     {
         db.addBlockingRegistry(new RegistryBlock(phoneNumber, rating, new Date()));
         RegistryFragment.loadRegistryBlockings();
+        StartActivity.mSectionsPagerAdapter.notifyDataSetChanged();
     }
 
     /**

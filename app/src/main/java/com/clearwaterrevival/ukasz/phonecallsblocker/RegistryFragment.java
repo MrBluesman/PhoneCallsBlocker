@@ -71,6 +71,7 @@ public class RegistryFragment extends Fragment implements MyRegistryRecyclerView
     {
         super.onResume();
         adapter.notifyDataSetChanged();
+        refreshMenuVisibility();
     }
 
     /**
@@ -135,6 +136,7 @@ public class RegistryFragment extends Fragment implements MyRegistryRecyclerView
             //Refresh data
             loadRegistryBlockings();
             adapter.notifyDataSetChanged();
+            refreshMenuVisibility();
         }
 
         return rootView;
@@ -165,6 +167,26 @@ public class RegistryFragment extends Fragment implements MyRegistryRecyclerView
         menu.clear();
         inflater.inflate(R.menu.menu_registry, menu);
         super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    /**
+     * Preparing a options menu before will be shown to user.
+     *
+     * @param menu {@link Menu menu} to prepare
+     */
+    @Override
+    public void onPrepareOptionsMenu(Menu menu)
+    {
+        super.onPrepareOptionsMenu(menu);
+        refreshMenuVisibility();
+    }
+
+    /**
+     * Refreshes the menu visibility based on emptyness of registry list.
+     */
+    public void refreshMenuVisibility()
+    {
+        setHasOptionsMenu(registryBlockings.size() > 0);
     }
 
     /**
@@ -216,6 +238,7 @@ public class RegistryFragment extends Fragment implements MyRegistryRecyclerView
     {
         db.clearRegistryBlockings();
         RegistryFragment.loadRegistryBlockings();
+        refreshMenuVisibility();
     }
 
     /**
@@ -329,12 +352,31 @@ public class RegistryFragment extends Fragment implements MyRegistryRecyclerView
                         //toggle item activation state
                         adapter.toggleActivation(position);
                         RegistryFragment.loadRegistryBlockings();
+                        //refreshMenuVisibility();
+                        try
+                        {
+                            if(db.getAllRegistryBlockings().isEmpty()) setHasOptionsMenu(false);
+                        }
+                        catch (ParseException e)
+                        {
+                            e.printStackTrace();
+                        }
                         break;
                     case R.id.menu_action_delete_all_related:
                         db.deleteRegistryBlockings(registryBlock);
+
                         //toggle item activation state
                         adapter.toggleActivation(position);
                         RegistryFragment.loadRegistryBlockings();
+                        //refreshMenuVisibility();
+                        try
+                        {
+                            if(db.getAllRegistryBlockings().isEmpty()) setHasOptionsMenu(false);
+                        }
+                        catch (ParseException e)
+                        {
+                            e.printStackTrace();
+                        }
                         break;
                 }
 
