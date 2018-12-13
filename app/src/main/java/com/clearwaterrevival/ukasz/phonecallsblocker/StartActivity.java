@@ -5,6 +5,7 @@ import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.Dialog;
+import android.app.FragmentTransaction;
 import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
 import android.content.ComponentName;
@@ -22,6 +23,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -64,7 +66,7 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
     loaded fragment in memory. If this becomes too memory intensive, it
     may be best to switch to
     a{@link android.support.v4.app.FragmentStatePagerAdapter}.*/
-    private static SectionsPagerAdapter mSectionsPagerAdapter;
+    public static SectionsPagerAdapter mSectionsPagerAdapter;
 
 
 
@@ -569,7 +571,7 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
      * one of the sections/tabs/pages.
      */
-    public class SectionsPagerAdapter extends FragmentPagerAdapter
+    public class SectionsPagerAdapter extends FragmentStatePagerAdapter
     {
         /**
          * SectionsPagerAdapter constructor.
@@ -603,6 +605,20 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
                     return SettingsFragment.newInstance();
             }
             return null;
+        }
+
+        /**
+         * Gets the position of the {@link Fragment} in menu.
+         * Workaround to make a refreshing fragment possible.
+         *
+         * @param object object which position we are looking for
+         * @return POSITION_NONE - provides a refreshing fragments
+         */
+        @Override
+        public int getItemPosition(@NonNull Object object)
+        {
+            // POSITION_NONE makes it possible to reload the PagerAdapter
+            return POSITION_NONE;
         }
 
         /**
@@ -877,7 +893,7 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
             Toast.makeText(StartActivity.this, R.string.add_phone_block_added, Toast.LENGTH_SHORT).show();
 
             PhoneBlockFragment.blockings.add(newBlock);
-            //TODO: Refreshing options menu after add item to local list
+            mSectionsPagerAdapter.notifyDataSetChanged();
             PhoneBlockFragment.loadBlockingsExternal();
         }
         else

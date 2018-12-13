@@ -88,7 +88,7 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
     {
         super.onResume();
         adapter.notifyDataSetChanged();
-        reloadMenuVisibility();
+        refreshMenuVisibility();
     }
 
     /**
@@ -144,7 +144,7 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
 
             adapter = new MyPhoneBlockRecyclerViewAdapter(context, blockings, this);
             adapter.notifyDataSetChanged();
-            reloadMenuVisibility();
+            refreshMenuVisibility();
             recyclerView.setItemAnimator(new DefaultItemAnimator());
             recyclerView.addItemDecoration(new DividerItemDecoration(context, LinearLayoutManager.VERTICAL));
             recyclerView.setAdapter(adapter);
@@ -190,7 +190,7 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
         blockings.addAll(blockingsToAddFromDb);
 
         adapter.notifyDataSetChanged();
-        reloadMenuVisibility();
+        refreshMenuVisibility();
         swipeRefreshLayout.setRefreshing(false);
     }
 
@@ -230,8 +230,7 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
     {
         // Inflate the menu;
         // this adds items to the action bar if it is present.
-//        menu.clear();
-        reloadMenuVisibility();
+        refreshMenuVisibility();
         inflater.inflate(R.menu.menu_phoneblock, menu);
         super.onCreateOptionsMenu(menu, inflater);
     }
@@ -245,10 +244,13 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
     public void onPrepareOptionsMenu(Menu menu)
     {
         super.onPrepareOptionsMenu(menu);
-        reloadMenuVisibility();
+        refreshMenuVisibility();
     }
 
-    public void reloadMenuVisibility()
+    /**
+     * Refreshes the menu visibility based on emptyness of blocking list.
+     */
+    public void refreshMenuVisibility()
     {
         setHasOptionsMenu(blockings.size() > 0);
     }
@@ -599,7 +601,7 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
         }
 
         adapter.notifyDataSetChanged();
-        reloadMenuVisibility();
+        refreshMenuVisibility();
     }
 
     /**
@@ -658,7 +660,7 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
             }
         }
         adapter.notifyDataSetChanged();
-        reloadMenuVisibility();
+        refreshMenuVisibility();
     }
 
     /**
