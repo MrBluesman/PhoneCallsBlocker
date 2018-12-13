@@ -969,6 +969,8 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
         sharedPreferencesEditor.putBoolean("notificationBlockEnabled", true);
 
         sharedPreferencesEditor.apply();
+
+        setDetectEnabled(detectEnabled);
     }
 
     /**
