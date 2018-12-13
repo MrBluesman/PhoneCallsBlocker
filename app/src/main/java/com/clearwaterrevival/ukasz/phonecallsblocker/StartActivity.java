@@ -32,6 +32,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.os.Bundle;
 import android.telephony.TelephonyManager;
+import android.util.Log;
 import android.view.View;
 
 import android.widget.Toast;
@@ -63,7 +64,8 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
     loaded fragment in memory. If this becomes too memory intensive, it
     may be best to switch to
     a{@link android.support.v4.app.FragmentStatePagerAdapter}.*/
-    private SectionsPagerAdapter mSectionsPagerAdapter;
+    private static SectionsPagerAdapter mSectionsPagerAdapter;
+
 
 
     //The {@link ViewPager} that will host the section contents.
@@ -875,6 +877,7 @@ public class StartActivity extends AppCompatActivity implements SettingsFragment
             Toast.makeText(StartActivity.this, R.string.add_phone_block_added, Toast.LENGTH_SHORT).show();
 
             PhoneBlockFragment.blockings.add(newBlock);
+            //TODO: Refreshing options menu after add item to local list
             PhoneBlockFragment.loadBlockingsExternal();
         }
         else

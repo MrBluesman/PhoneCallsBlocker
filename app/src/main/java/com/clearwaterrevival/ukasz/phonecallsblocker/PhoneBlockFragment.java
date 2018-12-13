@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.util.Log;
 import android.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
@@ -87,6 +88,7 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
     {
         super.onResume();
         adapter.notifyDataSetChanged();
+        reloadMenuVisibility();
     }
 
     /**
@@ -142,6 +144,7 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
 
             adapter = new MyPhoneBlockRecyclerViewAdapter(context, blockings, this);
             adapter.notifyDataSetChanged();
+            reloadMenuVisibility();
             recyclerView.setItemAnimator(new DefaultItemAnimator());
             recyclerView.addItemDecoration(new DividerItemDecoration(context, LinearLayoutManager.VERTICAL));
             recyclerView.setAdapter(adapter);
@@ -187,6 +190,7 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
         blockings.addAll(blockingsToAddFromDb);
 
         adapter.notifyDataSetChanged();
+        reloadMenuVisibility();
         swipeRefreshLayout.setRefreshing(false);
     }
 
@@ -226,9 +230,27 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
     {
         // Inflate the menu;
         // this adds items to the action bar if it is present.
-        menu.clear();
+//        menu.clear();
+        reloadMenuVisibility();
         inflater.inflate(R.menu.menu_phoneblock, menu);
         super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    /**
+     * Preparing a options menu before will be shown to user.
+     *
+     * @param menu {@link Menu menu} to prepare
+     */
+    @Override
+    public void onPrepareOptionsMenu(Menu menu)
+    {
+        super.onPrepareOptionsMenu(menu);
+        reloadMenuVisibility();
+    }
+
+    public void reloadMenuVisibility()
+    {
+        setHasOptionsMenu(blockings.size() > 0);
     }
 
     /**
@@ -517,7 +539,6 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
                 public void run()
                 {
                     adapter.resetAnimationIndex();
-                    // mAdapter.notifyDataSetChanged();
                 }
             });
 
@@ -578,6 +599,7 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
         }
 
         adapter.notifyDataSetChanged();
+        reloadMenuVisibility();
     }
 
     /**
@@ -636,6 +658,7 @@ public class PhoneBlockFragment extends Fragment implements SwipeRefreshLayout.O
             }
         }
         adapter.notifyDataSetChanged();
+        reloadMenuVisibility();
     }
 
     /**

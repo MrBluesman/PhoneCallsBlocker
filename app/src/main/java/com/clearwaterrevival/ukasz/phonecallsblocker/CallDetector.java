@@ -680,6 +680,7 @@ public class CallDetector
                         //ADD to blocking list to make notify data changed possible for adapter
                         Toast.makeText(ctx, R.string.add_phone_block_added, Toast.LENGTH_SHORT).show();
                         PhoneBlockFragment.blockings.add(newBlock);
+                        //TODO: Refreshing options menu after add item to local list
                         PhoneBlockFragment.loadBlockingsExternal();
                     }
                     else
